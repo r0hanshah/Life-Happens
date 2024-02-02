@@ -25,5 +25,7 @@ Clone the repository to your local machine.
 Install the necessary dependencies for both frontend and backend.
 Follow the setup instructions for Firebase and the OpenAI API plug-in.
 Run the backend server and frontend application as per the documentation.
-Installation
-Provide detailed instructions on how to install your project, including any prerequisites or dependencies.
+
+
+# Installation
+Coming Soon
