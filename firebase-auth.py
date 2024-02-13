@@ -1,5 +1,5 @@
 import pyrebase
-
+#reference vid- https://rb.gy/306aps
 firebaseConfig={
   'apiKey': "AIzaSyBgDOWWLjlJXgWRtN_hkBk4InUCr6QqHng",
   'authDomain': "lifehappens-293da.firebaseapp.com",
