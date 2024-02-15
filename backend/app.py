@@ -13,6 +13,8 @@ def signup():
     password = request.form['password']
     try:
         user = auth.create_user_with_email_and_password(email, password)
+
+        # find way to print out user id, then store ids in doc
         return jsonify({'message': 'Signup successful'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
