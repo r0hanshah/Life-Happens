@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup/Login Form</title>
+</head>
+<body>
+    <h1>Signup</h1>
+    <form action="http://127.0.0.1:5000/signup" method="post">
+        <label for="signup-email">Email:</label><br>
+        <input type="email" id="signup-email" name="email" required><br>
+        <label for="signup-password">Password:</label><br>
+        <input type="password" id="signup-password" name="password" required><br>
+        <input type="submit" value="Signup">
+    </form>
+
+    <h1>Login</h1>
+    <form action="http://127.0.0.1:5000/login" method="post">
+        <label for="login-email">Email:</label><br>
+        <input type="email" id="login-email" name="email" required><br>
+        <label for="login-password">Password:</label><br>
+        <input type="password" id="login-password" name="password" required><br>
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>
