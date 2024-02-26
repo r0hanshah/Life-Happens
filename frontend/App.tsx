@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import LoginScreen from './components/auth/LoginScreen';
 import SignUpScreen from './components/auth/SignUpScreen';
+import GridComponent from './components/main/GridComponent';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp'>('Login');
@@ -16,10 +17,13 @@ export default function App() {
   };
   return (
     <View style={styles.container}>
-      <>
+      <GridComponent offset={0} />
+      <GridComponent offset={5} />
+      <GridComponent offset={10} />
+      {/* <>
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
         {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
-      </>
+      </> */}
       <StatusBar style="auto" />
     </View>
   );
