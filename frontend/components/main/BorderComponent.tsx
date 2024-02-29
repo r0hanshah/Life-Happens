@@ -34,9 +34,9 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               borderStyle,
               {
                 minHeight: 0,
-                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*amountFill : 0,
+                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill != 1 ? 1-amountFill : 1) : 0,
                 height: orientation === 'vertical' ? ((windowHeight / 6) * 0.8)*amountFill : lastRow ? ((windowHeight / 6) * 0.8 + 50)*amountFill : 0,
-                paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.8 - 1.5 : lastRow ? (windowHeight / 6) * 0.8 + 50.5 : 0,
+                paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.8 + 3.5 : lastRow ? (windowHeight / 6) * 0.8 + 50.5 : 0,
               },
             ]}
           />

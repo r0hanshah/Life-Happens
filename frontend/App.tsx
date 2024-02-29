@@ -17,7 +17,7 @@ export default function App() {
   };
   return (
     <View style={styles.container}>
-      <GridComponent offset={0} subtaskDispIds={["red,lol|||loll===0,2,1,1", "green,lol|||loll===2,2,1,0"]} />
+      <GridComponent offset={0} subtaskDispIds={["red,lol|||loll===0,2,1,1", "green,lol|||loll===2,2,3,0"]} />
       <GridComponent offset={1} subtaskDispIds={[]}/>
       <GridComponent offset={2} subtaskDispIds={["#fff,lol|||loll===1,4,1,1"]}/>
       {/* <>
