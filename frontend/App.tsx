@@ -17,9 +17,9 @@ export default function App() {
   };
   return (
     <View style={styles.container}>
-      <GridComponent offset={0} />
-      <GridComponent offset={5} />
-      <GridComponent offset={10} />
+      <GridComponent offset={0} subtaskDispIds={[]} />
+      <GridComponent offset={1} subtaskDispIds={[]}/>
+      <GridComponent offset={2} subtaskDispIds={[]}/>
       {/* <>
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
         {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
@@ -32,7 +32,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#151515',
     alignItems: 'center',
     justifyContent: 'center',
   },
