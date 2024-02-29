@@ -18,8 +18,8 @@ export default function App() {
   return (
     <View style={styles.container}>
       <GridComponent offset={0} subtaskDispIds={["red,lol|||loll===0,2,1,1", "green,lol|||loll===2,2,3,0"]} />
-      <GridComponent offset={1} subtaskDispIds={[]}/>
-      <GridComponent offset={2} subtaskDispIds={["#fff,lol|||loll===1,4,1,1"]}/>
+      <GridComponent offset={1} subtaskDispIds={["yellow,lol|||loll===0,2,2,1"]}/>
+      <GridComponent offset={2} subtaskDispIds={["orange,lol|||loll===0,2,3,1","#fff,lol|||loll===1,4,1,1"]}/>
       {/* <>
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
         {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
