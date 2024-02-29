@@ -4,7 +4,7 @@ import BorderComponent from './BorderComponent';
 
 interface GridProps {
   offset: number;
-  subtaskDispIds: string[]; // Hexcode,parentid|||path_id===inter_row,inter_column:::path_id===row,column,index // TODO: Change to date with task id and then do more preprocessing
+  subtaskDispIds: string[]; // Hexcode,id|||path_rootid===inter_row,inter_column:::path_id===row,column,index,left_bound // TODO: Change to date with task id and then do more preprocessing
                             // Ideally, the leaf tasks of the root tasks will be passed together
 }
 
@@ -18,9 +18,13 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
     setColorQueues(computedResult);
   }, [subtaskDispIds]);
 
-  const generatePathsForIds = (ids : string[]): { [key: string]: Array<[string, number, string] > } => // Returns array of #COLORHEX, Amount fill (0-1), root_task_id
+
+  const generatePathsForIds = (ids : string[]): { [key: string]: Set<[string, number, string]> } => // Returns array of #COLORHEX, Amount fill (0-1), root_task_id
   {
-    var colorQueuesMap:{[key: string]: Array<[string, number, string]>} = {}
+    /*
+      This function assumes the parent id index has already been calculated and the subtask indices have also been calculated
+    */
+    var colorQueuesMap:{[key: string]: Set<[string, number, string]>} = {}
 
     for(const id of ids)
     {
@@ -29,18 +33,12 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
       //                              path_id | placement_inf0||path_id | placement_info => '==='
       //                              path_id | inter_row | inter_column || path_id | row | column | index => ','
       //                              )
-      const components = id.split(':::').map((section) =>
-        section.split('===').map((part) =>
-          part.split(',').map((element) => element.trim())
-        )
-      );
-
       const originAndSpecificData = id.split('|||')
       const hexcodeAndParentId = originAndSpecificData[0].split(',')
 
       // Extract Hexcode and parent id
       const hexcode = hexcodeAndParentId[0]
-      const parentId = hexcodeAndParentId[1]
+      const rootId = hexcodeAndParentId[1]
 
       // Extract positional features
       const specificData = originAndSpecificData[1]
@@ -54,17 +52,32 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
       else if (parentAndLeaf.length == 1) // Only root task is parent
       {
         const leafPathIdAndPlacementInfo = parentAndLeaf[0].split('===')
-        const rootId = leafPathIdAndPlacementInfo[0]
+        const pathId = leafPathIdAndPlacementInfo[0]
         const rowColumnIndex = leafPathIdAndPlacementInfo[1].split(',')
 
         const row = parseInt(rowColumnIndex[0], 10)
         const column = parseInt(rowColumnIndex[1], 10)
         const index = parseInt(rowColumnIndex[2], 10)
+        const leftBound:boolean = rowColumnIndex[3] == '1'
 
-        const leftSkewed:boolean = column <= 3
         const prioritized:boolean = index <= 3
 
         // Create key values for horizontal borders to fill in row of subtask and fill queus 
+        if(prioritized)
+        {
+          if(colorQueuesMap.hasOwnProperty(`${row}h${column}`))
+          {
+            colorQueuesMap[`${row}h${column}`].add([hexcode, 0.25 * index, rootId])
+          }
+          else
+          {
+            colorQueuesMap[`${row}h${column}`] = new Set([[hexcode, 0.25 * index, rootId]])
+          } 
+        }
+        else
+        {
+          throw new Error("Not Implemented")
+        }
       }
       else
       {
