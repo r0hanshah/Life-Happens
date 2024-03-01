@@ -25,7 +25,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
       return (
         <View style={[containerStyle, {
           width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85) : 0,
-          height: orientation === 'vertical' ? ((windowHeight / 6) * 0.8) : lastRow ? ((windowHeight / 6) * 0.8 + 50) : 0
+          height: orientation === 'vertical' ? ((windowHeight / 6) * 0.9) : lastRow ? ((windowHeight / 6) * 0.9 + 50) : 0
         }]}>
           <View
             key={index}
@@ -35,8 +35,8 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               {
                 minHeight: 0,
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill != 1 ? 1-amountFill : 1) : 0,
-                height: orientation === 'vertical' ? ((windowHeight / 6) * 0.8)*amountFill : lastRow ? ((windowHeight / 6) * 0.8 + 50)*amountFill : 0,
-                paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.8 + 3.5 : lastRow ? (windowHeight / 6) * 0.8 + 50.5 : 0,
+                height: orientation === 'vertical' ? ((windowHeight / 6) * 0.9)*amountFill : lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : 0,
+                paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 + 1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0,
               },
             ]}
           />
@@ -48,7 +48,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
   return (
     <View style={styles.container}>
       {renderBorders()}
-      <View style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.9 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.8 : lastRow ? (windowHeight / 6) * 0.8 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.8 -1.5 : lastRow ? (windowHeight / 6) * 0.8 + 50.5 : 0 }]} />
+      <View style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
     </View>
   );
 };
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   VContainer: {
     position: 'absolute',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center'
   },
   container: {
