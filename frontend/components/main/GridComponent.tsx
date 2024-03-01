@@ -59,7 +59,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
         const pRow = parseInt(parentRowColumnIndex[0], 10)
         const pColumn = parseInt(parentRowColumnIndex[1], 10)
-        const pIndex = parseInt(parentRowColumnIndex[2], 10)
 
         // Leaf Node
         const leafPathIdAndPlacementInfo = parentAndLeaf[1].split('===')
@@ -70,6 +69,60 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
         const lColumn = parseInt(rowColumnIndex[1], 10)
         const lIndex = parseInt(rowColumnIndex[2], 10)
         const leftBound:boolean = rowColumnIndex[3] == '1'
+
+        const prioritized:boolean = lIndex <= 3
+
+        // Draw wire from leaf to parent
+        if (prioritized)
+        {
+          // Draw first wire
+          if(colorQueuesMap.hasOwnProperty(`${lRow}h${lColumn}`))
+          {
+            colorQueuesMap[`${lRow}h${lColumn}`].add([hexcode, 0.25 * lIndex, rootId, lColumn > pColumn])
+          }
+          else
+          {
+            colorQueuesMap[`${lRow}h${lColumn}`] = new Set([[hexcode, 0.25 * lIndex, rootId, lColumn > pColumn]])
+          }
+
+
+          // Draw vertical lines
+          var rowOffset:number = lRow
+          while(lRow < pRow ? rowOffset < pRow : rowOffset > pRow)
+          {
+            lRow < pRow ? rowOffset += 1 : rowOffset -= 1
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`))
+            {
+              colorQueuesMap[`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`].add([hexcode, 1, rootId, lColumn <= pColumn])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`] = new Set([[hexcode, 1, rootId, lColumn <= pColumn]])
+            }
+          }
+
+          // Draw horizontal lines
+          var columnOffset:number = lColumn - (lColumn > pColumn ? 0 : 0)
+          while(lColumn < pColumn ? columnOffset < pColumn : columnOffset >= pColumn)
+          {
+            lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
+
+          // Draw lines from parent circle to root task
+
+        }
+        else
+        {
+          throw new Error("Not Implemented Yet")
+        }
       }
       else if (parentAndLeaf.length == 1) // Only root task is parent
       {
