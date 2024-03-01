@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import BorderComponent from './BorderComponent';
+import Circle from './ParentTaskCircle';
 
 interface GridProps {
   offset: number;
@@ -51,7 +52,24 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
       if (parentAndLeaf.length == 2 ) // Parent exists
       {
-        throw new Error('Feature not supported yet')
+        // Parent Node
+        const parentPathIdAndPlacementInfo = parentAndLeaf[0].split('===')
+        const parentPathId = parentPathIdAndPlacementInfo[0]
+        const parentRowColumnIndex = parentPathIdAndPlacementInfo[1].split(',')
+
+        const pRow = parseInt(parentRowColumnIndex[0], 10)
+        const pColumn = parseInt(parentRowColumnIndex[1], 10)
+        const pIndex = parseInt(parentRowColumnIndex[2], 10)
+
+        // Leaf Node
+        const leafPathIdAndPlacementInfo = parentAndLeaf[1].split('===')
+        const pathId = leafPathIdAndPlacementInfo[0]
+        const rowColumnIndex = leafPathIdAndPlacementInfo[1].split(',')
+
+        const lRow = parseInt(rowColumnIndex[0], 10)
+        const lColumn = parseInt(rowColumnIndex[1], 10)
+        const lIndex = parseInt(rowColumnIndex[2], 10)
+        const leftBound:boolean = rowColumnIndex[3] == '1'
       }
       else if (parentAndLeaf.length == 1) // Only root task is parent
       {
