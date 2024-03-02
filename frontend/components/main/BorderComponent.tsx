@@ -26,7 +26,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
         <View key={`cont${index}`} style={[containerStyle, {
           width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85) : 0,
           height: orientation === 'vertical' ? ((windowHeight / 6) * 0.9) : lastRow ? ((windowHeight / 6) * 0.9 + 50) : 0,
-          paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 63.5 : 0 : 0,
+          paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 103.5 : 0 : 0,
         }]}>
           <View
             key={index}
@@ -68,8 +68,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   VContainer: {
+    flex: 1,
     position: 'absolute',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center'
   },
   container: {

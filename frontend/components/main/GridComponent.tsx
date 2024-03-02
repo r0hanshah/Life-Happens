@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import BorderComponent from './BorderComponent';
-import Circle from './ParentTaskCircle';
 
 interface GridProps {
   offset: number;
@@ -78,34 +77,40 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
           // Draw first wire
           if(colorQueuesMap.hasOwnProperty(`${lRow}h${lColumn}`))
           {
-            colorQueuesMap[`${lRow}h${lColumn}`].add([hexcode, 0.25 * lIndex, rootId, lColumn > pColumn])
+            colorQueuesMap[`${lRow}h${lColumn}`].add([hexcode, 0.25 * lIndex, rootId, lColumn >= pColumn])
           }
           else
           {
-            colorQueuesMap[`${lRow}h${lColumn}`] = new Set([[hexcode, 0.25 * lIndex, rootId, lColumn > pColumn]])
+            colorQueuesMap[`${lRow}h${lColumn}`] = new Set([[hexcode, 0.25 * lIndex, rootId, lColumn >= pColumn]])
           }
 
 
           // Draw vertical lines
-          var rowOffset:number = lRow
+          var rowOffset:number = lRow + (pRow < lRow ? 1 : 0)
           while(lRow < pRow ? rowOffset < pRow : rowOffset > pRow)
           {
             lRow < pRow ? rowOffset += 1 : rowOffset -= 1
-            if(colorQueuesMap.hasOwnProperty(`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`))
+
+            if(pRow == rowOffset && pRow <= lRow) { break }
+
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${lColumn + (pColumn > lColumn ? 1 : 0)}`))
             {
-              colorQueuesMap[`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`].add([hexcode, 1, rootId, lColumn <= pColumn])
+              colorQueuesMap[`${rowOffset}v${lColumn + (pColumn > lColumn ? 1 : 0)}`].add([hexcode, 1, rootId, lColumn <= pColumn])
             }
             else
             {
-              colorQueuesMap[`${rowOffset + (lRow < pRow ? 0 : 1)}v${lColumn + (lColumn <= pColumn ? 1 : 0)}`] = new Set([[hexcode, 1, rootId, lColumn <= pColumn]])
+              colorQueuesMap[`${rowOffset}v${lColumn + (pColumn > lColumn ? 1 : 0)}`] = new Set([[hexcode, 1, rootId, lColumn <= pColumn]])
             }
           }
 
           // Draw horizontal lines
-          var columnOffset:number = lColumn - (lColumn > pColumn ? 0 : 0)
+          var columnOffset:number = lColumn
           while(lColumn < pColumn ? columnOffset < pColumn : columnOffset >= pColumn)
           {
+            if(pColumn == columnOffset && pColumn <= lColumn || pColumn - 1 == columnOffset && pColumn > lColumn) { break }
+
             lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
+
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
               colorQueuesMap[`${rowOffset}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
@@ -117,6 +122,33 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
           }
 
           // Draw lines from parent circle to root task
+          // Draw horizontal wires
+          while(leftBound? columnOffset > 0 : columnOffset < 7)
+          {
+            leftBound ? columnOffset -= 1 : columnOffset += 1;
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
+
+          // Draw vertical wires
+          while(rowOffset < 4)
+          {
+            rowOffset += 1
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
 
         }
         else
@@ -183,7 +215,48 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
         }
         else
         {
-          throw new Error("Not Implemented")
+          var amountFill = index % 3
+          amountFill == 0 ? amountFill += 3 : amountFill += 0
+          var columnOffset = index % 2 == 0 ? column : column + 1
+
+          // Draw first column line
+          if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
+          {
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound])
+          }
+          else
+          {
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound]])
+          }
+
+          // Draw horizontal lines
+          while(leftBound ? columnOffset > 0 : columnOffset < 7)
+          {
+            leftBound ? columnOffset -= 1 : columnOffset += 1;
+            if(colorQueuesMap.hasOwnProperty(`${row}h${columnOffset}`))
+            {
+              colorQueuesMap[`${row}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${row}h${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
+
+          // Draw vertical lines
+          var rowOffset:number = row
+          while(rowOffset < 4)
+          {
+            rowOffset += 1
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
         }
       }
       else
