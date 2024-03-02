@@ -153,7 +153,85 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
         }
         else
         {
-          throw new Error("Not Implemented Yet")
+          // Draw first vertical line
+          var amountFill = lIndex % 3
+          amountFill == 0 ? amountFill += 3 : amountFill += 0
+
+          var columnOffset = lIndex % 2 == 0 ? lColumn : lColumn + 1
+          if(colorQueuesMap.hasOwnProperty(`${lRow}v${columnOffset}`))
+          {
+            colorQueuesMap[`${lRow}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound])
+          }
+          else
+          {
+            colorQueuesMap[`${lRow}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound]])
+          }
+
+          // Draw horizontal lines towards parent
+          var rowOffset:number = lRow
+
+          columnOffset -=  lColumn < pColumn ? 1 : 0
+
+          while(lColumn < pColumn ? columnOffset < pColumn : columnOffset >= pColumn)
+          {
+            lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
+
+            if(pColumn  == columnOffset-1 && pColumn <= lColumn || pColumn - 1 == columnOffset && pColumn > lColumn) { break }
+            
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
+
+          // Draw vertical lines towards parent
+          while(lRow < pRow ? rowOffset < pRow : rowOffset > pRow)
+          {
+            if(pRow == rowOffset && pRow <= lRow) { break }
+
+            lRow < pRow ? rowOffset += 1 : rowOffset -= 1
+            
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, lColumn <= pColumn])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, lColumn <= pColumn]])
+            }
+          }
+
+          // Draw horizontal lines to root
+          while(leftBound? columnOffset > 0 : columnOffset < 7)
+          {
+            leftBound ? columnOffset -= 1 : columnOffset += 1;
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}h${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
+
+          // Draw vertical lines towards root
+          while(rowOffset < 4)
+          {
+            rowOffset += 1
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+            }
+            else
+            {
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+            }
+          }
         }
       }
       else if (parentAndLeaf.length == 1) // Only root task is parent
@@ -263,7 +341,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
       {
         throw new Error(`Unexpected data format in id: ${id}`);
       }
-      // IF NO PARENT => Check if column less than or equal to 3 => add to id 
     }
     
 
