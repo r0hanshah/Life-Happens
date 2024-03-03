@@ -107,9 +107,9 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
           var columnOffset:number = lColumn
           while(lColumn < pColumn ? columnOffset < pColumn : columnOffset >= pColumn)
           {
-            if(pColumn == columnOffset && pColumn <= lColumn || pColumn - 1 == columnOffset && pColumn > lColumn) { break }
-
             lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
+
+            if(pColumn == columnOffset && pColumn <= lColumn || pColumn - 1 == columnOffset && pColumn > lColumn) { break }
 
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
@@ -123,6 +123,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
           // Draw lines from parent circle to root task
           // Draw horizontal wires
+          columnOffset = pColumn > lColumn ? lColumn : columnOffset
           while(leftBound? columnOffset > 0 : columnOffset < 7)
           {
             leftBound ? columnOffset -= 1 : columnOffset += 1;
@@ -188,12 +189,13 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
             }
           }
 
+          rowOffset = lRow + (pRow < lRow ? 1 : 0)
           // Draw vertical lines towards parent
           while(lRow < pRow ? rowOffset < pRow : rowOffset > pRow)
           {
-            if(pRow == rowOffset && pRow <= lRow) { break }
-
             lRow < pRow ? rowOffset += 1 : rowOffset -= 1
+
+            if(pRow == rowOffset && pRow <= lRow) { break }
             
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
             {

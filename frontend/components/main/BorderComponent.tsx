@@ -25,9 +25,15 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
       return (
         <View key={`cont${index}`} style={[containerStyle, {
           width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85) : 0,
-          height: orientation === 'vertical' ? ((windowHeight / 6) * 0.9) : lastRow ? ((windowHeight / 6) * 0.9 + 50) : 0,
-          paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 103.5 : 0 : 0,
+          height: orientation === 'vertical' ? lastRow ? ((windowHeight / 6) * 0.9 + 50) : ((windowHeight / 6) * 0.9) : 0,
+          paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 104.5 : 0 : 0,
         }]}>
+          <View style={[{
+            height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 0,
+            display: orientation==='vertical'? 'flex' : 'none'
+          }]}>
+
+          </View>
           <View
             key={index}
             style={[
@@ -36,8 +42,8 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               {
                 minHeight: 0,
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill != 1 ? 1-amountFill : 1) : 0,
-                height: orientation === 'vertical' ? ((windowHeight / 6) * 0.9)*amountFill : lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : 0,
-                paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 + 1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0,
+                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
+                paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 :  0,
               },
             ]}
           />
@@ -49,7 +55,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
   return (
     <View style={styles.container}>
       {renderBorders()}
-      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0.0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
+      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
     </View>
   );
 };
@@ -70,7 +76,7 @@ const styles = StyleSheet.create({
   VContainer: {
     flex: 1,
     position: 'absolute',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center'
   },
   container: {
