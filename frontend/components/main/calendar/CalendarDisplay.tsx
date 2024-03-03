@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import DayNode from './DayNode';
 
 interface CalendarProps {
@@ -13,7 +13,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
   const windowHeight = useWindowDimensions().height;
 
   return (
-    <View style={[styles.grid, {marginTop: -110, width: windowWidth * 0.84}]}>
+    <View style={[styles.grid, {marginTop: -70, width: windowWidth * 0.84}]}>
       <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -58,6 +58,15 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+      </View>
+      <View style={[styles.row, { height: 40}]}>
+        <Text style={{color:'#717171'}}>Su</Text>
+        <Text style={{color:'#717171'}}>M</Text>
+        <Text style={{color:'#717171'}}>T</Text>
+        <Text style={{color:'#717171'}}>W</Text>
+        <Text style={{color:'#717171'}}>Th</Text>
+        <Text style={{color:'#717171'}}>F</Text>
+        <Text style={{color:'#717171'}}>S</Text>
       </View>
     </View>
   );
