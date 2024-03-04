@@ -474,6 +474,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
         <BorderComponent id='4v7' colorQueue={colorQueues.hasOwnProperty('4v7')? Array.from(colorQueues['4v7']) : []} orientation="vertical" lastRow = {true} />
       </View>
+      {/* Create another row only if there is not enough day modules to display all days */}
     </View>
   );
 };

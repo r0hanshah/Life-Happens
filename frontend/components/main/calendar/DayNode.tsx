@@ -17,6 +17,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   {
     backgroundColor: currentDay ? '#00488A' : '#383838',
     height: windowHeight/6 * 0.35,
+    maxHeight: 50,
     width: windowWidth/7 * 0.7,
     borderRadius: 20,
     justifyContent: 'flex-start'

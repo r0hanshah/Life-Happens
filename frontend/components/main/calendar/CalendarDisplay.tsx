@@ -13,8 +13,8 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
   const windowHeight = useWindowDimensions().height;
 
   return (
-    <View style={[styles.grid, {marginTop: -70, width: windowWidth * 0.84}]}>
-      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
+    <View style={[styles.grid, { width: windowWidth * 0.84}]}>
+      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -23,7 +23,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
       </View>
-      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
+      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -32,7 +32,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
       </View>
-      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
+      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -41,7 +41,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
       </View>
-      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
+      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -50,7 +50,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
       </View>
-      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9)}]}>
+      <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
@@ -59,6 +59,16 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
         <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
       </View>
+      {/* Display only when the calendar is not big enough to fit all days */}
+      {/* <View style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+        <DayNode dayNumber={1} dayOfWeek={0} currentDay={false} leafTasks={[]} />
+      </View> */}
       <View style={[styles.row, { height: 40}]}>
         <Text style={{color:'#717171'}}>Su</Text>
         <Text style={{color:'#717171'}}>M</Text>
@@ -79,7 +89,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     justifyContent: 'space-around',
   },
 });

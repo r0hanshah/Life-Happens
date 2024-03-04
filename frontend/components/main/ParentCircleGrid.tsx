@@ -95,6 +95,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes }) =
         <Circle diameter={10} color={colors.hasOwnProperty('46') ? colors['46'] : 'rgba(0,0,0,0)'}/>
         <Circle diameter={10} color={colors.hasOwnProperty('47') ? colors['47'] : 'rgba(0,0,0,0)'}/>
       </View>
+      {/* Display another row only if there are not enough days to represent all days in the calendar */}
     </View>
   );
 };
