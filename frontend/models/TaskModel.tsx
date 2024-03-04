@@ -1,6 +1,6 @@
 class TaskModel
 {
-    constructor(id:string, creatorId:string, users:UserModel[], invitedUsers:string[], title:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:string[])
+    constructor(id:string, creatorId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:string[])
     {
         this.id = id
         this.creatorId = creatorId
@@ -8,6 +8,7 @@ class TaskModel
         this.invitedUsers = invitedUsers
 
         this.title = title
+        this.color = color
         this.ancestors = ancestors
         this.children = children
         this.startDate = startDate
@@ -29,6 +30,7 @@ class TaskModel
     invitedUsers:string[]
 
     title:string
+    color:string
     ancestors:TaskModel[]
     children:TaskModel[]
     startDate:string
@@ -43,3 +45,5 @@ class TaskModel
     contextText:string
     contextFiles:string[]
 }
+
+export default TaskModel

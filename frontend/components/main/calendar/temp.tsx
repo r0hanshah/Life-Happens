@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
-import DayNode from './DayNode';
 import moment from 'moment';
+import DayNode from './DayNode';
 
-interface CalendarProps {
-  offset: number;
-  parentNodes: string[]; // row,column,color
-}
+interface CalendarProps {}
 
-const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
+const CalendarComponent: React.FC<CalendarProps> = () => {
+  const [currentMonth, setCurrentMonth] = useState(moment());
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
-
-  const [currentMonth, setCurrentMonth] = useState(moment());
 
   useEffect(() => {
     // Fetch or set the initial month based on your requirements
@@ -52,33 +48,30 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
     return calendarDisplay;
   };
 
-
   return (
-    <View style={[styles.grid, { width: windowWidth * 0.84}]}>
-      {renderCalendar()}
-      <View style={[styles.row, { height: 40}]}>
-        <Text style={{color:'#717171'}}>Su</Text>
-        <Text style={{color:'#717171'}}>M</Text>
-        <Text style={{color:'#717171'}}>T</Text>
-        <Text style={{color:'#717171'}}>W</Text>
-        <Text style={{color:'#717171'}}>Th</Text>
-        <Text style={{color:'#717171'}}>F</Text>
-        <Text style={{color:'#717171'}}>S</Text>
+    <View style={{ flex: 1, marginTop: 20 }}>
+      {/* Render the header with day names */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+        {moment.weekdaysShort().map(day => (
+          <Text key={day}>{day}</Text>
+        ))}
       </View>
+      {/* Render the calendar grid */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>{renderCalendar()}</View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  grid: {
-    flex: 1,
-    position: 'absolute',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-around',
-  },
-});
+    grid: {
+      flex: 1,
+      position: 'absolute',
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-around',
+    },
+  });
 
-export default CalendarDisplay;
+export default CalendarComponent;

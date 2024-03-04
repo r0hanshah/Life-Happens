@@ -2,10 +2,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import GridComponent from './GridComponent';
 import ParentNodeGridComponent from './ParentCircleGrid';
 import CalendarDisplay from './calendar/CalendarDisplay';
+import TaskModel from '../../models/TaskModel'
 
 
 interface Tasks {
-    tasks: string[];
+    tasks: TaskModel[];
 }
 
 const WireFrame: React.FC<Tasks> = ({ tasks }) => {

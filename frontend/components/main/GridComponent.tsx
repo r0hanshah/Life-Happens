@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import BorderComponent from './BorderComponent';
+import moment from 'moment';
 
 interface GridProps {
   offset: number;
@@ -15,6 +16,7 @@ interface ColorQueueType {
 const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
   const [colorQueues, setColorQueues] = useState<ColorQueueType>({});
+  const [currentMonth, setCurrentMonth] = useState(moment());
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {
@@ -279,7 +281,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
           // Draw vertical lines
           var rowOffset:number = row
-          while(rowOffset < 4)
+          while(rowOffset < 5)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
@@ -325,7 +327,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
 
           // Draw vertical lines
           var rowOffset:number = row
-          while(rowOffset < 4)
+          while(rowOffset < 5)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
@@ -350,130 +352,53 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
     return colorQueuesMap;
   };
 
+  const renderBorderComponents = (colorQueues: any) => {
+    const firstDayOfMonth = currentMonth.clone().startOf('month');
+    const daysInMonth = currentMonth.daysInMonth();
+    const startDay = firstDayOfMonth.clone().startOf('week');
+    const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
+
+    const daysDifference = endDay.diff(startDay, 'days');
+
+    const columns = 7;
+    const components = [];
+    for(var row = 0; row < daysDifference; row+=7)
+    {
+      const rowComponents = [];
+  
+      for (let col = 0; col < columns; col++) {
+        const idV = `${row/7}v${col}`;
+        const idH = `${row/7}h${col}`;
+  
+        rowComponents.push(
+          <React.Fragment key={idV + idH}>
+            <BorderComponent id={idV} colorQueue={colorQueues.hasOwnProperty(idV) ? Array.from(colorQueues[idV]) : []} orientation="vertical" lastRow={row/7 == daysDifference/7 - 1} />
+            <BorderComponent id={idH} colorQueue={colorQueues.hasOwnProperty(idH) ? Array.from(colorQueues[idH]) : []} orientation="horizontal" lastRow={row/7 == daysDifference/7 - 1} />
+          </React.Fragment>
+        );
+      }
+
+      rowComponents.push(
+        <React.Fragment key={`lastColumn${row/7}`}>
+            <BorderComponent id={`${row/7}v${7}`} colorQueue={colorQueues.hasOwnProperty(`${row/7}v${7}`) ? Array.from(colorQueues[`${row/7}v${7}`]) : []} orientation="vertical" lastRow={row == daysDifference/7 - 1} />
+        </React.Fragment>
+      )
+  
+      components.push(
+        <View key={row} style={styles.row}>
+          {rowComponents}
+        </View>
+      );
+    }
+
+    return components;
+  };
+
 
 
   return (
     <View style={[styles.grid, {marginTop: offset * 8}]}>
-      <View style={styles.row}>
-        <BorderComponent id='0v0' colorQueue={colorQueues.hasOwnProperty('0v0')? Array.from(colorQueues['0v0']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h0' colorQueue={colorQueues.hasOwnProperty('0h0')? Array.from(colorQueues['0h0']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v1' colorQueue={colorQueues.hasOwnProperty('0v1')? Array.from(colorQueues['0v1']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h1' colorQueue={colorQueues.hasOwnProperty('0h1')? Array.from(colorQueues['0h1']) : []} orientation="horizontal" lastRow = {false}  />
- 
-        <BorderComponent id='0v2' colorQueue={colorQueues.hasOwnProperty('0v2')? Array.from(colorQueues['0v2']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h2' colorQueue={colorQueues.hasOwnProperty('0h2')? Array.from(colorQueues['0h2']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v3' colorQueue={colorQueues.hasOwnProperty('0v3')? Array.from(colorQueues['0v3']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h3' colorQueue={colorQueues.hasOwnProperty('0h3')? Array.from(colorQueues['0h3']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v4' colorQueue={colorQueues.hasOwnProperty('0v4')? Array.from(colorQueues['0v4']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h4' colorQueue={colorQueues.hasOwnProperty('0h4')? Array.from(colorQueues['0h4']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v5' colorQueue={colorQueues.hasOwnProperty('0v5')? Array.from(colorQueues['0v5']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h5' colorQueue={colorQueues.hasOwnProperty('0h5')? Array.from(colorQueues['0h5']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v6' colorQueue={colorQueues.hasOwnProperty('0v6')? Array.from(colorQueues['0v6']) : []} orientation="vertical"  lastRow = {false} />
-        <BorderComponent id='0h6' colorQueue={colorQueues.hasOwnProperty('0h6')? Array.from(colorQueues['0h6']) : []} orientation="horizontal" lastRow = {false}  />
-
-        <BorderComponent id='0v7' colorQueue={colorQueues.hasOwnProperty('0v7')? Array.from(colorQueues['0v7']) : []} orientation="vertical"  lastRow = {false} />
-      </View>
-      <View style={styles.row}>
-        <BorderComponent id='1v0' colorQueue={colorQueues.hasOwnProperty('1v0')? Array.from(colorQueues['1v0']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h0' colorQueue={colorQueues.hasOwnProperty('1h0')? Array.from(colorQueues['1h0']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v1' colorQueue={colorQueues.hasOwnProperty('1v1')? Array.from(colorQueues['1v1']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h1' colorQueue={colorQueues.hasOwnProperty('1h1')? Array.from(colorQueues['1h1']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v2' colorQueue={colorQueues.hasOwnProperty('1v2')? Array.from(colorQueues['1v2']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h2' colorQueue={colorQueues.hasOwnProperty('1h2')? Array.from(colorQueues['1h2']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v3' colorQueue={colorQueues.hasOwnProperty('1v3')? Array.from(colorQueues['1v3']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h3' colorQueue={colorQueues.hasOwnProperty('1h3')? Array.from(colorQueues['1h3']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v4' colorQueue={colorQueues.hasOwnProperty('1v4')? Array.from(colorQueues['1v4']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h4' colorQueue={colorQueues.hasOwnProperty('1h4')? Array.from(colorQueues['1h4']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v5' colorQueue={colorQueues.hasOwnProperty('1v5')? Array.from(colorQueues['1v5']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h5' colorQueue={colorQueues.hasOwnProperty('1h5')? Array.from(colorQueues['1h5']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v6' colorQueue={colorQueues.hasOwnProperty('1v6')? Array.from(colorQueues['1v6']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='1h6' colorQueue={colorQueues.hasOwnProperty('1h6')? Array.from(colorQueues['1h6']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='1v7' colorQueue={colorQueues.hasOwnProperty('1v7')? Array.from(colorQueues['1v7']) : []} orientation="vertical" lastRow = {false} />
-      </View>
-      <View style={styles.row}>
-        <BorderComponent id='2v0' colorQueue={colorQueues.hasOwnProperty('2v0')? Array.from(colorQueues['2v0']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h0' colorQueue={colorQueues.hasOwnProperty('2h0')? Array.from(colorQueues['2h0']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v1' colorQueue={colorQueues.hasOwnProperty('2v1')? Array.from(colorQueues['2v1']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h1' colorQueue={colorQueues.hasOwnProperty('2h1')? Array.from(colorQueues['2h1']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v2' colorQueue={colorQueues.hasOwnProperty('2v2')? Array.from(colorQueues['2v2']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h2' colorQueue={colorQueues.hasOwnProperty('2h2')? Array.from(colorQueues['2h2']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v3' colorQueue={colorQueues.hasOwnProperty('2v3')? Array.from(colorQueues['2v3']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h3' colorQueue={colorQueues.hasOwnProperty('2h3')? Array.from(colorQueues['2h3']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v4' colorQueue={colorQueues.hasOwnProperty('2v4')? Array.from(colorQueues['2v4']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h4' colorQueue={colorQueues.hasOwnProperty('2h4')? Array.from(colorQueues['2h4']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v5' colorQueue={colorQueues.hasOwnProperty('2v5')? Array.from(colorQueues['2v5']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h5' colorQueue={colorQueues.hasOwnProperty('2h5')? Array.from(colorQueues['2h5']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v6' colorQueue={colorQueues.hasOwnProperty('2v6')? Array.from(colorQueues['2v6']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='2h6' colorQueue={colorQueues.hasOwnProperty('2h6')? Array.from(colorQueues['2h6']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='2v7' colorQueue={colorQueues.hasOwnProperty('2v7')? Array.from(colorQueues['2v7']) : []} orientation="vertical" lastRow = {false} />
-      </View>
-      <View style={styles.row}>
-        <BorderComponent id='3v0' colorQueue={colorQueues.hasOwnProperty('3v0')? Array.from(colorQueues['3v0']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h0' colorQueue={colorQueues.hasOwnProperty('3h0')? Array.from(colorQueues['3h0']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v1' colorQueue={colorQueues.hasOwnProperty('3v1')? Array.from(colorQueues['3v1']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h1' colorQueue={colorQueues.hasOwnProperty('3h1')? Array.from(colorQueues['3h1']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v2' colorQueue={colorQueues.hasOwnProperty('3v2')? Array.from(colorQueues['3v2']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h2' colorQueue={colorQueues.hasOwnProperty('3h2')? Array.from(colorQueues['3h2']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v3' colorQueue={colorQueues.hasOwnProperty('3v3')? Array.from(colorQueues['3v3']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h3' colorQueue={colorQueues.hasOwnProperty('3h3')? Array.from(colorQueues['3h3']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v4' colorQueue={colorQueues.hasOwnProperty('3v4')? Array.from(colorQueues['3v4']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h4' colorQueue={colorQueues.hasOwnProperty('3h4')? Array.from(colorQueues['3h4']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v5' colorQueue={colorQueues.hasOwnProperty('3v5')? Array.from(colorQueues['3v5']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h5' colorQueue={colorQueues.hasOwnProperty('3h5')? Array.from(colorQueues['3h5']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v6' colorQueue={colorQueues.hasOwnProperty('3v6')? Array.from(colorQueues['3v6']) : []} orientation="vertical" lastRow = {false} />
-        <BorderComponent id='3h6' colorQueue={colorQueues.hasOwnProperty('3h6')? Array.from(colorQueues['3h6']) : []} orientation="horizontal" lastRow = {false} />
-
-        <BorderComponent id='3v7' colorQueue={colorQueues.hasOwnProperty('3v7')? Array.from(colorQueues['3v7']) : []} orientation="vertical" lastRow = {false} />
-      </View>
-      <View style={styles.row}>
-        <BorderComponent id='4v0' colorQueue={colorQueues.hasOwnProperty('4v0')? Array.from(colorQueues['4v0']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h0' colorQueue={colorQueues.hasOwnProperty('4h0')? Array.from(colorQueues['4h0']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v1' colorQueue={colorQueues.hasOwnProperty('4v1')? Array.from(colorQueues['4v1']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h1' colorQueue={colorQueues.hasOwnProperty('4h1')? Array.from(colorQueues['4h1']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v2' colorQueue={colorQueues.hasOwnProperty('4v2')? Array.from(colorQueues['4v2']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h2' colorQueue={colorQueues.hasOwnProperty('4h2')? Array.from(colorQueues['4h2']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v3' colorQueue={colorQueues.hasOwnProperty('4v3')? Array.from(colorQueues['4v3']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h3' colorQueue={colorQueues.hasOwnProperty('4h3')? Array.from(colorQueues['4h3']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v4' colorQueue={colorQueues.hasOwnProperty('4v4')? Array.from(colorQueues['4v4']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h4' colorQueue={colorQueues.hasOwnProperty('4h4')? Array.from(colorQueues['4h4']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v5' colorQueue={colorQueues.hasOwnProperty('4v5')? Array.from(colorQueues['4v5']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h5' colorQueue={colorQueues.hasOwnProperty('4h5')? Array.from(colorQueues['4h5']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v6' colorQueue={colorQueues.hasOwnProperty('4v6')? Array.from(colorQueues['4v6']) : []} orientation="vertical" lastRow = {true} />
-        <BorderComponent id='4h6' colorQueue={colorQueues.hasOwnProperty('4h6')? Array.from(colorQueues['4h6']) : []} orientation="horizontal" lastRow = {true} />
-
-        <BorderComponent id='4v7' colorQueue={colorQueues.hasOwnProperty('4v7')? Array.from(colorQueues['4v7']) : []} orientation="vertical" lastRow = {true} />
-      </View>
+      {renderBorderComponents(colorQueues)}
       {/* Create another row only if there is not enough day modules to display all days */}
     </View>
   );

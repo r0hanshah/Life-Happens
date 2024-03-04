@@ -6,9 +6,10 @@ interface DayNodeProps {
   dayOfWeek: number;
   leafTasks: string[];
   currentDay: boolean; 
+  inMonth: boolean;
 }
 
-const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay }) => {
+const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
@@ -20,7 +21,8 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     maxHeight: 50,
     width: windowWidth/7 * 0.7,
     borderRadius: 20,
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    opacity: inMonth ? 1 : 0.5
   }
 
   return( 
