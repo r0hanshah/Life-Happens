@@ -55,7 +55,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
   return (
     <View style={styles.container}>
       {renderBorders()}
-      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0.1)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
+      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
     </View>
   );
 };

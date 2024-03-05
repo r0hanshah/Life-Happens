@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import GridComponent from './GridComponent';
 import ParentNodeGridComponent from './ParentCircleGrid';
-import CalendarDisplay from './calendar/CalendarDisplay';
-import TaskModel from '../../models/TaskModel'
-
+import CalendarDisplay from '../calendar/CalendarDisplay';
+import TaskModel from '../../../models/TaskModel'
 
 interface Tasks {
-    tasks: TaskModel[];
+    tasks: TaskModel[]; // Only root tasks
 }
 
 const WireFrame: React.FC<Tasks> = ({ tasks }) => {
@@ -25,7 +24,6 @@ const WireFrame: React.FC<Tasks> = ({ tasks }) => {
 
 const styles = StyleSheet.create({
     container: {
-      position: 'absolute',
       flex: 1,
       backgroundColor: '#rgba(0,0,0,0)',
       alignItems: 'center',

@@ -43,7 +43,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
     for(var i = 0; i < calendarDays.length; i+=7)
     {
         calendarDisplay.push(
-            <View key={`row${i/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: '2%'}]}>
+            <View key={`row${i/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: windowHeight / 6 * 0.4}]}>
                 {calendarDays.slice(i,i+7)}
             </View>
         )

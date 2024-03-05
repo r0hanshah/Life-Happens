@@ -140,7 +140,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
           }
 
           // Draw vertical wires
-          while(rowOffset < 4)
+          while(rowOffset < 5)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
@@ -224,7 +224,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
           }
 
           // Draw vertical lines towards root
-          while(rowOffset < 4)
+          while(rowOffset < 5)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
