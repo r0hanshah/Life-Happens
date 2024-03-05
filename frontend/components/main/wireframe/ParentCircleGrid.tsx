@@ -69,7 +69,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes }) =
       }
   
       components.push(
-        <View key={`row${row/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9 + (row/7 == daysDifference/7 - 1 ? 50.5 : 0))}]}>
+        <View key={`row${row/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9 + (row/7 == Math.ceil(daysDifference/7 - 1) ? 50.5 : 0))}]}>
           {rowComponents}
         </View>
       );

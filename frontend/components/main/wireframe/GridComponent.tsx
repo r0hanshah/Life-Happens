@@ -372,15 +372,15 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
   
         rowComponents.push(
           <React.Fragment key={idV + idH}>
-            <BorderComponent id={idV} colorQueue={colorQueues.hasOwnProperty(idV) ? Array.from(colorQueues[idV]) : []} orientation="vertical" lastRow={row/7 == daysDifference/7 - 1} />
-            <BorderComponent id={idH} colorQueue={colorQueues.hasOwnProperty(idH) ? Array.from(colorQueues[idH]) : []} orientation="horizontal" lastRow={row/7 == daysDifference/7 - 1} />
+            <BorderComponent id={idV} colorQueue={colorQueues.hasOwnProperty(idV) ? Array.from(colorQueues[idV]) : []} orientation="vertical" lastRow={row/7 == Math.ceil(daysDifference/7 - 1)} />
+            <BorderComponent id={idH} colorQueue={colorQueues.hasOwnProperty(idH) ? Array.from(colorQueues[idH]) : []} orientation="horizontal" lastRow={row/7 == Math.ceil(daysDifference/7 - 1)} />
           </React.Fragment>
         );
       }
 
       rowComponents.push(
         <React.Fragment key={`lastColumn${row/7}`}>
-            <BorderComponent id={`${row/7}v${7}`} colorQueue={colorQueues.hasOwnProperty(`${row/7}v${7}`) ? Array.from(colorQueues[`${row/7}v${7}`]) : []} orientation="vertical" lastRow={row == daysDifference/7 - 1} />
+            <BorderComponent id={`${row/7}v${7}`} colorQueue={colorQueues.hasOwnProperty(`${row/7}v${7}`) ? Array.from(colorQueues[`${row/7}v${7}`]) : []} orientation="vertical" lastRow={row/7 == Math.ceil(daysDifference/7 - 1)} />
         </React.Fragment>
       )
   

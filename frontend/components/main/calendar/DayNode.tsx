@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ViewStyle, useWindowDimensions, Text } from 'react-native';
+import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 
 interface DayNodeProps {
   dayNumber: number;
@@ -14,6 +15,10 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
 
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium
+  });
+
   const containerStyle:ViewStyle=
   {
     backgroundColor: currentDay ? '#00488A' : '#383838',
@@ -22,7 +27,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     width: windowWidth/7 * 0.7,
     borderRadius: 20,
     justifyContent: 'flex-start',
-    opacity: inMonth ? 1 : 0.5
+    opacity: inMonth ? 1 : 0.5,
   }
 
   return( 
@@ -30,7 +35,8 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       <Text style={{
         color: '#fff',
         paddingTop: 10,
-        paddingLeft: 15
+        paddingLeft: 15,
+        fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial'
       }}>{dayNumber}</Text>
     </View>
   );
