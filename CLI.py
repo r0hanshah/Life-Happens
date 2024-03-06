@@ -166,47 +166,47 @@ def create_task(user_id):
         task_data = Task(**task_data)
         task_ref = db.collection('User').document(user_id).collection('Tasks').add(task_data.__dict__)
         task_id = task_ref[1].id
+
         print("Task created successfully!")
         print("Task ID:", task_id)
+        return task_id
     except Exception as e:
         print("Error creating task:", e)
 
+
 def create_subtask(user_id, task_id):
-    print("Create a sub task...")
-    input("Press Enter to continue...")
+    print("Create a subtask...")
     title = input("Enter Title: ")
     start_date = input("Enter Start Date (YYYY-MM-DD): ")
     end_date = input("Enter End Date (YYYY-MM-DD): ")
     due_date = input("Enter Due Date (YYYY-MM-DD): ")
     expected_time = int(input("Enter Expected Time of Completion (in hours): "))
+
+    subtask_data = {
+        "CreatorID": user_id,
+        "Title": title,
+        "StartDate": start_date,
+        "EndDate": end_date,
+        "DueDate": due_date,
+        "ExpectedTimeOfCompletion": expected_time,
+        "IsMovable": True,
+        "Content": {"field1": "value1", "field2": "value2"},
+        "Notes": "Example notes with links: www.example.com",
+        "ExtraMedia": ["https://example.com/image.jpg", "https://example.com/video.mp4"],
+        "isRoot": False,
+        "ContextText": "Example context",
+        "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
+    }
+
     try:
-        subtask_data = {
-            "ID": user_id,
-            "CreatorID": user_id,
-            "Users": ["user1", "user2"],
-            "InvitedUsers": ["email1@example.com", "username2"],
-            "Title": title,
-            "Ancestors": ["ancestor1", "ancestor2"],
-            "Children": ["child1", "child2"],
-            "StartDate": start_date,
-            "EndDate": end_date,
-            "DueDate": due_date,
-            "ExpectedTimeOfCompletion": expected_time,
-            "IsMovable": True,
-            "Content": {"field1": "value1", "field2": "value2"},
-            "Notes": "Example notes with links: www.example.com",
-            "ExtraMedia": ["https://example.com/image.jpg", "https://example.com/video.mp4"],
-            "isRoot": False,
-            "ContextText": "Example context",
-            "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
-        }
-        subtask_data = Subtask(**subtask_data)
-        subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').add(subtask_data.__dict__)
-        subtask_id = subtask_ref[1].id
+        subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection(
+            'Subtasks').add(subtask_data)
+        subtask_id = subtask_ref.id
         print("Subtask created successfully!")
         print("Subtask ID:", subtask_id)
     except Exception as e:
         print("Error creating subtask:", e)
+
 
 def main():
     ans = input("Are you a new user?[y/n]: ")
@@ -214,14 +214,16 @@ def main():
         user_id = sign_up()
         if user_id:
             task_id = create_task(user_id)
-            create_subtask(user_id, task_id)
+            if task_id:
+                create_subtask(user_id, task_id)
             login()  # Log in after sign up
     elif ans.lower() == 'n':
         print("Redirecting to login...")
         user_id = login()
         if user_id:
             task_id = create_task(user_id)
-            create_subtask(user_id, task_id)
+            if task_id:
+                create_subtask(user_id, task_id)
     else:
         print("Invalid option")
 
