@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, ViewStyle, useWindowDimensions, Text } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
+import TaskModel from '../../../models/TaskModel';
 
 interface DayNodeProps {
   dayNumber: number;
   dayOfWeek: number;
-  leafTasks: string[];
+  leafTasks: TaskModel[];
   currentDay: boolean; 
   inMonth: boolean;
 }
@@ -38,6 +39,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
         paddingLeft: 15,
         fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial'
       }}>{dayNumber}</Text>
+      {/* Render task circles */}
     </View>
   );
 };

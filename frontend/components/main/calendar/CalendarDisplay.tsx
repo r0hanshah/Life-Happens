@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import DayNode from './DayNode';
 import moment from 'moment';
+import TaskModel from '../../../models/TaskModel';
 
 interface CalendarProps {
   offset: number;
-  parentNodes: string[]; // row,column,color
+  leafNodes: TaskModel[]; // row,column,color
 }
 
-const CalendarDisplay: React.FC<CalendarProps> = ({ offset, parentNodes }) => {
+const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodes }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
 
   const [currentMonth, setCurrentMonth] = useState(moment());
+
+  // Produce map of yyyymmdd (string) : [TaskModel[]]
 
   useEffect(() => {
     // Fetch or set the initial month based on your requirements

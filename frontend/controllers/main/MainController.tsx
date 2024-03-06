@@ -1,0 +1,1 @@
+// This will control anything that happens inside Main view

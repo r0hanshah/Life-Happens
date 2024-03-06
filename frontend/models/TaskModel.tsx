@@ -1,9 +1,11 @@
 class TaskModel
 {
-    constructor(id:string, creatorId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:string[])
+    constructor(id:string, creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:string[])
     {
         this.id = id
         this.creatorId = creatorId
+        this.rootId = rootId
+
         this.users = users
         this.invitedUsers = invitedUsers
 
@@ -11,8 +13,8 @@ class TaskModel
         this.color = color
         this.ancestors = ancestors
         this.children = children
-        this.startDate = startDate
-        this.endDate = endDate
+        this.startDate = new Date(startDate)
+        this.endDate = new Date(endDate)
 
         this.isMovable = isMovable
         this.content = content
@@ -26,6 +28,7 @@ class TaskModel
 
     id:string
     creatorId:string
+    rootId:string
     users:UserModel[]
     invitedUsers:string[]
 
@@ -33,8 +36,8 @@ class TaskModel
     color:string
     ancestors:TaskModel[]
     children:TaskModel[]
-    startDate:string
-    endDate:string
+    startDate:Date
+    endDate:Date
     
     isMovable:boolean 
     content:{[key:string]:any}
