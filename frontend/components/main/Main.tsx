@@ -47,7 +47,6 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => { //TODO: Pass in moment to wir
         if(observedNode.children.length == 0)
         {
           leafNodes.push(observedNode)
-          q.slice(1)
         }
         else
         {
@@ -55,8 +54,8 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => { //TODO: Pass in moment to wir
           {
             q.push(child)
           }
-          q.slice(1)
         }
+        q.slice(1)
       }
 
       return leafNodes
