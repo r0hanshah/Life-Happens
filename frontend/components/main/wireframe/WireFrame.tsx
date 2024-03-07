@@ -31,7 +31,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
         const startDay = firstDayOfMonth.clone().startOf('week');
         const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
         const numberOfDaysBetween = endDay.diff(startDay, 'days')
-        const numberOfColumns = numberOfDaysBetween / 7
+        const numberOfColumns = (numberOfDaysBetween+1) / 7
 
 
         var leafIdsByWireFrame:{ [key: number]: string[] } = {}
@@ -65,7 +65,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                 allLeafNodes.concat(sortedLeafNodes)
                 
                 // Get Priority
-                var priority:number = 0
+                var priority:number = 1
 
                 for(const leafNode of leafNodesMap[key])
                 {
@@ -76,8 +76,13 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                     const parentId = leafNode.ancestors.length > 0 ? leafNode.ancestors[0].id == leafNode.rootId ? "" : leafNode.ancestors[0].id : ""
 
                     // Get row and column from start date
-                    const daysFromStartDay = moment(leafNode.startDate).diff(startDay)
-                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : -1
+                    const momentOfStatrDate = moment(leafNode.startDate)
+
+                    const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
+
+                    console.log(`${daysFromStartDay} =? ${numberOfDaysBetween}`)
+
+                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns)-1 : daysFromStartDay > numberOfDaysBetween? 999 : -1
                     const column:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 : daysFromStartDay > numberOfDaysBetween ? 999 : -1
 
                     // Get firts ancestor and calculate row and column of parent W/ Parent Cache
@@ -128,6 +133,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
     useEffect(() => {
         const computedResult = generateLeafAndParentNodeIds(leafNodesMap);
         setLeafIds(computedResult[0])
+        console.log(`Computed Leaf Ids: ${computedResult[0][0]}`)
         setParentNodeIds(computedResult[1])
         setAllLeafNodes(computedResult[2])
       }, [leafNodesMap])

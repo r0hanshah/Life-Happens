@@ -60,19 +60,21 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
 
       while(q.length != 0)
       {
-        var observedNode = q[0]
+        var observedNode:TaskModel = q[0]
         if(observedNode.children.length == 0)
         {
           leafNodes.push(observedNode)
         }
         else
         {
+          console.log(observedNode)
           for(const child of observedNode.children)
           {
             q.push(child)
           }
         }
-        q.slice(1)
+        q.shift()
+        console.log(q.length)
       }
 
       return leafNodes
