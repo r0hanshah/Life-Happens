@@ -18,7 +18,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       {/* <CalendarComponent /> */}
-      <Main tasks={[]}/>
+      <Main rootTasks={[]}/>
       {/* <>
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
         {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}

@@ -5,18 +5,19 @@ import moment from 'moment';
 
 interface GridProps {
   offset: number;
-  subtaskDispIds: string[]; // Hexcode,id|||path_rootid===inter_row,inter_column:::path_id===row,column,index,left_bound // TODO: Change to date with task id and then do more preprocessing
+  subtaskDispIds: string[]; // Hexcode,id|||path_parentid===inter_row,inter_column:::path_id===row,column,index,left_bound
                             // Ideally, the leaf tasks of the root tasks will be passed together
+  inMoment: moment.Moment;
 }
 
 interface ColorQueueType {
   [key: string]: Set<[string, number, string, boolean]>;
 }
 
-const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds }) => {
+const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }) => {
 
   const [colorQueues, setColorQueues] = useState<ColorQueueType>({});
-  const [currentMonth, setCurrentMonth] = useState(moment());
+  const [currentMonth, setCurrentMonth] = useState(inMoment);
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {

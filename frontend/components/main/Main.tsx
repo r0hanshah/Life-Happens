@@ -9,12 +9,15 @@ interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
 }
 
-const Main: React.FC<Tasks> = ({ rootTasks }) => { //TODO: Pass in moment to wireframe and downstream that information
+const Main: React.FC<Tasks> = ({ rootTasks }) => {
 
     const windowHeight = useWindowDimensions().height;
     const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
 
-    const currentMonthAndYear = moment().format('MMMM YYYY');
+    const [currentMonth, setCurrentMonth] = useState(moment());
+
+    const currentMonthAndYear = currentMonth.format('MMMM YYYY');
+
     let [fontsLoaded] = useFonts({
         Inter_900Black
       });
@@ -26,9 +29,23 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => { //TODO: Pass in moment to wir
 
       for(const rootTask of rootTasks)
       {
-        //TODO: Have bfsTree return all leaf nodes but also a '1' (left bound) or '0' (right bound) based on the day of the week each leaf node is given
-        //TODO: Include that value as part of the id so you can then extract it
-        allLeafNodes[rootTask.id] = bfsTree(rootTask)
+        const leafNodes:TaskModel[] = bfsTree(rootTask)
+
+        const key = (leafNodes:TaskModel[], parentId:string): string =>
+        {
+          var sum:number = 0
+          var count:number = 0
+          for(const node of leafNodes)
+          {
+            sum += node.startDate.getDay()
+            count += 1
+          }
+          const average = sum / count
+          console.log(`Average for left bound calculation: ${average}`)
+          return parentId + ":::" + (average > 3 ? "0":"1")
+        }
+
+        allLeafNodes[key(leafNodes, rootTask.id)] = leafNodes
       }
 
       return allLeafNodes
@@ -72,11 +89,7 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => { //TODO: Pass in moment to wir
         <ScrollView style={{width:"100%"}}>
           <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80}}>{currentMonthAndYear}</Text>
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
-            <WireFrame leafNodesMap={leafNodesMap}/>
-            {/* <>
-              {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
-              {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
-            </> */}
+            <WireFrame leafNodesMap={leafNodesMap} inMoment={currentMonth}/>
           </View>
           <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80}}>Root Tasks</Text>
         </ScrollView>

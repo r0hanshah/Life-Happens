@@ -7,21 +7,22 @@ import TaskModel from '../../../models/TaskModel';
 interface CalendarProps {
   offset: number;
   leafNodes: TaskModel[]; // row,column,color
+  inMoment: moment.Moment;
 }
 
-const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodes }) => {
+const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodes, inMoment }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
 
-  const [currentMonth, setCurrentMonth] = useState(moment());
+  const [currentMonth, setCurrentMonth] = useState(inMoment);
 
   // Produce map of yyyymmdd (string) : [TaskModel[]]
 
   useEffect(() => {
     // Fetch or set the initial month based on your requirements
     // For example, you can set it to the current month
-    setCurrentMonth(moment());
+    setCurrentMonth(inMoment);
   }, []);
 
   const renderCalendar = () => {

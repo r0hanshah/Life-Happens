@@ -6,20 +6,21 @@ import moment from 'moment';
 interface GridProps {
   offset: number;
   parentNodes: string[]; // row,column,color
+  inMoment: moment.Moment;
 }
 
 interface ColorMapType {
   [key: string]: string; // key: <row><column> => value: <colorString>
 }
 
-const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes }) => {
+const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes, inMoment }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
 
   const [colors, setColors] = useState<ColorMapType>({});
 
-  const [currentMonth, setCurrentMonth] = useState(moment());
+  const [currentMonth, setCurrentMonth] = useState(inMoment);
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {
