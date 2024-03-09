@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './types';
+import {useNavigation} from "@react-navigation/native";
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -24,6 +25,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
     // Add logic for GitHub sign-in
     console.log("Hello")
   };
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -45,8 +47,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
         <Ionicons name="logo-github" size={24} color="white" />
         <Text style={styles.buttonText}>Log in with GitHub</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <Text onPress={navigateToSignUp} style={styles.signUpLink}>Don't have an account? Sign up here</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <Text style={styles.backToSignUpLink}>Don't have an account? Sign up here</Text>
       </TouchableOpacity>
     </View>
   );
@@ -112,6 +114,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#333', // GitHub gray color
     justifyContent: 'center',
     width: 300
+  },
+  backToSignUpLink: {
+    marginTop: 16,
+    color: '#007AFF',
   },
 });
 

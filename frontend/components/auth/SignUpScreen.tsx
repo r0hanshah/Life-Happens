@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {useNavigation} from "@react-navigation/native";
 
 interface SignUpScreenProps {
     navigateBack: () => void;
   }
-  
+
   const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
   const signUpWithGoogle = () => {
     // Add logic for Google sign-up
@@ -18,8 +19,9 @@ interface SignUpScreenProps {
   const signUpWithGitHub = () => {
     // Add logic for GitHub sign-up
   };
+  const navigation = useNavigation();
 
-  return (
+    return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
       <TextInput style={styles.input} placeholder="Full Name" />
@@ -42,7 +44,7 @@ interface SignUpScreenProps {
         <Ionicons name="logo-github" size={24} color="white" />
         <Text style={styles.buttonText}>Sign up with GitHub</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={navigateBack}>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
