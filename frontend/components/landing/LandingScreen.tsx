@@ -6,10 +6,26 @@ import { useNavigation } from '@react-navigation/native';
 const UserProfilePopup = ({ onClose }: { onClose: () => void }) => {
     return (
         <Modal animationType="slide" transparent={true} visible={true}>
-            < View style={{ height: '100%', width: '25%', backgroundColor:'blue', marginLeft: 'auto'}}>
-                    <Text>User Profile</Text>
-                    {/* Add user profile details or options here */}
-                    <Button title="Close" onPress={onClose} />
+            < View style={styles.profileContainer}>
+                <Text style = {styles.profileTitle}>
+                    Welcome (User)
+                </Text>
+
+                <TouchableOpacity style={styles.profileItem}>
+                    <Text style={styles.profileText}>AI Settings</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.profileItem}>
+                    <Text style={styles.profileText}>Notification Settings</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.profileItem}>
+                    <Text style={styles.profileText}> Shared Task Trees</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.profileClose} onPress={onClose} >
+                    <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
             </View>
         </Modal>
     );
@@ -23,7 +39,7 @@ const LandingScreen: React.FC = () => {
         <View style={styles.container}>
             <View style={styles.navBar}>
                 <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Landing')}>
-                    <Text style={styles.navButtonText}>About</Text>
+                    <Text style={styles.navButtonText}>Main</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('SignUp')}>
                     <Text style={styles.navButtonText}>SignUp</Text>
@@ -39,10 +55,10 @@ const LandingScreen: React.FC = () => {
             <View style={styles.contentContainer}>
                 <View style={styles.topContainer}>
                     <Text style={styles.title}>Life Happens</Text>
-                    <Text style={styles.h2}>Increasing Productivity since 2024.</Text>
+                    <Text style={styles.h2}>Increasing Productivity Since 2024.</Text>
                 </View>
                 <View style={styles.middleContainer}>
-                    <Image source= '' style={styles.image} />
+                    <Image src = 'frontend/assets/adaptive-icon.png' style={styles.image} />
                 </View>
                 <TouchableOpacity style={[styles.button, styles.toLoginLink]} onPress={() => navigation.navigate('SignUp')}>
                     <Text style={styles.buttonText}>Get Started</Text>
@@ -100,9 +116,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 32,
         justifyContent: 'center',
-        width: 300
+        width: 250
     },
     buttonText: {
         color: 'white',
@@ -123,6 +139,47 @@ const styles = StyleSheet.create({
     toLoginLink: {
         marginTop: 16,
         color: '#007AFF',
+    },
+
+    profileContainer: {
+        paddingTop: 12,
+        height: '100%',
+        width: '25%',
+        backgroundColor:'gray',
+        marginLeft: 'auto',
+    },
+
+    profileTitle: {
+        textAlign: "center",
+        fontWeight: 'bold',
+        marginTop: 20,
+        fontSize: 20,
+        marginBottom: 18,
+    },
+
+    profileItem:{
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 8,
+        marginVertical: 25,
+        marginHorizontal: 5,
+    },
+    profileText:{
+        color: '#fff',
+        fontSize: 16,
+    },
+    profileClose:{
+        backgroundColor: '#007AFF',
+        padding: 5,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 30,
+        marginHorizontal: 10,
+        justifyContent: 'center',
+
+
     },
 });
 
