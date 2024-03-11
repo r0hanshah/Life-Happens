@@ -1,13 +1,12 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {useNavigation} from "@react-navigation/native";
 
 interface SignUpScreenProps {
-    navigateBack: () => void;
-  }
+  navigateBack: () => void;
+}
 
-  const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
   const signUpWithGoogle = () => {
     // Add logic for Google sign-up
   };
@@ -19,35 +18,34 @@ interface SignUpScreenProps {
   const signUpWithGitHub = () => {
     // Add logic for GitHub sign-up
   };
-  const navigation = useNavigation();
 
-    return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput style={styles.input} placeholder="Full Name" />
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Username" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
-      <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signUpWithGoogle}>
-        <Ionicons name="logo-google" size={24} color="white" />
-        <Text style={styles.buttonText}>Sign up with Google</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signUpWithApple}>
-        <Ionicons name="logo-apple" size={24} color="white" />
-        <Text style={styles.buttonText}>Sign up with Apple</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signUpWithGitHub}>
-        <Ionicons name="logo-github" size={24} color="white" />
-        <Text style={styles.buttonText}>Sign up with GitHub</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
-      </TouchableOpacity>
-    </View>
+  return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Sign Up</Text>
+        <TextInput style={styles.input} placeholder="Full Name" />
+        <TextInput style={styles.input} placeholder="Email" />
+        <TextInput style={styles.input} placeholder="Username" />
+        <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
+        <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={true} />
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signUpWithGoogle}>
+          <Ionicons name="logo-google" size={24} color="white" />
+          <Text style={styles.buttonText}>Sign up with Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signUpWithApple}>
+          <Ionicons name="logo-apple" size={24} color="white" />
+          <Text style={styles.buttonText}>Sign up with Apple</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signUpWithGitHub}>
+          <Ionicons name="logo-github" size={24} color="white" />
+          <Text style={styles.buttonText}>Sign up with GitHub</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={navigateBack}>
+          <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
+        </TouchableOpacity>
+      </View>
   );
 };
 

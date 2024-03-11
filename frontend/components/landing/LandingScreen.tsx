@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, Modal  } from "react-native";
-import { useNavigation } from '@react-navigation/native';
 
 
 const UserProfilePopup = ({ onClose }: { onClose: () => void }) => {
@@ -30,21 +29,27 @@ const UserProfilePopup = ({ onClose }: { onClose: () => void }) => {
         </Modal>
     );
 };
-const LandingScreen: React.FC = () => {
-    const navigation = useNavigation();
+
+interface LandingProps {
+    navigateToSignUp: () => void;
+    navigateToLogin: () => void;
+    navigateToLanding: () => void;
+}
+
+const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLanding, navigateToLogin }) => {
     const [showProfile, setShowProfile] = useState(false);
 
 
     return (
         <View style={styles.container}>
             <View style={styles.navBar}>
-                <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Landing')}>
+                <TouchableOpacity style={styles.navButton} onPress={navigateToLanding}>
                     <Text style={styles.navButtonText}>Main</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('SignUp')}>
+                <TouchableOpacity style={styles.navButton} onPress={navigateToSignUp}>
                     <Text style={styles.navButtonText}>SignUp</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Login')}>
+                <TouchableOpacity style={styles.navButton} onPress={navigateToLogin}>
                     <Text style={styles.navButtonText}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navButton} onPress={() => setShowProfile(true)}>
@@ -60,7 +65,7 @@ const LandingScreen: React.FC = () => {
                 <View style={styles.middleContainer}>
                     <Image src = 'frontend/assets/adaptive-icon.png' style={styles.image} />
                 </View>
-                <TouchableOpacity style={[styles.button, styles.toLoginLink]} onPress={() => navigation.navigate('SignUp')}>
+                <TouchableOpacity style={[styles.button, styles.toLoginLink]} onPress={navigateToSignUp}>
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
             </View>
@@ -178,8 +183,6 @@ const styles = StyleSheet.create({
         marginVertical: 30,
         marginHorizontal: 10,
         justifyContent: 'center',
-
-
     },
 });
 
