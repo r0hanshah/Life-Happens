@@ -5,8 +5,8 @@ import LoginScreen from './components/auth/LoginScreen';
 import SignUpScreen from './components/auth/SignUpScreen';
 import Main from './components/main/Main';
 import TaskModel from './models/TaskModel';
-
 import LandingScreen from './components/landing/LandingScreen';
+
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing'>('Landing');

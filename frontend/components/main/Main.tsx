@@ -4,6 +4,7 @@ import WireFrame from './wireframe/WireFrame';
 import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
+import RootTaskList from './rootTaskList/RootTaskList';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
@@ -13,6 +14,10 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
 
     const windowHeight = useWindowDimensions().height;
     const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
+    const [rootTaskMap, setRootTaskMap] = useState<{[key:string]:TaskModel[]}>({
+      "0":[],
+      "1":[]
+    });
 
     const [currentMonth, setCurrentMonth] = useState(moment());
 
@@ -23,9 +28,13 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
       });
     
     // Extract leaf nodes from root tasks with breadth first search
-    const getAllLeafNodes=(rootTasks:TaskModel[]):{ [key: string]: TaskModel[]} =>
+    const getAllLeafNodes=(rootTasks:TaskModel[]):[{ [key: string]: TaskModel[]}, { [key: string]: TaskModel[]}] =>
     {
       var allLeafNodes:{[key:string]:TaskModel[]} = {}
+      var sidedRootTasks:{ [key: string]: TaskModel[]} = {
+        "0":[],
+        "1":[]
+      }
 
       for(const rootTask of rootTasks)
       {
@@ -42,13 +51,14 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
           }
           const average = sum / count
           console.log(`Average for left bound calculation: ${average}`)
+          sidedRootTasks[average > 3 ? "0":"1"].push(rootTask)
           return parentId + ":::" + (average > 3 ? "0":"1")
         }
 
         allLeafNodes[key(leafNodes, rootTask.id)] = leafNodes
       }
 
-      return allLeafNodes
+      return [allLeafNodes, sidedRootTasks]
     }
 
     const bfsTree=(root:TaskModel):TaskModel[] =>
@@ -60,19 +70,21 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
 
       while(q.length != 0)
       {
-        var observedNode = q[0]
+        var observedNode:TaskModel = q[0]
         if(observedNode.children.length == 0)
         {
           leafNodes.push(observedNode)
         }
         else
         {
+          console.log(observedNode)
           for(const child of observedNode.children)
           {
             q.push(child)
           }
         }
-        q.slice(1)
+        q.shift()
+        console.log(q.length)
       }
 
       return leafNodes
@@ -80,8 +92,9 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
 
     // Set all leaf nodes
     useEffect(() => {
-      const allLeafNodes = getAllLeafNodes(rootTasks)
-      setLeafNodesMap(allLeafNodes);
+      const orderedMaps = getAllLeafNodes(rootTasks)
+      setLeafNodesMap(orderedMaps[0]);
+      setRootTaskMap(orderedMaps[1])
     }, [rootTasks]);
 
 
@@ -91,7 +104,8 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
             <WireFrame leafNodesMap={leafNodesMap} inMoment={currentMonth}/>
           </View>
-          <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80}}>Root Tasks</Text>
+          <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+          <RootTaskList rootTasksMap={rootTaskMap}/>
         </ScrollView>
       );
 }
