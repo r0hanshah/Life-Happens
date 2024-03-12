@@ -105,7 +105,9 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
             <WireFrame leafNodesMap={leafNodesMap} inMoment={currentMonth}/>
           </View>
           <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
-          <RootTaskList rootTasksMap={rootTaskMap}/>
+          <View style={{maxWidth: "auto", alignItems:"center"}}>
+            <RootTaskList rootTasksMap={rootTaskMap}/>
+          </View>
         </ScrollView>
       );
 }

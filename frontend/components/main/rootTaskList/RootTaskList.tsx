@@ -11,9 +11,9 @@ interface RootTaskListProps
 const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) => 
 {
 
-    const renderLists = (rootTasksMap: {[key:string]:TaskModel[]}) => {
+    const windowWidth = useWindowDimensions().width;
 
-        const windowWidth = useWindowDimensions().width;
+    const renderLists = (rootTasksMap: {[key:string]:TaskModel[]}) => {
 
         const leftBoundTasks = []
         const rightBoundTasks = []
@@ -22,20 +22,20 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
         console.log(rootTasksMap)
         for(const task of rootTasksMap["1"])
         {
-            leftBoundTasks.push(<ListItem rootTask={task} leftBound={true}/>)
+            leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true}/>)
         }
 
         // Right Bound Tasks
         for(const task of rootTasksMap["0"])
         {
-            rightBoundTasks.push(<ListItem rootTask={task} leftBound={false}/>)
+            rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false}/>)
         }
 
         const lists = [
-            <View style={{width: windowWidth * 0.40, marginRight: windowWidth*0.04}}>
+            <View key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
                 {leftBoundTasks}
             </View>,
-            <View style={{width: windowWidth * 0.40}}>
+            <View key={"rightList"} style={{flex: 1, alignItems: "flex-end"}}>
                 {rightBoundTasks}
             </View>
         ]
@@ -44,7 +44,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
       };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {width: windowWidth * 0.83 + 17}]}>
             {renderLists(rootTasksMap)}
         </View>
     )
@@ -52,8 +52,10 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
 
 const styles = StyleSheet.create({
     container: {
-      flexDirection: 'row',
-      justifyContent: "center"
+      width: "100%",
+      alignItems: 'flex-start',
+      justifyContent: "center",
+      flexDirection: "row"
     },
   }); 
 
