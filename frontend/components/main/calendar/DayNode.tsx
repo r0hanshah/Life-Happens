@@ -51,45 +51,52 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       )
   }
 
+  const renderDayNode = () =>
+  {
+    return (
+      <View style={{flexDirection:"column", alignItems:"center"}}>
+        <View style={{flexDirection: "row"}}>
+          <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+          </View>
+          <View style={containerStyle}>
+            <Text style={{
+              color: '#fff',
+              paddingLeft: 15,
+              fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
+              alignContent: "flex-start",
+              width: 35
+            }}>{dayNumber}</Text>
+            {/* Render task circles */}
+            {renderTaskCircles()}
+          </View>
+          <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+            <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
+          </View>
+        </View>
+        <View style={{flexDirection: "row", justifyContent: "flex-start", width: "100%"}}>
+          <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3, marginLeft: 60}}/>
+          <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+          <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 8}}/>
+
+          <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+          <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+          <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 8}}/>
+
+          <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+          <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+          <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
+        </View>
+      </View>
+    )
+  }
+
   return( 
-    <View style={{flexDirection:"column", alignItems:"center"}}>
-      <View style={{flexDirection: "row"}}>
-        <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-        </View>
-        <View style={containerStyle}>
-          <Text style={{
-            color: '#fff',
-            paddingLeft: 15,
-            fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
-            alignContent: "flex-start",
-            width: 35
-          }}>{dayNumber}</Text>
-          {/* Render task circles */}
-          {renderTaskCircles()}
-        </View>
-        <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-          <View style={{width: 15, height: 2, backgroundColor:"rgba(255,255,255,0.1)", marginBottom: 3}}/>
-        </View>
-      </View>
-      <View style={{flexDirection: "row", justifyContent: "flex-start", width: "100%"}}>
-        <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3, marginLeft: 60}}/>
-        <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-        <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 8}}/>
-
-        <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-        <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-        <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 8}}/>
-
-        <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-        <View style={{width: 2, height: 33, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-        <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0.1)", marginRight: 3}}/>
-      </View>
-    </View>
+    renderDayNode()
   );
 };
 

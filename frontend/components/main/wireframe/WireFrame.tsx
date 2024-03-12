@@ -37,6 +37,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
         var leafIdsByWireFrame:{ [key: number]: string[] } = {}
         var parentNodeIdsByWireFrame:{ [key: number]: string[] } = {}
         var leafTaskByIndex:{ [key: number]: TaskModel[] } = {}
+
+        var offsetMap: { [key:number] : number} = {}
         
         var count:number = 0
         // Iterate through each key value in leafNodesMap
@@ -77,6 +79,12 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
 
                     const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
 
+                    var index = priority
+
+                    offsetMap.hasOwnProperty(daysFromStartDay) ? index += offsetMap[daysFromStartDay] : offsetMap[daysFromStartDay] = 0
+
+                    offsetMap[daysFromStartDay] += 1
+
                     leafTaskByIndex.hasOwnProperty(daysFromStartDay) ? leafTaskByIndex[daysFromStartDay].push(leafNode) :  leafTaskByIndex[daysFromStartDay] = [leafNode]
 
                     const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor((daysFromStartDay)/7) : daysFromStartDay > numberOfDaysBetween? 999 : -1
@@ -109,7 +117,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                     
 
                     // Create Leaf Id and parent node id
-                    const leafId:string = `${color},${rootId}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${priority},${leftBound}`
+                    const leafId:string = `${color},${rootId}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${index},${leftBound}`
 
                     console.log(leafId)
 

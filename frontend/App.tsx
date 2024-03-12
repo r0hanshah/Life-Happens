@@ -25,7 +25,6 @@ export default function App() {
         new TaskModel("123", "dp", "123", [], [], "One More Test", "green", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
         new TaskModel("124", "dp", "124", [], [], "2 Test", "blue", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
         new TaskModel("125", "dp", "125", [], [], "3 Test", "orange", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("126", "dp", "126", [], [], "3 Test", "pink", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
         ]}/>
       {/* <>
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}

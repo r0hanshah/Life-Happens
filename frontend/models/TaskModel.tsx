@@ -24,6 +24,8 @@ class TaskModel
 
         this.contextText = contextText
         this.contextFiles = contextFiles
+
+        this.offset = 0
     }
 
     id:string
@@ -47,6 +49,9 @@ class TaskModel
 
     contextText:string
     contextFiles:string[]
+
+    //UI Aids
+    offset:number
 }
 
 export default TaskModel
