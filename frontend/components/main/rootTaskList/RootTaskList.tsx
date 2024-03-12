@@ -20,15 +20,19 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
 
         // Left Bound Tasks
         console.log(rootTasksMap)
+        var count = 0
         for(const task of rootTasksMap["1"])
         {
-            leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true}/>)
+            leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
+            count += 1;
         }
 
         // Right Bound Tasks
+        count = 0
         for(const task of rootTasksMap["0"])
         {
-            rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false}/>)
+            rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
+            count += 1;
         }
 
         const lists = [

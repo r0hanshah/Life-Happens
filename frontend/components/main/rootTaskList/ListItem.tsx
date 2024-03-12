@@ -7,9 +7,10 @@ interface ListItemProps
 {
     rootTask: TaskModel
     leftBound: boolean
+    index:number
 }
 
-const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound }) => 
+const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) => 
 {
     const windowWidth = useWindowDimensions().width;
 
@@ -20,7 +21,7 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound }) =>
     return (
         <View key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
 
-            <View style={{width: 2, height: 195, backgroundColor: rootTask.color, bottom: 168, display: leftBound ? "flex": "none"}}/>
+            <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/>
             <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, display: leftBound ? "flex": "none"}}/>
 
             <View style={[styles.container, {width: windowWidth * 0.39, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
@@ -37,7 +38,7 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound }) =>
             </View>
 
             <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, display: !leftBound ? "flex": "none"}}/>
-            <View style={{width: 2, height: 195, backgroundColor: rootTask.color, bottom: 168, display: !leftBound ? "flex": "none"}}/>
+            <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/>
 
         </View>
     )
