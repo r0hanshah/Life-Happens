@@ -17,12 +17,12 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
     // Produce ids for leaf nodes and their parents
     const [leafIds, setLeafIds] = useState<{ [key: number]: string[] }>({});
     const [parentNodeIds, setParentNodeIds] = useState<{ [key: number]: string[] }>({})
-    const [allLeafNodes, setAllLeafNodes] = useState<TaskModel[]>([])
+    const [leafTaskByIndex, setLeafTaskByIndex] = useState<{ [key: number]: TaskModel[] }>({})
 
     const [currentMonth, setCurrentMonth] = useState(inMoment);
 
     // Generate values for all parameters above
-    const generateLeafAndParentNodeIds = (leafNodesMap:{[key:string]:TaskModel[]}):[{ [key: number]: string[] }, { [key: number]: string[] }, TaskModel[]] =>
+    const generateLeafAndParentNodeIds = (leafNodesMap:{[key:string]:TaskModel[]}):[{ [key: number]: string[] }, { [key: number]: string[] }, { [key: number]: TaskModel[] }] =>
     {
         const firstDayOfMonth = currentMonth.clone().startOf('month');
         const daysInMonth = currentMonth.daysInMonth();
@@ -36,7 +36,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
 
         var leafIdsByWireFrame:{ [key: number]: string[] } = {}
         var parentNodeIdsByWireFrame:{ [key: number]: string[] } = {}
-        var allLeafNodes:TaskModel[] = []
+        var leafTaskByIndex:{ [key: number]: TaskModel[] } = {}
         
         var count:number = 0
         // Iterate through each key value in leafNodesMap
@@ -60,14 +60,11 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
             {
                 // Sort all leaf nodes for parent by start Date
                 const sortedLeafNodes:TaskModel[] = leafNodesMap[key].sort((a, b) => a.startDate.getDate() - b.startDate.getDate())
-
-                // Add leaf nodes to allLeafNodes
-                allLeafNodes.concat(sortedLeafNodes)
                 
                 // Get Priority
                 var priority:number = 1
 
-                for(const leafNode of leafNodesMap[key])
+                for(const leafNode of sortedLeafNodes)
                 {
                     // Get color
                     const color = leafNode.color
@@ -80,9 +77,9 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
 
                     const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
 
-                    console.log(`${daysFromStartDay} =? ${numberOfDaysBetween}`)
+                    leafTaskByIndex.hasOwnProperty(daysFromStartDay) ? leafTaskByIndex[daysFromStartDay].push(leafNode) :  leafTaskByIndex[daysFromStartDay] = [leafNode]
 
-                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns)-1 : daysFromStartDay > numberOfDaysBetween? 999 : -1
+                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor((daysFromStartDay)/7) : daysFromStartDay > numberOfDaysBetween? 999 : -1
                     const column:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 : daysFromStartDay > numberOfDaysBetween ? 999 : -1
 
                     // Get firts ancestor and calculate row and column of parent W/ Parent Cache
@@ -114,6 +111,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                     // Create Leaf Id and parent node id
                     const leafId:string = `${color},${rootId}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${priority},${leftBound}`
 
+                    console.log(leafId)
+
                     // Place ids in dictionary
                     leafIdsByWireFrame.hasOwnProperty(offset) ? leafIdsByWireFrame[offset].push(leafId) : leafIdsByWireFrame[offset] = [leafId]
 
@@ -127,7 +126,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                 count += 1
             }
         }
-        return [leafIdsByWireFrame, parentNodeIdsByWireFrame, allLeafNodes]
+        return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex]
     }
 
     useEffect(() => {
@@ -135,7 +134,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
         setLeafIds(computedResult[0])
         console.log(`Computed Leaf Ids: ${computedResult[0][0]}`)
         setParentNodeIds(computedResult[1])
-        setAllLeafNodes(computedResult[2])
+        setLeafTaskByIndex(computedResult[2])
       }, [leafNodesMap])
 
     return (
@@ -148,7 +147,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
             <ParentNodeGridComponent offset={1} parentNodes={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} inMoment={inMoment}/>
             <ParentNodeGridComponent offset={2} parentNodes={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} inMoment={inMoment}/>
 
-            <CalendarDisplay offset={0} leafNodes={allLeafNodes} inMoment={inMoment}/>
+            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment}/>
         </View>
     )
 }

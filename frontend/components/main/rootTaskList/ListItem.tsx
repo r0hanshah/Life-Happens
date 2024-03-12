@@ -24,7 +24,7 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
             <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/>
             <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, display: leftBound ? "flex": "none"}}/>
 
-            <View style={[styles.container, {width: windowWidth * 0.39, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
+            <View style={[styles.container, {width: windowWidth * 0.395, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
 
                 <View style={[styles.circle, {backgroundColor: rootTask.color, display: leftBound ? "flex": "none"}]}/>
 
