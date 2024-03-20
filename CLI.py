@@ -1,6 +1,8 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from firebase_admin import auth
+
 import pyrebase
 
 # Initialize Firebase app
@@ -22,7 +24,6 @@ firebaseConfig={
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
-
 class User:
     def __init__(self, ID, Name, WeeklyAITimesAllowed, ProfilePicture="", TaskTreeRoots=[], Settings={}, AllowAIMoveTasks=False, SharedTaskTrees=[], ParentsOfLeafNodesByTask={}):
         self.ID = ID
@@ -90,6 +91,29 @@ def login():
         print("Invalid email or password.")
         return None  # Return None if login fails
 
+def create_user(email, password):
+    try:
+        user = auth.create_user_with_email_and_password(email, password)
+        user_id = user['localId']  # Retrieve the UID
+        return user_id
+    except Exception as e:
+        print("Error creating user:", e)
+        return None
+
+
+def delete_account(user_id):
+    try:
+        # Delete the user's document
+        db.collection('User').document(user_id).delete()
+
+        print("Account deleted successfully!")
+        return True
+    except Exception as e:
+        print("Error deleting account:", e)
+        return False
+
+
+
 def sign_up():
     print("Sign up...")
     name = input("Enter Name: ")
@@ -102,38 +126,37 @@ def sign_up():
         print("Email already exists!")
         return None
 
-    try:
-        user = auth.create_user_with_email_and_password(email, password)
-        user_id = user['localId']  # Retrieve the UID
-        weekly_ai_times = input(
-            "Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
-        weekly_ai_times_dict = dict(item.split(":::") for item in weekly_ai_times.split(","))
-        user_data = {
-            "ID": user_id,
-            "ProfilePicture": "https://example.com/profile.jpg",
-            "TaskTreeRoots": ["root1", "root2"],
-            "Name": name,
-            "WeeklyAITimesAllowed":  weekly_ai_times_dict ,
-            "Settings": {
-                "setting1": "value1",
-                "setting2": "value2"
-            },
-            "AllowAIMoveTasks": True,
-            "SharedTaskTrees": ["sharedRoot1:::sharedNode1", "sharedRoot2:::sharedNode2"],
-            "ParentsOfLeafNodesByTask": {
-                "root1": ["2024-02-22:::leafNode1", "2024-02-23:::leafNode2"],
-                "root2": ["2024-02-24:::leafNode3"]
+    user_id = create_user(email, password)
+    if user_id:
+        try:
+            weekly_ai_times = input("Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
+            weekly_ai_times_dict = dict(item.split(":::") for item in weekly_ai_times.split(","))
+            user_data = {
+                "ID": user_id,
+                "ProfilePicture": "https://example.com/profile.jpg",
+                "TaskTreeRoots": ["root1", "root2"],
+                "Name": name,
+                "WeeklyAITimesAllowed":  weekly_ai_times_dict ,
+                "Settings": {
+                    "setting1": "value1",
+                    "setting2": "value2"
+                },
+                "AllowAIMoveTasks": True,
+                "SharedTaskTrees": ["sharedRoot1:::sharedNode1", "sharedRoot2:::sharedNode2"],
+                "ParentsOfLeafNodesByTask": {
+                    "root1": ["2024-02-22:::leafNode1", "2024-02-23:::leafNode2"],
+                    "root2": ["2024-02-24:::leafNode3"]
+                }
             }
-        }
-        user_data= User(**user_data)
-        user_ref = db.collection('User').document(user_id).set(user_data.__dict__)
-        print("Successfully created account!")
-        print("Your user ID is:", user_id)
-        return user_id  # Return the user ID after successful sign up
-    except Exception as e:
-        print("Error:", e)
-        return None
-# make this a subtree to user
+            user_data= User(**user_data)
+            user_ref = db.collection('User').document(user_id).set(user_data.__dict__)
+            print("Successfully created account!")
+            print("Your user ID is:", user_id)
+            return user_id  # Return the user ID after successful sign up
+        except Exception as e:
+            print("Error:", e)
+            return None
+
 
 def create_task(user_id):
     print("Create a task...")
@@ -209,26 +232,41 @@ def create_subtask(user_id, task_id):
 
 
 def main():
-    ans = input("Are you a new user?[y/n]: ")
-    if ans.lower() == 'y':
-        user_id = sign_up()
+    user_id = None
+    while True:
         if user_id:
-            task_id = create_task(user_id)
-            if task_id:
+            print("\nOptions:")
+            print("1. Create Task")
+            print("2. Create Subtask")
+            print("3. Delete Account")
+            print("4. Logout")
+            choice = input("Enter your choice: ")
+            if choice == '1':
+                create_task(user_id)
+            elif choice == '2':
+                task_id = input("Enter Task ID: ")
                 create_subtask(user_id, task_id)
-            login()  # Log in after sign up
-    elif ans.lower() == 'n':
-        print("Redirecting to login...")
-        user_id = login()
-        if user_id:
-            task_id = create_task(user_id)
-            if task_id:
-                create_subtask(user_id, task_id)
-    else:
-        print("Invalid option")
+            elif choice == '3':
+                confirm = input("Are you sure you want to delete your account?[y/n]: ")
+                if confirm.lower() == 'y':
+                    if delete_account(user_id):
+                        break
+            elif choice == '4':
+                print("Logging out...")
+                break
+            else:
+                print("Invalid choice")
+        else:
+            ans = input("Are you a new user?[y/n]: ")
+            if ans.lower() == 'y':
+                user_id = sign_up()
+            elif ans.lower() == 'n':
+                print("Redirecting to login...")
+                user_id = login()
+            else:
+                print("Invalid option")
 
-    input("Press any key to exit...")
-
+    print("Exiting...")
 
 if __name__ == "__main__":
     main()
