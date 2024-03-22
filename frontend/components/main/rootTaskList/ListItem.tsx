@@ -21,8 +21,8 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
     return (
         <View key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
 
-            <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/>
-            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, display: leftBound ? "flex": "none"}}/>
+            {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/> */}
+            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
 
             <View style={[styles.container, {width: windowWidth * 0.395, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
 
@@ -37,8 +37,8 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
 
             </View>
 
-            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, display: !leftBound ? "flex": "none"}}/>
-            <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/>
+            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginRight:1, display: !leftBound ? "flex": "none"}}/>
+            {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/> */}
 
         </View>
     )

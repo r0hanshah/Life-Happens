@@ -48,7 +48,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
       };
 
     return (
-        <View style={[styles.container, {width: windowWidth * 0.83 + 15}]}>
+        <View style={[styles.container, {width: windowWidth * 0.83 + 14}]}>
             {renderLists(rootTasksMap)}
         </View>
     )

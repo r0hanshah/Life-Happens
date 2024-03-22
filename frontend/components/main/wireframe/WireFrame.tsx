@@ -10,10 +10,11 @@ import moment from 'moment';
 
 interface WireFrameProps {
     leafNodesMap: {[key:string]:TaskModel[]};
+    sidedRootTasksMap: {[key:string]:TaskModel[]};
     inMoment: moment.Moment;
 }
 
-const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
+const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment }) => {
     // Produce ids for leaf nodes and their parents
     const [leafIds, setLeafIds] = useState<{ [key: number]: string[] }>({});
     const [parentNodeIds, setParentNodeIds] = useState<{ [key: number]: string[] }>({})
@@ -114,10 +115,20 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, inMoment }) => {
                         }
                     }
                     
+                    var rootIndex = 0
+                    for(var i = 0; i < sidedRootTasksMap[leftBound].length; i += 1)
+                    {
+                        const rootTask = sidedRootTasksMap[leftBound][i]
+                        if (rootTask.id == rootId)
+                        {
+                            rootIndex = i
+                            break
+                        }
+                    }
                     
 
                     // Create Leaf Id and parent node id
-                    const leafId:string = `${color},${rootId}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${index},${leftBound}`
+                    const leafId:string = `${color},${rootId},${rootIndex}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${index},${leftBound}`
 
                     console.log(leafId)
 

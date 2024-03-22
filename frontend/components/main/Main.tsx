@@ -102,7 +102,7 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
         <ScrollView style={{width:"100%"}}>
           <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80}}>{currentMonthAndYear}</Text>
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
-            <WireFrame leafNodesMap={leafNodesMap} inMoment={currentMonth}/>
+            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
           </View>
           <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
           <View style={{maxWidth: "auto", alignItems:"center"}}>
