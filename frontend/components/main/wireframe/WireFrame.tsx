@@ -131,8 +131,6 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     // Create Leaf Id and parent node id
                     const leafId:string = `${color},${rootId},${rootIndex}|||${parentId.length > 0? parentId +'==='+ pRow + ',' + pColumn + ':::' : ''}${leafNode.id}===${row},${column},${index},${leftBound}`
 
-                    console.log(leafId)
-
                     // Place ids in dictionary
                     leafIdsByWireFrame.hasOwnProperty(offset) ? leafIdsByWireFrame[offset].push(leafId) : leafIdsByWireFrame[offset] = [leafId]
 
@@ -152,7 +150,6 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
     useEffect(() => {
         const computedResult = generateLeafAndParentNodeIds(leafNodesMap);
         setLeafIds(computedResult[0])
-        console.log(`Computed Leaf Ids: ${computedResult[0][0]}`)
         setParentNodeIds(computedResult[1])
         setLeafTaskByIndex(computedResult[2])
       }, [leafNodesMap])

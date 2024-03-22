@@ -19,7 +19,6 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
         const rightBoundTasks = []
 
         // Left Bound Tasks
-        console.log(rootTasksMap)
         var count = 0
         for(const task of rootTasksMap["1"])
         {

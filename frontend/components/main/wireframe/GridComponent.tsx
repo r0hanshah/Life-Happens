@@ -38,7 +38,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
 
     const daysDifference = endDay.diff(startDay, 'days');
     const ROWS = (daysDifference+1) / 7
-    console.log(ROWS)
 
     for(const id of ids)
     {
@@ -313,15 +312,16 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           // Draw first column line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
-            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.50 + 0.002* ((index-3)%3) + 0.01*(offset), rootId, leftBound])
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.38 + 0.051*((offset) + (((index)-4)%3+1)), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.50 + 0.002* ((index-3)%3) + 0.01*(offset), rootId, leftBound]])
+            console.log(offset, ((index)-4)%3+1, hexcode, index)
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.38 + 0.051* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
           }
 
           // Draw horizontal lines
-          columnOffset = index > 5 ? columnOffset : columnOffset - 1
+          columnOffset = columnOffset - 1
           while(leftBound ? columnOffset > 0 : columnOffset < 7)
           {
             leftBound ? columnOffset -= 1 : columnOffset += 1;

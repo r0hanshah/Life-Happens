@@ -50,7 +50,6 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
             count += 1
           }
           const average = sum / count
-          console.log(`Average for left bound calculation: ${average}`)
           sidedRootTasks[average > 3 ? "0":"1"].push(rootTask)
           return parentId + ":::" + (average > 3 ? "0":"1")
         }
@@ -77,14 +76,12 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
         }
         else
         {
-          console.log(observedNode)
           for(const child of observedNode.children)
           {
             q.push(child)
           }
         }
         q.shift()
-        console.log(q.length)
       }
 
       return leafNodes
