@@ -67,8 +67,9 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                 // Get Priority
                 var priority:number = 1
 
-                for(const leafNode of sortedLeafNodes)
+                for(var leafNode of sortedLeafNodes)
                 {
+                    leafNode.offset = offset
                     // Get color
                     const color = leafNode.color
 

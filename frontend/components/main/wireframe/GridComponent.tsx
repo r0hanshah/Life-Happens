@@ -266,11 +266,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           // Draw line from calendar node to 
           if(colorQueuesMap.hasOwnProperty(`${row}h${column}`))
           {
-            colorQueuesMap[`${row}h${column}`].add([hexcode, 0.25 * index, rootId, leftBound])
+            colorQueuesMap[`${row}h${column}`].add([hexcode, 0.579 - 0.105* (3-index), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}h${column}`] = new Set([[hexcode, 0.25 * index, rootId, leftBound]])
+            colorQueuesMap[`${row}h${column}`] = new Set([[hexcode,  0.579 - 0.105* (3-index), rootId, leftBound]])
           }
          
           // Draw horizontal lines for second level subtasks 
@@ -295,11 +295,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.48 + 0.56* parseInt(rootIndex) + 0.031*(2-offset)) : 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.48 + 0.56* parseInt(rootIndex) + 0.031*(2-offset)) : 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
             }
           }
 
@@ -308,19 +308,20 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
         {
           var amountFill = index % 3
           amountFill == 0 ? amountFill += 3 : amountFill += 0
-          var columnOffset = index % 2 == 0 ? column : column + 1
+          var columnOffset = index > 6 ? column : column + 1
 
           // Draw first column line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
-            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound])
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.50 + 0.002* ((index-3)%3) + 0.01*(offset), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound]])
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.50 + 0.002* ((index-3)%3) + 0.01*(offset), rootId, leftBound]])
           }
 
           // Draw horizontal lines
+          columnOffset = index > 5 ? columnOffset : columnOffset - 1
           while(leftBound ? columnOffset > 0 : columnOffset < 7)
           {
             leftBound ? columnOffset -= 1 : columnOffset += 1;
@@ -341,11 +342,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (3 * parseInt(rootIndex) + 0.5) : 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)): 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (3 * parseInt(rootIndex) + 0.5) : 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
             }
           }
         }

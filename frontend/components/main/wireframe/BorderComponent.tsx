@@ -28,6 +28,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
           width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85) : 0,
           height: orientation === 'vertical' ? lastRow ? ((windowHeight / 6) * 0.9 + 50) : ((windowHeight / 6) * 0.9) : 0,
           paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 104.5 : 0 : 0,
+          justifyContent: lastRow ? "flex-start" : "center"
         }]}>
           <View style={[{
             height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 0,
@@ -40,10 +41,10 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               borderStyle,
               {
                 minHeight: 0,
-                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill != 1 ? (amountFill/2)*0.82 + 0.26 : amountFill : amountFill != 1 ? 1-(amountFill/2)*0.82 - 0.26 : 1) : 0,
+                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 0,
                 height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
                 paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 : 0,
-                marginTop: orientation === 'vertical' && lastRow ? (windowHeight/6)*amountFill * 0.5 : 0
+                // marginTop: orientation === 'vertical' && lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill * 0.5 : 0
               },
             ]}
           />
@@ -55,7 +56,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
   return (
     <View style={styles.container}>
       {renderBorders()}
-      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
+      <View key='base' style={[ borderStyle, {zIndex: -999, borderColor: 'rgba(255, 255, 255, 0.1)', width: orientation === 'horizontal' ? (windowWidth / 7) * 0.89 : 0, height: orientation === 'vertical' ? (windowHeight / 6) * 0.9 : lastRow ? (windowHeight / 6) * 0.9 + 50 : 0, paddingTop: orientation === 'horizontal' ? (windowHeight / 6) * 0.9 -1.5 : lastRow ? (windowHeight / 6) * 0.9 + 50.5 : 0 }]} />
     </View>
   );
 };
