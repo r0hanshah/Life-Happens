@@ -85,6 +85,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
                     offsetMap.hasOwnProperty(daysFromStartDay) ? index += offsetMap[daysFromStartDay] : offsetMap[daysFromStartDay] = 0
 
+                    index = offsetMap[daysFromStartDay] + 1
+
                     offsetMap[daysFromStartDay] += 1
 
                     leafTaskByIndex.hasOwnProperty(daysFromStartDay) ? leafTaskByIndex[daysFromStartDay].push(leafNode) :  leafTaskByIndex[daysFromStartDay] = [leafNode]
@@ -105,13 +107,17 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                         else
                         {
                             const children = leafNode.ancestors[0].children
-                            const latestChild = children.reduce((max, child) => (child.startDate.getDate() > max.startDate.getDate() ? child : max), children[0]);
+                            console.log("gettting parent indexes")
+                            const latestChild = children.reduce((max, child) => (child.startDate.getDate() >= max.startDate.getDate() ? child : max), children[0]);
                             // Parent node will be placed one behind (left bound) or 2 infront (right bound) of the latest Child
-                            const daysFromStartDay = moment(latestChild.startDate).diff(startDay)
+                            const momentOfStatrDate = moment(latestChild.startDate)
+                            const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
+                            console.log(daysFromStartDay)
 
                             pRow = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : -1
                             pColumn = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 + (daysFromStartDay % 7 == 0 && leftBound == "1"? 1 : daysFromStartDay % 7 == 6 && leftBound == "0"? - 1 : leftBound == "1" ? -1 : 2) : daysFromStartDay > numberOfDaysBetween ? 999 : -1
-
+                            pColumn += leftBound == "1" ? 1 : 0
+                            console.log("parent row and col", pRow, pColumn)
                             parentCache[parentId] = [pRow, pColumn]
                         }
                     }
@@ -144,6 +150,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                 count += 1
             }
         }
+        console.log(parentNodeIdsByWireFrame)
         return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex]
     }
 
