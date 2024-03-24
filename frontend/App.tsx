@@ -30,6 +30,7 @@ export default function App() {
   childOfParent1.children.push(new TaskModel("002", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   childOfParent1.children.push(new TaskModel("001", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-02-29T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   childOfParent1.children.push(new TaskModel("001", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+  childOfParent1.children.push(new TaskModel("001", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   parent1.children.push(childOfParent1)
 
   return (

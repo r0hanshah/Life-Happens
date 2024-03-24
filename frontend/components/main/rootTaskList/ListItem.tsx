@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, useWindowDimensions, TouchableHighlight } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 import TaskModel from '../../../models/TaskModel';
+
+import MainController from '../../../controllers/main/MainController';
 
 interface ListItemProps
 {
@@ -12,6 +14,8 @@ interface ListItemProps
 
 const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) => 
 {
+    const controller = MainController.getInstance();
+
     const windowWidth = useWindowDimensions().width;
 
     let [fontsLoaded] = useFonts({
@@ -19,28 +23,34 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
       });
 
     return (
-        <View key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
+        
 
-            {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/> */}
-            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
+            <View  key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
 
-            <View style={[styles.container, {width: windowWidth * 0.395, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
+                {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/> */}
+                <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
 
-                <View style={[styles.circle, {backgroundColor: rootTask.color, display: leftBound ? "flex": "none"}]}/>
+                    <TouchableHighlight style={{borderRadius: 25}} onPress={() => controller.increaseCounter()}>
+                        
+                        <View style={[styles.container, {width: windowWidth * 0.395, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
 
-                <Text style={{
-                    color: '#fff',
-                    fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial'
-                }}>{rootTask.title}</Text>
+                            <View style={[styles.circle, {backgroundColor: rootTask.color, display: leftBound ? "flex": "none"}]}/>
 
-                <View style={[styles.circle, {backgroundColor: rootTask.color, display: !leftBound ? "flex": "none"}]}/>
+                            <Text style={{
+                                color: '#fff',
+                                fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial'
+                            }}>{rootTask.title}</Text>
+
+                            <View style={[styles.circle, {backgroundColor: rootTask.color, display: !leftBound ? "flex": "none"}]}/>
+
+                        </View>
+
+                    </TouchableHighlight>
+
+                <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginRight:1, display: !leftBound ? "flex": "none"}}/>
+                {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/> */}
 
             </View>
-
-            <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginRight:1, display: !leftBound ? "flex": "none"}}/>
-            {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/> */}
-
-        </View>
     )
 }
 

@@ -6,11 +6,32 @@ import moment from 'moment';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import RootTaskList from './rootTaskList/RootTaskList';
 
+import MainController from '../../controllers/main/MainController';
+
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
 }
 
 const Main: React.FC<Tasks> = ({ rootTasks }) => {
+
+    //TEMP
+
+    const controller = MainController.getInstance();
+    const counterProperty = controller.getCounterProperty();
+    const [counter, setCounter] = useState(counterProperty.getValue());
+
+    // Update counter state when counterProperty changes
+    useEffect(() => {
+      const listener = (value: number) => {
+        setCounter(value);
+      };
+      counterProperty.addListener(listener);
+      return () => {
+        counterProperty.removeListener(listener);
+      };
+    }, [counterProperty]);
+
+    //TEMP
 
     const windowHeight = useWindowDimensions().height;
     const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
@@ -101,7 +122,7 @@ const Main: React.FC<Tasks> = ({ rootTasks }) => {
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
             <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
           </View>
-          <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+          <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks {counter}</Text>
           <View style={{maxWidth: "auto", alignItems:"center"}}>
             <RootTaskList rootTasksMap={rootTaskMap}/>
           </View>
