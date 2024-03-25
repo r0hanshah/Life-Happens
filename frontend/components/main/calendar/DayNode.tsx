@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, ViewStyle, useWindowDimensions, Text } from 'react-native';
+import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 import TaskModel from '../../../models/TaskModel';
+
+import MainController from '../../../controllers/main/MainController';
 
 interface DayNodeProps {
   dayNumber: number;
@@ -12,6 +14,8 @@ interface DayNodeProps {
 }
 
 const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth }) => {
+
+  const controller = MainController.getInstance();
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
@@ -40,7 +44,9 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       for(const task of leafTasks)
       {
         circles.push(
-          <View key={`leafTask${task.id}`} style={{width: 13, height: 13, borderRadius: 13, backgroundColor: task.color, marginLeft: 8}}/>
+          <TouchableHighlight style={{width: 13, height: 13, borderRadius: 13,  marginLeft: 8}}  key={`leafTask${task.id}`} onPress={() => controller.setSelectedTask(task)}>
+               <View style={{width: 13, height: 13, borderRadius: 13, backgroundColor: task.color}}/>
+          </TouchableHighlight>
         )
         if(circles.length > 4) {break}
       }

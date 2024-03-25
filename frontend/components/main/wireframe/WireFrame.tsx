@@ -19,11 +19,12 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
     const [leafIds, setLeafIds] = useState<{ [key: number]: string[] }>({});
     const [parentNodeIds, setParentNodeIds] = useState<{ [key: number]: string[] }>({})
     const [leafTaskByIndex, setLeafTaskByIndex] = useState<{ [key: number]: TaskModel[] }>({})
+    const [parentTaskByWireFrame, setParentTaskByWireframe] = useState<{[key: number]: TaskModel[]}>({})
 
     const [currentMonth, setCurrentMonth] = useState(inMoment);
 
     // Generate values for all parameters above
-    const generateLeafAndParentNodeIds = (leafNodesMap:{[key:string]:TaskModel[]}):[{ [key: number]: string[] }, { [key: number]: string[] }, { [key: number]: TaskModel[] }] =>
+    const generateLeafAndParentNodeIds = (leafNodesMap:{[key:string]:TaskModel[]}):[{ [key: number]: string[] }, { [key: number]: string[] }, { [key: number]: TaskModel[] }, { [key: number]: TaskModel[] }] =>
     {
         const firstDayOfMonth = currentMonth.clone().startOf('month');
         const daysInMonth = currentMonth.daysInMonth();
@@ -37,6 +38,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
         var leafIdsByWireFrame:{ [key: number]: string[] } = {}
         var parentNodeIdsByWireFrame:{ [key: number]: string[] } = {}
+        var parentTaskByWireFrame:{ [key: number]: TaskModel[] } = {}
         var leafTaskByIndex:{ [key: number]: TaskModel[] } = {}
 
         var offsetMap: { [key:number] : number} = {}
@@ -74,6 +76,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     const color = leafNode.color
 
                     // Get Parent id
+                    const parentTask = leafNode.ancestors.length > 0 ? leafNode.ancestors[0] : null
                     const parentId = leafNode.ancestors.length > 0 ? leafNode.ancestors[0].id == leafNode.rootId ? "" : leafNode.ancestors[0].id : ""
 
                     // Get row and column from start date
@@ -141,6 +144,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     leafIdsByWireFrame.hasOwnProperty(offset) ? leafIdsByWireFrame[offset].push(leafId) : leafIdsByWireFrame[offset] = [leafId]
 
                     parentId.length > 0 ? parentNodeIdsByWireFrame.hasOwnProperty(offset) ? parentNodeIdsByWireFrame[offset].push(`${pRow},${pColumn},${color}`) : parentNodeIdsByWireFrame[offset] = [`${pRow},${pColumn},${color}`]  : console.log(`This child ${leafNode.id} is orphaned`)
+                    parentTask ? parentTaskByWireFrame.hasOwnProperty(offset) ? parentTaskByWireFrame[offset].push(parentTask) : parentTaskByWireFrame[offset] = [parentTask]  : console.log(`b/c no parent was found`)
                 
                     // Increase priority
                     priority += 1
@@ -150,8 +154,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                 count += 1
             }
         }
-        console.log(parentNodeIdsByWireFrame)
-        return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex]
+        return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex, parentTaskByWireFrame]
     }
 
     useEffect(() => {
@@ -159,6 +162,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
         setLeafIds(computedResult[0])
         setParentNodeIds(computedResult[1])
         setLeafTaskByIndex(computedResult[2])
+        setParentTaskByWireframe(computedResult[3])
       }, [leafNodesMap])
 
     return (
@@ -167,9 +171,9 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
             <GridComponent offset={1} subtaskDispIds={leafIds.hasOwnProperty(1) ? leafIds[1]: []} inMoment={inMoment}/>
             <GridComponent offset={2} subtaskDispIds={leafIds.hasOwnProperty(2) ? leafIds[2]: []} inMoment={inMoment}/>
 
-            <ParentNodeGridComponent offset={0} parentNodes={parentNodeIds.hasOwnProperty(0) ? parentNodeIds[0]: []} inMoment={inMoment}/>
-            <ParentNodeGridComponent offset={1} parentNodes={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} inMoment={inMoment}/>
-            <ParentNodeGridComponent offset={2} parentNodes={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} inMoment={inMoment}/>
+            <ParentNodeGridComponent offset={0} parentNodeIds={parentNodeIds.hasOwnProperty(0) ? parentNodeIds[0]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(0) ? parentTaskByWireFrame[0] : [] } inMoment={inMoment}/>
+            <ParentNodeGridComponent offset={1} parentNodeIds={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(1) ? parentTaskByWireFrame[1] : [] } inMoment={inMoment}/>
+            <ParentNodeGridComponent offset={2} parentNodeIds={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(2) ? parentTaskByWireFrame[2] : [] } inMoment={inMoment}/>
 
             <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment}/>
         </View>

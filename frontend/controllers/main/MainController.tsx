@@ -1,10 +1,11 @@
-import PropertyListener from "./Listener"; 
+import PropertyListener from "./Listener";
+import TaskModel from "../../models/TaskModel"; 
 
 // This will control anything that happens inside Main view
 
 class MainController {
     private static instance: MainController | null = null;
-    private counterProperty: PropertyListener<number> = new PropertyListener<number>(0);
+    private selectedTask: PropertyListener<TaskModel | null> = new PropertyListener<TaskModel | null>(null);
   
     // Private constructor to prevent instantiation from outside
     private constructor() {
@@ -21,14 +22,13 @@ class MainController {
   
     // Other methods and properties can be added as needed
     // Getter for the counter property
-    public getCounterProperty(): PropertyListener<number> {
-        return this.counterProperty;
+    public getSelectedTask(): PropertyListener<TaskModel | null> {
+        return this.selectedTask;
     }
 
     // Method to increase the counter value
-    public increaseCounter(): void {
-        const newValue = this.counterProperty.getValue() + 1;
-        this.counterProperty.setValue(newValue);
+    public setSelectedTask(selectedTask: TaskModel | null): void {
+        this.selectedTask.setValue(selectedTask)
     }
   }
 

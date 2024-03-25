@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, useWindowDimensions, TouchableHighlight } from 'react-native';
 import Circle from './ParentTaskCircle';
 import moment from 'moment';
 
+import TaskModel from '../../../models/TaskModel';
+import MainController from '../../../controllers/main/MainController';
+
 interface GridProps {
   offset: number;
-  parentNodes: string[]; // row,column,color
+  parentNodeIds: string[]; // row,column,color
+  parentTasks: TaskModel[];
   inMoment: moment.Moment;
 }
 
@@ -13,27 +17,34 @@ interface ColorMapType {
   [key: string]: string; // key: <row><column> => value: <colorString>
 }
 
-const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes, inMoment }) => {
+const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, parentTasks, inMoment }) => {
+
+  const controller = MainController.getInstance();
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
 
   const [colors, setColors] = useState<ColorMapType>({});
+  const [parentTasksMap, setParentTasksMap] = useState<{[key: string]: TaskModel}>({})
 
   const [currentMonth, setCurrentMonth] = useState(inMoment);
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {
-    const computedResult:{[key: string]: string}  = generateColorMap(parentNodes);
-    setColors(computedResult);
-  }, [parentNodes]);
+    const computedResult= generateColorMap(parentNodeIds);
+    setColors(computedResult[0]);
+    setParentTasksMap(computedResult[1])
+  }, [parentNodeIds]);
 
-  const generateColorMap = (ids: string[]): {[key: string]: string} =>
+  const generateColorMap = (ids: string[]): [{[key: string]: string}, {[key: string]: TaskModel}] =>
   {
     const colorMap: {[key: string]: string} = {}
+    const taskMap: {[key: string]: TaskModel} = {}
 
-    for(const id of ids)
+    for(var i = 0; i < ids.length; i++)
     {
+      const id = ids[i]
+      const parentTask = parentTasks[i]
       const parentComponents = id.split(',')
       const row = parentComponents[0]
       const col = parentComponents[1]
@@ -42,12 +53,13 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes, inM
       if(colorMap.hasOwnProperty(row+col)) { continue }
 
       colorMap[row+col] = color
+      taskMap[row+col] = parentTask
     }
 
-    return colorMap
+    return [colorMap, taskMap]
   }
 
-  const renderParentNodeGrid = (colors: any) => {
+  const renderParentNodeGrid = (colors: any, parentTasks:any) => {
     const firstDayOfMonth = currentMonth.clone().startOf('month');
     const daysInMonth = currentMonth.daysInMonth();
     const startDay = firstDayOfMonth.clone().startOf('week');
@@ -63,9 +75,20 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes, inM
   
       for (let col = 0; col < columns; col++) {
         const id = `${row/7}${col}`;
+        console.log( colors.hasOwnProperty(id) && parentTasks.hasOwnProperty(id))
   
         rowComponents.push(
-          <Circle key={id} diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
+          <View key={id}>
+            { colors.hasOwnProperty(id) && parentTasks.hasOwnProperty(id) ? (
+              <TouchableHighlight  style={{borderRadius: 10}} onPress={() => controller.setSelectedTask(parentTasks[id])}>
+                <Circle diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
+              </TouchableHighlight>
+            ) :
+            (
+              <Circle  diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
+            )
+            }
+          </View>
         );
       }
   
@@ -81,7 +104,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodes, inM
 
   return (
     <View style={[styles.grid, {marginTop: offset * 8 + 10, width: windowWidth * 0.96}]}>
-      {renderParentNodeGrid(colors)}
+      {renderParentNodeGrid(colors, parentTasksMap)}
       {/* Display another row only if there are not enough days to represent all days in the calendar */}
     </View>
   );
