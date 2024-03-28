@@ -105,6 +105,8 @@ def delete_account(user_id):
     try:
         # Delete the user's document
         db.collection('User').document(user_id).delete()
+        db.collection('Task').document(user_id).delete()
+        db.collection('Subtask').document(user_id).delete()
 
         print("Account deleted successfully!")
         return True
@@ -112,6 +114,39 @@ def delete_account(user_id):
         print("Error deleting account:", e)
         return False
 
+
+def update_user(user_id):
+    print("Update user fields...")
+    # Example: update the name field
+    new_name = input("Enter new Name: ")
+    try:
+        db.collection('User').document(user_id).update({"Name": new_name})
+        print("User fields updated successfully!")
+    except Exception as e:
+        print("Error updating user fields:", e)
+
+def update_task(user_id):
+    print("Update task fields...")
+    # Example: update the title field of a task
+    task_id = input("Enter Task ID: ")
+    new_title = input("Enter new Title: ")
+    try:
+        db.collection('User').document(user_id).collection('Tasks').document(task_id).update({"Title": new_title})
+        print("Task fields updated successfully!")
+    except Exception as e:
+        print("Error updating task fields:", e)
+
+def update_subtask(user_id):
+    print("Update subtask fields...")
+    # Example: update the title field of a subtask
+    task_id = input("Enter Task ID: ")
+    subtask_id = input("Enter Subtask ID: ")
+    new_title = input("Enter new Title: ")
+    try:
+        db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).update({"Title": new_title})
+        print("Subtask fields updated successfully!")
+    except Exception as e:
+        print("Error updating subtask fields:", e)
 
 
 def sign_up():
@@ -238,8 +273,11 @@ def main():
             print("\nOptions:")
             print("1. Create Task")
             print("2. Create Subtask")
-            print("3. Delete Account")
-            print("4. Logout")
+            print("3. Update User Fields")
+            print("4. Update Task Fields")
+            print("5. Update Subtask Fields")
+            print("6. Delete Account")
+            print("7. Logout")
             choice = input("Enter your choice: ")
             if choice == '1':
                 create_task(user_id)
@@ -247,11 +285,17 @@ def main():
                 task_id = input("Enter Task ID: ")
                 create_subtask(user_id, task_id)
             elif choice == '3':
+                update_user(user_id)
+            elif choice == '4':
+                update_task(user_id)
+            elif choice == '5':
+                update_subtask(user_id)
+            elif choice == '6':
                 confirm = input("Are you sure you want to delete your account?[y/n]: ")
                 if confirm.lower() == 'y':
                     if delete_account(user_id):
                         break
-            elif choice == '4':
+            elif choice == '7':
                 print("Logging out...")
                 break
             else:
