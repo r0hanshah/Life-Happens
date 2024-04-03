@@ -5,18 +5,26 @@ import LoginScreen from './components/auth/LoginScreen';
 import SignUpScreen from './components/auth/SignUpScreen';
 import Main from './components/main/Main';
 import TaskModel from './models/TaskModel';
+import LandingScreen from './components/landing/LandingScreen';
+
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp'>('Login');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing'>('Landing');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
   };
-
   const navigateBack = () => {
     setCurrentScreen('Login');
   };
-
+  
+  const navigateToLogin = () => {
+    setCurrentScreen('Login');
+  };
+  const navigateToLanding = () => {
+    setCurrentScreen('Landing');
+  };
+  
   var parent = new TaskModel("122", "dp", "122", [], [], "More Test", "yellow", [], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
   var childOfParent = new TaskModel("111", "dp", "122", [], [], "More Test on Parent of Children", "yellow", [parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
   childOfParent.children.push(new TaskModel("101", "dp", "122", [], [], "More Test child 1", "yellow", [childOfParent, parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
@@ -32,10 +40,12 @@ export default function App() {
   childOfParent1.children.push(new TaskModel("003", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   parent1.children.push(childOfParent1)
-
+  
   return (
-    <View style={styles.container}>
-      {/* <CalendarComponent /> */}
+        <View style={styles.container}>
+          {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToLanding={navigateToLanding}/>}
+          <View style={styles.signupLoginContainer}>
+               {/* <CalendarComponent /> */}
       <Main rootTasks={[
         parent1, 
         parent,
@@ -50,19 +60,26 @@ export default function App() {
         new TaskModel("131", "dp", "131", [], [], "9 Test", "aqua", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
         ]}/>
       {/* <>
+
         {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
         {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
-      </> */}
-      <StatusBar style="auto" />
-    </View>
+      </> 
+            <StatusBar style="auto" />
+          </View>
+        </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#151515',
+    backgroundColor: '#fff',
+  },
+  signupLoginContainer:{
     alignItems: 'center',
     justifyContent: 'center',
+
   },
+
 });
