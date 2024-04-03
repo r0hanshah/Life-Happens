@@ -32,6 +32,12 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
       This function assumes the parent id index has already been calculated and the subtask indices have also been calculated
     */
     var colorQueuesMap:{[key: string]: Set<[string, number, string, boolean]>} = {}
+    const firstDayOfMonth = currentMonth.clone().startOf('month');
+    const startDay = firstDayOfMonth.clone().startOf('week');
+    const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
+
+    const daysDifference = endDay.diff(startDay, 'days');
+    const ROWS = (daysDifference+1) / 7
 
     for(const id of ids)
     {
@@ -41,11 +47,12 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
       //                              path_id | inter_row | inter_column || path_id | row | column | index => ','
       //                              )
       const originAndSpecificData = id.split('|||')
-      const hexcodeAndParentId = originAndSpecificData[0].split(',')
+      const hexcodeAndParentIdAndIndex = originAndSpecificData[0].split(',')
 
       // Extract Hexcode and parent id
-      const hexcode = hexcodeAndParentId[0]
-      const rootId = hexcodeAndParentId[1]
+      const hexcode = hexcodeAndParentIdAndIndex[0]
+      const rootId = hexcodeAndParentIdAndIndex[1]
+      const rootIndex = hexcodeAndParentIdAndIndex[2]
 
       // Extract positional features
       const specificData = originAndSpecificData[1]
@@ -80,11 +87,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           // Draw first wire
           if(colorQueuesMap.hasOwnProperty(`${lRow}h${lColumn}`))
           {
-            colorQueuesMap[`${lRow}h${lColumn}`].add([hexcode, 0.25 * lIndex, rootId, lColumn >= pColumn])
+            colorQueuesMap[`${lRow}h${lColumn}`].add([hexcode,  0.579 - 0.105* (3-lIndex), rootId, lColumn >= pColumn])
           }
           else
           {
-            colorQueuesMap[`${lRow}h${lColumn}`] = new Set([[hexcode, 0.25 * lIndex, rootId, lColumn >= pColumn]])
+            colorQueuesMap[`${lRow}h${lColumn}`] = new Set([[hexcode, 0.579 - 0.105* (3-lIndex), rootId, lColumn >= pColumn]])
           }
 
 
@@ -141,16 +148,16 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
 
           // Draw vertical wires
-          while(rowOffset < 5)
+          while(rowOffset < ROWS)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
             }
           }
 
@@ -225,16 +232,16 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
 
           // Draw vertical lines towards root
-          while(rowOffset < 5)
+          while(rowOffset < ROWS)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (3 * parseInt(rootIndex) + 0.5) : 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (3 * parseInt(rootIndex) + 0.5) : 1, rootId, leftBound]])
             }
           }
         }
@@ -258,11 +265,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           // Draw line from calendar node to 
           if(colorQueuesMap.hasOwnProperty(`${row}h${column}`))
           {
-            colorQueuesMap[`${row}h${column}`].add([hexcode, 0.25 * index, rootId, leftBound])
+            colorQueuesMap[`${row}h${column}`].add([hexcode, 0.579 - 0.105* (3-index), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}h${column}`] = new Set([[hexcode, 0.25 * index, rootId, leftBound]])
+            colorQueuesMap[`${row}h${column}`] = new Set([[hexcode,  0.579 - 0.105* (3-index), rootId, leftBound]])
           }
          
           // Draw horizontal lines for second level subtasks 
@@ -282,16 +289,16 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
 
           // Draw vertical lines
           var rowOffset:number = row
-          while(rowOffset < 5)
+          while(rowOffset < ROWS)
           {
             rowOffset += 1
-            if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
+            if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
             }
           }
 
@@ -300,19 +307,21 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
         {
           var amountFill = index % 3
           amountFill == 0 ? amountFill += 3 : amountFill += 0
-          var columnOffset = index % 2 == 0 ? column : column + 1
+          var columnOffset = index > 6 ? column : column + 1
 
           // Draw first column line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
-            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound])
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.38 + 0.051*((offset) + (((index)-4)%3+1)), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound]])
+            console.log(offset, ((index)-4)%3+1, hexcode, index)
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.38 + 0.051* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
           }
 
           // Draw horizontal lines
+          columnOffset = columnOffset - 1
           while(leftBound ? columnOffset > 0 : columnOffset < 7)
           {
             leftBound ? columnOffset -= 1 : columnOffset += 1;
@@ -328,16 +337,16 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
 
           // Draw vertical lines
           var rowOffset:number = row
-          while(rowOffset < 5)
+          while(rowOffset < ROWS)
           {
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)): 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
             }
           }
         }

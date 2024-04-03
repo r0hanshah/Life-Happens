@@ -6,11 +6,11 @@ import TaskModel from '../../../models/TaskModel';
 
 interface CalendarProps {
   offset: number;
-  leafNodes: TaskModel[]; // row,column,color
+  leafNodesMap: { [key:number] : TaskModel[]}; // row,column,color
   inMoment: moment.Moment;
 }
 
-const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodes, inMoment }) => {
+const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMoment }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
@@ -34,13 +34,15 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodes, inMoment 
     const calendarDays = [];
     let currentDay = startDay.clone();
 
-    while (currentDay.isBefore(endDay)) {
-
+    var offset:number = 0;
+    while (currentDay.isBefore(endDay)) 
+    {
         calendarDays.push(
-            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDay.year() == currentMonth.year() && currentDay.month() == currentMonth.month() && currentDay.toDate().getDate() == currentMonth.toDate().getDate()} leafTasks={[]} inMonth={ currentDay.month() == currentMonth.month()}/>
+            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDay.year() == currentMonth.year() && currentDay.month() == currentMonth.month() && currentDay.toDate().getDate() == currentMonth.toDate().getDate()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()}/>
         );
 
         currentDay.add(1, 'day');
+        offset += 1;
     }
 
     const calendarDisplay = []
