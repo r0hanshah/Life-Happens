@@ -11,31 +11,34 @@ interface RootTaskListProps
 const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) => 
 {
 
-    const renderLists = (rootTasksMap: {[key:string]:TaskModel[]}) => {
+    const windowWidth = useWindowDimensions().width;
 
-        const windowWidth = useWindowDimensions().width;
+    const renderLists = (rootTasksMap: {[key:string]:TaskModel[]}) => {
 
         const leftBoundTasks = []
         const rightBoundTasks = []
 
         // Left Bound Tasks
-        console.log(rootTasksMap)
+        var count = 0
         for(const task of rootTasksMap["1"])
         {
-            leftBoundTasks.push(<ListItem rootTask={task} leftBound={true}/>)
+            leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
+            count += 1;
         }
 
         // Right Bound Tasks
+        count = 0
         for(const task of rootTasksMap["0"])
         {
-            rightBoundTasks.push(<ListItem rootTask={task} leftBound={false}/>)
+            rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
+            count += 1;
         }
 
         const lists = [
-            <View style={{width: windowWidth * 0.40, marginRight: windowWidth*0.04}}>
+            <View key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
                 {leftBoundTasks}
             </View>,
-            <View style={{width: windowWidth * 0.40}}>
+            <View key={"rightList"} style={{flex: 1, alignItems: "flex-end"}}>
                 {rightBoundTasks}
             </View>
         ]
@@ -44,7 +47,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
       };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {width: windowWidth * 0.83 + 14}]}>
             {renderLists(rootTasksMap)}
         </View>
     )
@@ -52,8 +55,10 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
 
 const styles = StyleSheet.create({
     container: {
-      flexDirection: 'row',
-      justifyContent: "center"
+      width: "100%",
+      alignItems: 'flex-start',
+      justifyContent: "center",
+      flexDirection: "row"
     },
   }); 
 

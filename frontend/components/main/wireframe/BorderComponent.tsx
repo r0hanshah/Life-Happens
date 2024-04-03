@@ -17,7 +17,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
 
   const renderBorders = () => {
     return colorQueue.map((value, index) => {
-      const borderColor = value[0], amountFill = value[1], rootTaskId = value[2], leftBound = value[3]
+      const borderColor = value[0], amountFill = value[1] , rootTaskId = value[2], leftBound = value[3]
       const borderStyle = orientation === 'horizontal' ? styles.horizontalBorder : styles.verticalBorder;
       const containerStyle = orientation === 'horizontal' ? (leftBound? styles.HLContainer : styles.HRContainer) : styles.VContainer
       const zIndex = -(index + 1); // Set zIndex to stack borders
@@ -27,13 +27,12 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
           width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85) : 0,
           height: orientation === 'vertical' ? lastRow ? ((windowHeight / 6) * 0.9 + 50) : ((windowHeight / 6) * 0.9) : 0,
           paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 104.5 : 0 : 0,
+          justifyContent: lastRow ? "flex-start" : "center"
         }]}>
           <View style={[{
             height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 0,
             display: orientation==='vertical'? 'flex' : 'none'
-          }]}>
-
-          </View>
+          }]} />
           <View
             key={index}
             style={[
@@ -41,9 +40,10 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               borderStyle,
               {
                 minHeight: 0,
-                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill != 1 ? 1-amountFill : 1) : 0,
+                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 0,
                 height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
-                paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 :  0,
+                paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 : 0,
+                // marginTop: orientation === 'vertical' && lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill * 0.5 : 0
               },
             ]}
           />
