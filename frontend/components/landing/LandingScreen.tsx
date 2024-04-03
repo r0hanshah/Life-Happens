@@ -34,16 +34,17 @@ interface LandingProps {
     navigateToSignUp: () => void;
     navigateToLogin: () => void;
     navigateToLanding: () => void;
+    navigateToMain: () => void;
 }
 
-const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLanding, navigateToLogin }) => {
+const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLanding, navigateToLogin, navigateToMain }) => {
     const [showProfile, setShowProfile] = useState(false);
 
 
     return (
         <View style={styles.container}>
             <View style={styles.navBar}>
-                <TouchableOpacity style={styles.navButton} onPress={navigateToLanding}>
+                <TouchableOpacity style={styles.navButton} onPress={navigateToMain}>
                     <Text style={styles.navButtonText}>Main</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navButton} onPress={navigateToSignUp}>
