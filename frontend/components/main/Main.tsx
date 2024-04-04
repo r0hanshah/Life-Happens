@@ -5,6 +5,7 @@ import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import RootTaskList from './rootTaskList/RootTaskList';
+import TaskView from '../taskView/TaskView';
 
 import MainController from '../../controllers/main/MainController';
 import PropertyListener from '../../controllers/main/Listener';
@@ -15,20 +16,20 @@ interface Tasks {
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
-var parent = new TaskModel("122", "dp", "122", [], [], "More Test", "yellow", [], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-var childOfParent = new TaskModel("111", "dp", "122", [], [], "More Test on Parent of Children", "yellow", [parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-childOfParent.children.push(new TaskModel("101", "dp", "122", [], [], "More Test child 1", "yellow", [childOfParent, parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("102", "dp", "122", [], [], "More Test child 2", "yellow", [childOfParent, parent], [], "2024-03-04T19:54:02+0000", "2024-03-05T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("103", "dp", "122", [], [], "More Test child 3", "yellow", [childOfParent, parent], [], "2024-03-07T19:54:02+0000", "2024-03-11T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("104", "dp", "122", [], [], "More Test on child 4", "yellow", [childOfParent, parent], [], "2024-03-19T19:54:02+0000", "2024-03-20T20:54:02+0000", false, {}, "", [], true, "", []))
+var parent = new TaskModel("122", "dp", "122", [], [], "More Test", "#ffc700", [], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
+var childOfParent = new TaskModel("111", "dp", "122", [], [], "More Test on Parent of Children", "#ffc700", [parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
+childOfParent.children.push(new TaskModel("101", "dp", "122", [], [], "More Test child 1", "#ffc700", [childOfParent, parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("102", "dp", "122", [], [], "More Test child 2", "#ffc700", [childOfParent, parent], [], "2024-03-04T19:54:02+0000", "2024-03-05T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("103", "dp", "122", [], [], "More Test child 3", "#ffc700", [childOfParent, parent], [], "2024-03-07T19:54:02+0000", "2024-03-11T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("104", "dp", "122", [], [], "More Test on child 4", "#ffc700", [childOfParent, parent], [], "2024-03-19T19:54:02+0000", "2024-03-20T20:54:02+0000", false, {}, "", [], true, "", []))
 parent.children.push(childOfParent)
 
-var parent1 = new TaskModel("121", "dp", "121", [], [], "Test Root Task", "red", [], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-var childOfParent1 = new TaskModel("112", "dp", "121", [], [], "Test Root Task", "red", [parent1], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-childOfParent1.children.push(new TaskModel("002", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent1.children.push(new TaskModel("001", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-02-29T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent1.children.push(new TaskModel("003", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+var parent1 = new TaskModel("121", "dp", "121", [], [], "Test Root Task", "#ff0000", [], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
+var childOfParent1 = new TaskModel("112", "dp", "121", [], [], "Test Root Task", "#ff0000", [parent1], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
+childOfParent1.children.push(new TaskModel("002", "dp", "121", [], [], "Test Root Task", "#ff0000", [childOfParent1, parent1], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent1.children.push(new TaskModel("001", "dp", "121", [], [], "Test Root Task", "#ff0000", [childOfParent1, parent1], [], "2024-02-29T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent1.children.push(new TaskModel("003", "dp", "121", [], [], "Test Root Task", "#ff0000", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "#ff0000", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
 parent1.children.push(childOfParent1)
 
 const Main: React.FC<Tasks> = () => {
@@ -41,10 +42,15 @@ const Main: React.FC<Tasks> = () => {
   const [slideAnimation] = useState(new Animated.Value(0));
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false)
 
   // Load in tasks on appear
   useEffect(() => {
-    loadRootTasks()
+    if(!isLoaded)
+    {
+      loadRootTasks()
+      setIsLoaded(true)
+    }
   })
 
   // Load in tasks
@@ -57,21 +63,20 @@ const Main: React.FC<Tasks> = () => {
         [
           parent1, 
           parent,
-          new TaskModel("123", "dp", "123", [], [], "One More Test", "green", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("124", "dp", "124", [], [], "2 Test", "blue", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("125", "dp", "125", [], [], "3 Test", "orange", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("126", "dp", "126", [], [], "4 Test", "pink", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("127", "dp", "127", [], [], "5 Test", "purple", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("128", "dp", "128", [], [], "6 Test", "red", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("129", "dp", "129", [], [], "7 Test", "yellow", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("130", "dp", "130", [], [], "8 Test", "white", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("131", "dp", "131", [], [], "9 Test", "aqua", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("123", "dp", "123", [], [], "One More Test", "#00ff00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("124", "dp", "124", [], [], "2 Test", "#0000ff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("125", "dp", "125", [], [], "3 Test", "#ff7a00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("126", "dp", "126", [], [], "4 Test", "#ff00e5", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("127", "dp", "127", [], [], "5 Test", "#a100bb", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("128", "dp", "128", [], [], "6 Test", "#ff0000", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("129", "dp", "129", [], [], "7 Test", "#ffc700", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("130", "dp", "130", [], [], "8 Test", "#ffffff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
           ]
       )
     }
     else
     {
-      setRootTasks([])
+      setRootTasks([new TaskModel("131", "dp", "131", [], [], "9 Test", "#2ef5e9", [], [], "2024-04-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])])
     }
   }
 
@@ -183,18 +188,20 @@ const Main: React.FC<Tasks> = () => {
       <View style={{flex: 1, width:'100%'}}>
         {task && (
             <Animated.View
-            style={[
-              styles.slideInView,
-              { transform: [{ translateX: slideFromLeft }], width: windowWidth * 0.49, marginLeft: windowWidth * 0.49 },
-            ]}
-            >
-              {/* Content of the sliding view */}
-              <View style={{padding:20}}>
-              <TouchableHighlight onPress={() => {setTask(null)}}>
-                <Text>X</Text>
-              </TouchableHighlight>
-                <Text>{task.title}</Text>
-              </View>
+              style={[
+                styles.slideInView,
+                { transform: [{ translateX: slideFromLeft }], width: windowWidth * 0.49, marginLeft: windowWidth * 0.49 },
+              ]}
+              >
+                {/* Content of the sliding view */}
+                <TaskView task={task} isLeft={true}/>
+
+                {/* <View style={{padding:20}}>
+                  <TouchableHighlight onPress={() => {setTask(null)}}>
+                    <Text>X</Text>
+                  </TouchableHighlight>
+                    <Text>{task.title}</Text>
+                </View> */}
             </Animated.View>
           )
           }
@@ -228,7 +235,6 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: 0,
       bottom: 0,
-      backgroundColor: 'white',
       zIndex: 999, // Ensure it's above other content
     },
     container: {

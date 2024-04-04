@@ -9,7 +9,7 @@ import LandingScreen from './components/landing/LandingScreen';
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'Main'>('Landing');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'Main'>('Main');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');

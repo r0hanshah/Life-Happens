@@ -316,7 +316,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
           else
           {
-            console.log(offset, ((index)-4)%3+1, hexcode, index)
             colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.38 + 0.051* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
           }
 

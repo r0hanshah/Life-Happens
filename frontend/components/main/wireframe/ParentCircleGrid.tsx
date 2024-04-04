@@ -75,7 +75,6 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
   
       for (let col = 0; col < columns; col++) {
         const id = `${row/7}${col}`;
-        console.log( colors.hasOwnProperty(id) && parentTasks.hasOwnProperty(id))
   
         rowComponents.push(
           <View key={id}>
