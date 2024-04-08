@@ -1,4 +1,4 @@
-import PropertyListener from "./Listener";
+import PropertyListener from "../Listener";
 import TaskModel from "../../models/TaskModel"; 
 
 // This will control anything that happens inside Main view

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, useWindowDimensions, Animated, Button, TouchableHighlight, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, Text, View, ScrollView, useWindowDimensions, Animated, Button, TouchableHighlight, Image, Modal } from 'react-native';
 import WireFrame from './wireframe/WireFrame';
 import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
@@ -8,7 +8,7 @@ import RootTaskList from './rootTaskList/RootTaskList';
 import TaskView from '../taskView/TaskView';
 
 import MainController from '../../controllers/main/MainController';
-import PropertyListener from '../../controllers/main/Listener';
+import PropertyListener from '../../controllers/Listener';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
@@ -46,7 +46,7 @@ const Main: React.FC<Tasks> = () => {
 
   // Load in tasks on appear
   useEffect(() => {
-    if(!isLoaded)
+    if (!isLoaded)
     {
       loadRootTasks()
       setIsLoaded(true)
@@ -76,14 +76,17 @@ const Main: React.FC<Tasks> = () => {
     }
     else
     {
-      setRootTasks([new TaskModel("131", "dp", "131", [], [], "9 Test", "#2ef5e9", [], [], "2024-04-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])])
+      setRootTasks([
+        new TaskModel("131", "dp", "131", [], [], "9 Test", "#2ef5e9", [], [], "2024-04-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("141", "dp", "141", [], [], "10 Test", "#fef5e0", [], [], "2024-04-27T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
+    ])
     }
   }
 
   // Animation
   const slideFromLeft = slideAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [-windowWidth*0.49, 0],
+    outputRange: [0, windowWidth*0.49],
   });
 
   // Update counter state when counterProperty changes
@@ -125,7 +128,7 @@ const Main: React.FC<Tasks> = () => {
         "1":[]
       }
 
-      for(const rootTask of rootTasks)
+      for(var rootTask of rootTasks)
       {
         const leafNodes:TaskModel[] = bfsTree(rootTask)
 
@@ -139,6 +142,7 @@ const Main: React.FC<Tasks> = () => {
             count += 1
           }
           const average = sum / count
+          rootTask.isLeft = average <= 3
           sidedRootTasks[average > 3 ? "0":"1"].push(rootTask)
           return parentId + ":::" + (average > 3 ? "0":"1")
         }
@@ -183,37 +187,49 @@ const Main: React.FC<Tasks> = () => {
       setRootTaskMap(orderedMaps[1])
     }, [rootTasks]);
 
+    const animationRef = useRef(new Animated.Value(task ? 0 : 222)).current;
+
+    useEffect(() => {
+      if (task) {
+        Animated.timing(animationRef, {
+          toValue: windowWidth * 0.49,
+          delay: 100,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      } else {
+        Animated.timing(animationRef, {
+          toValue:0,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+      }
+    }, [task]);
 
     return (
       <View style={{flex: 1, width:'100%'}}>
-        {task && (
+        
             <Animated.View
               style={[
                 styles.slideInView,
-                { transform: [{ translateX: slideFromLeft }], width: windowWidth * 0.49, marginLeft: windowWidth * 0.49 },
+                { transform: [{ translateX: slideFromLeft }], width: animationRef },
+                task && task.isLeftBound() ? {right: 0} : {left:0}
               ]}
               >
                 {/* Content of the sliding view */}
-                <TaskView task={task} isLeft={true}/>
+                {task && <TaskView task={task} isLeft={!task.isLeftBound()} onPress={()=>{controller.setSelectedTask(null)}}/>}
 
-                {/* <View style={{padding:20}}>
-                  <TouchableHighlight onPress={() => {setTask(null)}}>
-                    <Text>X</Text>
-                  </TouchableHighlight>
-                    <Text>{task.title}</Text>
-                </View> */}
             </Animated.View>
-          )
-          }
+          
         <ScrollView style={{width:"100%"}}>
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop:80}]}>
-            <TouchableHighlight onPress={()=>{setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
+            <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
               <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
             </TouchableHighlight>
             
             <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonthAndYear}</Text>
 
-            <TouchableHighlight onPress={()=>{setCurrentMonth(currentMonth.add(1, 'months'))}}>
+            <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.add(1, 'months'))}}>
               <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
             </TouchableHighlight>
           </View>          

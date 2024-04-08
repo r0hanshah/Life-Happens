@@ -50,8 +50,17 @@ class TaskModel
     contextText:string
     contextFiles:string[]
 
+    isLeft:boolean = false
     //UI Aids
     offset:number
+
+    isLeftBound():boolean {
+        if (this.ancestors.length > 0)
+        {
+            return this.ancestors[this.ancestors.length-1].isLeft
+        }
+        return this.isLeft
+    }
 }
 
 export default TaskModel
