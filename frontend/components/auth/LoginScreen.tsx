@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
@@ -12,6 +12,36 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "email": email,
+          "password":password
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      Alert.alert('Success', 'Login successful');
+      // Redirect user or do something else on success
+    } catch (error) {
+      Alert.alert('Error', 'Login failed');
+      console.error('Login error:', error);
+    }
+  };
+
+
   const signInWithGoogle = () => {
     // Add logic for Google sign-in
   };
@@ -28,9 +58,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
   return (
       <View style={styles.container}>
         <Text style={styles.largeTitle}>Life Happens.</Text>
-        <TextInput style={styles.input} placeholder="Email" />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
-        <TouchableOpacity style={styles.button}>
+
+        <TextInput style={styles.input}
+                   placeholder="Email"
+                   onChangeText={(text) => setEmail(text)}
+                   value={email} />
+
+
+        <TextInput style={styles.input}
+                   placeholder="Password"
+                   secureTextEntry={true}
+                   onChangeText={(text) => setPassword(text)}
+                   value={password} />
+
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signInWithGoogle}>
@@ -81,6 +123,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 8,
     borderRadius: 8,
+    color: 'white',
   },
   button: {
     backgroundColor: '#007AFF',
