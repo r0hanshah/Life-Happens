@@ -101,46 +101,61 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     }
   };
 
+  // For Creating subtask
+  const [createSubTask, setCreateSubTask] = useState<boolean>(false);
+  
+
   // Render subtasks
   const renderSubtasks = () => {
     if( task.children.length > 0)
     {
         return (
-            <View style={{width:'100%'}}>
-                <Text style={[{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40}, {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>{task.children.length} Sub tasks</Text>
+
 
                 <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
 
                     {task.children.map((task, index) => (
-                        <TouchableOpacity style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', height:50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems:'center', marginTop: 10}} onPress={()=>{MainController.getInstance().setSelectedTask(task)}}>
+                        <TouchableOpacity key={index} style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', height:50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems:'center', marginTop: 10}} onPress={()=>{MainController.getInstance().setSelectedTask(task)}}>
                             
                                 <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                                     <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
                                     <Text style={{color:'white'}}>{task.title}</Text>
                                 </View>
-                                <Text style={{color:'white'}}>{task.children.length} Sub Tasks</Text>
+                                <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
                                 <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
                                         
                                         <View style={{width: 30, height: 30, borderRadius: 30, borderWidth: 2, borderColor: 'gray', marginRight:10}}></View>
 
                                         <Text style={{color: 'gray'}}>0%</Text>
 
-                                    </View>
+                                </View>
+                                <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
+                                <View style={[{height:60, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-58}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
                             
                         </TouchableOpacity>
                     ))}
 
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}}>
+
+                    <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
+                    <Image
+                        style={{width: 20, height: 20, marginHorizontal: 10}}
+                        source={require('../../assets/robot_icon.png')}
+                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                    />
+
+                    </TouchableOpacity>
+
                 </View>
                 
-            </View>
+
         )
     }
     else
     {
         return (
-        <View style={{width:'100%'}}>
-            <Text style={[{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40}, {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>{task.children.length} Sub tasks</Text>
 
+    
             <View style={{alignItems: isLeft ? 'flex-start': 'flex-end'}}>
                 <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'#86C28B', margin:10}}>
 
@@ -165,9 +180,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 </TouchableOpacity>
             </View>
 
-            
-            
-        </View>
         )
     }
     
@@ -225,6 +237,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center'}}>
                         <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
+                        {(task.children.length > 0 || createSubTask)  && <View style={{width:2, height: task.children.length > 0 ? '90.65%' : '78%', backgroundColor: task.color}}></View>}
                     </View>
 
                     {/* Content */}
@@ -434,7 +447,108 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </View>
 
                         {/* Subtasks */}
-                        {renderSubtasks()}
+                        <View style={{width:'100%'}}>
+                            <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'flex-end'}}>
+                                <Text style={[{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40}, {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>{task.children.length} Sub tasks</Text>
+                                <TouchableOpacity style={{justifyContent:'center', alignItems:'center', width:30, height:30, backgroundColor:'rgba(50,50,50,1)', borderRadius:30, margin:5, marginRight:isLeft ? 20 : 0}} onPress={()=>{setCreateSubTask(true)}}>
+                                    <Image
+                                        style={{width: 10, height: 10, marginHorizontal: 10, transform:[{rotate: '45deg'}], margin:5}}
+                                        source={require('../../assets/x_mark_white.png')}
+                                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            {createSubTask &&  
+                            <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
+                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:250, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30}}>
+                                    <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
+                                            
+                                            <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
+                                                <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
+                                                <Text style={{color:'white'}}>Sub Task {task.children.length + 1}</Text>
+                                            </View>
+                                            <Text style={{color:'white'}}>Leaf Task</Text>
+                                            <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
+                                                    
+                                                    <View style={{width: 30, height: 30, borderRadius: 30, borderWidth: 2, borderColor: 'gray', marginRight:10}}></View>
+
+                                                    <Text style={{color: 'gray'}}>0%</Text>
+
+                                            </View>
+                                            <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
+                                            <View style={[{height:50, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-48}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
+                                        
+                                    </View>
+
+                                    {/* Set start date and end date and say whether the event is movable */}
+                                    <View style={[{width:'100%', paddingHorizontal:25}]}>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20}}>
+                                            <View style={{flexDirection:'row'}}>
+                                                <Image
+                                                    style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                    source={require('../../assets/calendar_icon.png')}
+                                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                                />
+                                                <Text style={{color:'gray'}}>Start Date</Text>
+                                            </View>
+                                            <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                            <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/calendar_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>End Date</Text>
+                                            </View>
+                                            <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                            <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/clock_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>Duration</Text>
+                                            </View>
+                                            <Text style={{color:'gray', marginHorizontal: 10}}>7 days</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                            <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/robot_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>Is Movable?</Text>
+                                            </View>
+                                            <Text style={{color:'gray', marginHorizontal: 10}}>Yes</Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Cancel or Create sub task */}
+                                    <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingVertical:10}}>
+                                        <TouchableOpacity onPress={()=>{setCreateSubTask(false)}}>
+                                            <Text style={{color:'white'}}>Cancel</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity>
+                                            <Text style={{color:'white'}}>Create Sub Task</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+
+                                </View>
+                                
+                            </View>
+                            }
+
+                            {renderSubtasks()}
+
+                        </View>
+                        
 
                     </View>
                 </View>
