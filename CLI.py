@@ -4,6 +4,7 @@ from firebase_admin import firestore
 from firebase_admin import auth
 
 import pyrebase
+from firebase_admin.auth import get_user
 
 # Initialize Firebase app
 cred = credentials.Certificate("serviceAccountKey.json")
@@ -23,7 +24,6 @@ firebaseConfig={
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
-auth = firebase.auth()
 class User:
     def __init__(self, ID, Name, WeeklyAITimesAllowed, ProfilePicture="", TaskTreeRoots=[], Settings={}, AllowAIMoveTasks=False, SharedTaskTrees=[], ParentsOfLeafNodesByTask={}):
         self.ID = ID
@@ -79,6 +79,9 @@ class Subtask:
         self.ContextText = ContextText
         self.ContextFiles = ContextFiles
 def login():
+    firebase = pyrebase.initialize_app(firebaseConfig)
+    auth = firebase.auth()
+
     print("Login in...")
     email = input("Enter email: ")
     password = input("Enter password: ")
@@ -92,6 +95,8 @@ def login():
         return None  # Return None if login fails
 
 def create_user(email, password):
+    firebase = pyrebase.initialize_app(firebaseConfig)
+    auth = firebase.auth()
     try:
         user = auth.create_user_with_email_and_password(email, password)
         user_id = user['localId']  # Retrieve the UID
@@ -101,19 +106,45 @@ def create_user(email, password):
         return None
 
 
-def delete_account(user_id):
+def delete_user(user_id):
     try:
         # Delete the user's document
         db.collection('User').document(user_id).delete()
-        db.collection('Task').document(user_id).delete()
-        db.collection('Subtask').document(user_id).delete()
-
-        print("Account deleted successfully!")
+        auth.delete_user(user_id)
+        print("User deleted successfully!")
         return True
     except Exception as e:
-        print("Error deleting account:", e)
+        print("Error deleting user:", e)
         return False
 
+def delete_task(user_id, task_id):
+    try:
+        # Fetch all subtasks of the task
+        subtasks_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').get()
+
+        # Delete each subtask
+        for subtask in subtasks_ref:
+            subtask.reference.delete()
+
+        # Delete the task document
+        db.collection('User').document(user_id).collection('Tasks').document(task_id).delete()
+
+        print("Task deleted successfully!")
+        return True
+    except Exception as e:
+        print("Error deleting task:", e)
+        return False
+
+
+def delete_subtask(user_id, task_id, subtask_id):
+    try:
+        # Delete the subtask document
+        db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).delete()
+        print("Subtask deleted successfully!")
+        return True
+    except Exception as e:
+        print("Error deleting subtask:", e)
+        return False
 
 def update_user(user_id):
     print("Update user fields...")
@@ -148,6 +179,37 @@ def update_subtask(user_id):
     except Exception as e:
         print("Error updating subtask fields:", e)
 
+def getUser(user_id):
+    try:
+        # Fetch user document from Firestore
+        user_doc = db.collection('User').document(user_id).get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            # Fetch user email from Firebase Authentication
+            user = auth.get_user(user_id)
+            user_data['email'] = user.email if user else None
+            print(user_data)
+            return user_data
+        else:
+            print("User not found.")
+            return None
+    except Exception as e:
+        print("Error fetching user:", e)
+        return None
+
+
+def getTasks(user_id):
+    try:
+        # Fetch tasks collection for the user
+        tasks_ref = db.collection('User').document(user_id).collection('Tasks').get()
+        tasks_list = []
+        for task_doc in tasks_ref:
+            tasks_list.append(task_doc.to_dict())
+        return tasks_list
+    except Exception as e:
+        print("Error fetching tasks:", e)
+        return None
+
 
 def sign_up():
     print("Sign up...")
@@ -162,6 +224,7 @@ def sign_up():
         return None
 
     user_id = create_user(email, password)
+
     if user_id:
         try:
             weekly_ai_times = input("Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
@@ -266,6 +329,7 @@ def create_subtask(user_id, task_id):
         print("Error creating subtask:", e)
 
 
+
 def main():
     user_id = None
     while True:
@@ -276,8 +340,12 @@ def main():
             print("3. Update User Fields")
             print("4. Update Task Fields")
             print("5. Update Subtask Fields")
-            print("6. Delete Account")
-            print("7. Logout")
+            print("6. Delete User")
+            print("7. Delete Task")
+            print("8. Delete Subtask")
+            print("9. Get User")
+            print("10. Get Task")
+            print("11. Logout")
             choice = input("Enter your choice: ")
             if choice == '1':
                 create_task(user_id)
@@ -293,9 +361,25 @@ def main():
             elif choice == '6':
                 confirm = input("Are you sure you want to delete your account?[y/n]: ")
                 if confirm.lower() == 'y':
-                    if delete_account(user_id):
+                    if delete_user(user_id):
                         break
             elif choice == '7':
+                task_id = input("Enter Task ID: ")
+                confirm = input("Are you sure you want to delete this task?[y/n]: ")
+                if confirm.lower() == 'y':
+                    delete_task(user_id, task_id)
+            elif choice == '8':
+                task_id = input("Enter Task ID: ")
+                subtask_id = input("Enter Subtask ID: ")
+                confirm = input("Are you sure you want to delete this subtask?[y/n]: ")
+                if confirm.lower() == 'y':
+                    delete_subtask(user_id, task_id, subtask_id)
+            elif choice == '9':
+                getUser(user_id)
+            elif choice == '10':
+                #task_id = input("Enter Task ID: ")
+                getTasks(user_id)
+            elif choice == '11':
                 print("Logging out...")
                 break
             else:
@@ -311,6 +395,7 @@ def main():
                 print("Invalid option")
 
     print("Exiting...")
+
 
 if __name__ == "__main__":
     main()
