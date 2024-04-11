@@ -12,7 +12,7 @@ db = firestore.client()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 #user passwords are all 123456
