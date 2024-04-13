@@ -212,7 +212,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </TouchableOpacity>
                     ))}
 
-                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}}>
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40}}>
 
                     <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
                     <Image
@@ -311,19 +311,19 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         </View>
         <View style={[styles.container, isLeft ? styles.containerL : styles.containerR]}>
 
-            <ScrollView style={{ height: useWindowDimensions().height - 20, padding:39 }}>
-                <View style ={{flexDirection: isLeft ? 'row' : 'row-reverse', width:'100%', paddingBottom: 20}}>
+            <ScrollView style={{ height: useWindowDimensions().height - 20, padding:39}}>
+                <View style ={{flexDirection: isLeft ? 'row' : 'row-reverse', width:'100%', paddingBottom: 20, paddingTop:20 }}>
 
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center'}}>
                         <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
-                        {(task.children.length > 0 || createSubTask)  && <View style={{width:3, height: task.children.length > 0 ? '90.65%' : '78%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || createSubTask)  && <View style={{width:3, height: task.children.length > 0 ? '87.65%' : '77%', backgroundColor: task.color}}></View>}
                     </View>
 
                     {/* Content */}
                     <View style={{width:'80%', alignItems: isLeft ? 'flex-start' : 'flex-end'}}>
                         <Text style={{color: 'white'}}>Created by: Daniel Parra</Text> {/* Get creator name */}
-                        <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: isLeft ? 'flex-start' : 'flex-end', justifyContent:'space-between'}}>
+                        <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}}>
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
 
@@ -567,7 +567,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                             {createSubTask &&  
                             <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
-                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:250, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30}}>
+                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:260, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30}}>
                                     <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
                                             
                                             <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
@@ -637,10 +637,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                     {/* Cancel or Create sub task */}
                                     <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingVertical:10}}>
-                                        <TouchableOpacity onPress={()=>{setCreateSubTask(false)}}>
+                                        <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'red', justifyContent:'center', alignItems:'center'}} onPress={()=>{setCreateSubTask(false)}}>
                                             <Text style={{color:'white'}}>Cancel</Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'white', justifyContent:'center', alignItems:'center'}}>
                                             <Text style={{color:'white'}}>Create Sub Task</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -659,16 +659,16 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     </View>
                 </View>
 
-                {/* X and other page manipulation components */}
-                <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute'}, isLeft ? {right:10} : {left:10}]}>
-                    <TouchableOpacity onPress={onPress}>
-                        <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
-                    </TouchableOpacity>
-                </View>
+                
                 
             </ScrollView>
             
-
+            {/* X and other page manipulation components */}
+            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20} : {left:20}]}>
+                    <TouchableOpacity onPress={onPress}>
+                        <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
+                    </TouchableOpacity>
+            </View>
             
         </View>
     </View>
