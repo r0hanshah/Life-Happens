@@ -16,12 +16,12 @@ interface Tasks {
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
-var parent = new TaskModel("122", "dp", "122", [], [], "More Test", "#ffc700", [], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-var childOfParent = new TaskModel("111", "dp", "122", [], [], "More Test on Parent of Children", "#ffc700", [parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
-childOfParent.children.push(new TaskModel("101", "dp", "122", [], [], "More Test child 1", "#ffc700", [childOfParent, parent], [], "2024-03-11T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("102", "dp", "122", [], [], "More Test child 2", "#ffc700", [childOfParent, parent], [], "2024-03-04T19:54:02+0000", "2024-03-05T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("103", "dp", "122", [], [], "More Test child 3", "#ffc700", [childOfParent, parent], [], "2024-03-07T19:54:02+0000", "2024-03-11T20:54:02+0000", false, {}, "", [], true, "", []))
-childOfParent.children.push(new TaskModel("104", "dp", "122", [], [], "More Test on child 4", "#ffc700", [childOfParent, parent], [], "2024-03-19T19:54:02+0000", "2024-03-20T20:54:02+0000", false, {}, "", [], true, "", []))
+var parent = new TaskModel("122", "dp", "122", [], [], "More Test", "#ffc700", [], [], "2024-03-11T19:54:02+0000", "2024-03-30T20:54:02+0000", false, {}, "", [], true, "", [])
+var childOfParent = new TaskModel("111", "dp", "122", [], [], "More Test on Parent of Children", "#ffc700", [parent], [], "2024-03-11T19:54:02+0000", "2024-03-30T20:54:02+0000", false, {}, "", [], true, "", [])
+childOfParent.children.push(new TaskModel("101", "dp", "122", [], [], "More Test child 1", "#ffc700", [childOfParent, parent], [], "2024-03-11T19:54:02+0000", "2024-03-12T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("102", "dp", "122", [], [], "More Test child 2", "#ffc700", [childOfParent, parent], [], "2024-03-13T19:54:02+0000", "2024-03-18T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("103", "dp", "122", [], [], "More Test child 3", "#ffc700", [childOfParent, parent], [], "2024-03-19T19:54:02+0000", "2024-03-22T20:54:02+0000", false, {}, "", [], true, "", []))
+childOfParent.children.push(new TaskModel("104", "dp", "122", [], [], "More Test on child 4", "#ffc700", [childOfParent, parent], [], "2024-03-23T19:54:02+0000", "2024-03-30T20:54:02+0000", false, {}, "", [], true, "", []))
 parent.children.push(childOfParent)
 
 var parent1 = new TaskModel("121", "dp", "121", [], [], "Test Root Task", "#ff0000", [], [], "2024-03-08T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", [])
@@ -69,7 +69,7 @@ const Main: React.FC<Tasks> = () => {
           new TaskModel("126", "dp", "126", [], [], "4 Test", "#ff00e5", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
           new TaskModel("127", "dp", "127", [], [], "5 Test", "#a100bb", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
           new TaskModel("128", "dp", "128", [], [], "6 Test", "#ff0000", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("129", "dp", "129", [], [], "7 Test", "#ffc700", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+          new TaskModel("129", "dp", "129", [], [], "7 Test", "#ff4400", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
           new TaskModel("130", "dp", "130", [], [], "8 Test", "#ffffff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
           ]
       )

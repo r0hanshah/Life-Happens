@@ -51,6 +51,7 @@ class TaskModel
     contextFiles:string[]
 
     isLeft:boolean = false
+    completeness:number = 0
     //UI Aids
     offset:number
 
@@ -61,6 +62,48 @@ class TaskModel
         }
         return this.isLeft
     }
+
+    getPercentCompleteness():number {
+        var percentCompleteness = this.traverse(this)
+        return percentCompleteness
+    }
+
+    private traverse(task:TaskModel):number {
+        if (task.children.length == 0)
+        {
+            return task.completeness
+        }
+
+        var completeness:number = 0
+        const taskDuration:number = this.getDurationOfTask(task)
+        for(const subtask of task.children)
+        {
+            completeness += this.traverse(subtask) * (subtask.getDateDifferenceInMinutes(subtask.startDate, subtask.endDate) / taskDuration)
+        }
+        return completeness
+    }
+
+    private getDurationOfTask(task:TaskModel):number
+    {
+        var sum = 0
+        for(const child of task.children)
+        {
+            sum += this.getDateDifferenceInMinutes(child.startDate, child.endDate)
+        }  
+        return sum 
+    }
+
+    private getDateDifferenceInMinutes(startDate:Date, endDate:Date) {
+        // Convert both dates to minutes
+        const startMinutes = startDate.getTime() / (1000 * 60);
+        const endMinutes = endDate.getTime() / (1000 * 60);
+      
+        // Calculate the difference in minutes
+        const differenceMinutes = Math.abs(endMinutes - startMinutes);
+      
+        return differenceMinutes;
+      }
+
 }
 
 export default TaskModel
