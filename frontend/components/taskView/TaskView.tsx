@@ -10,7 +10,7 @@ import MainController from '../../controllers/main/MainController';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 import CircularProgressBar from './CircularProgressView';
 
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateSelector from './DateSelection';
 
 interface TaskViewProps {
   task: TaskModel;
@@ -27,6 +27,9 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   let [fontsLoaded] = useFonts({
     Inter_900Black
   });
+
+  // For subtask interaction
+  const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null)
 
   // For date pickers
   const [date, setDate] = useState(new Date());
@@ -47,6 +50,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   
   useEffect(() => {
     const taskListener = controller.getViewInvitedUsers();
+    setCompletion(task.getPercentCompleteness())
 
     const listener = (bool: boolean) => {
       setViewUsers(bool);
@@ -64,7 +68,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const [urlText, setUrlText] = useState('');
   const [urls, setUrls] = useState<string[]>(task.extraMedia);
 
-  const [urlsMetadata, setUrlsMetadata] = useState<{ title: string; description: string; image: string; }[] | null>([]);
+  const [urlsMetadata, setUrlsMetadata] = useState<{ title: string; description: string; image: string; url:string}[] | null>([]);
 
   const handleAddItem = () => {
     if (isValidUrl(urlText)) {
@@ -75,6 +79,14 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       alert('Invalid URL');
     }
   };
+
+  const handleDeleteMedia = (urlToDelete:string) => {
+    setUrls(urls.filter(url => url !== urlToDelete))
+    if (urlsMetadata)
+    {
+        setUrlsMetadata(urlsMetadata!.filter(data => data.url !== urlToDelete))
+    }
+  }
 
   const fetchMetadata = async (url:string) => {
     try {
@@ -113,6 +125,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
           title: metadata.data.title,
           description: metadata.data.description,
           image: metadata.data.logo.url, 
+          url: metadata.data.url
         }));
         setUrlsMetadata(extractedData);
     };
@@ -121,10 +134,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
 
   // For Notes section
-  const [text, setText] = useState('');
+  const [text, setText] = useState(task.notes);
 
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setText(newText);
+    task.notes = newText.valueOf().toString()
   };
 
   const onSubmitEditing = () => {
@@ -133,10 +147,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   };
 
   // For AI Context Prompt section
-  const [context, setContext] = useState('');
+  const [context, setContext] = useState(task.contextText);
 
   const onChangeContext = (newText: React.SetStateAction<string>) => {
     setContext(newText);
+    task.contextText = newText.valueOf().toString()
   };
 
   const onSubmitContextEditing = () => {
@@ -145,7 +160,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   };
 
   // For adding unobserved files
-  const [files, setFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
+  const [files, setFiles] = useState<DocumentPicker.DocumentPickerAsset[]>(task.unobservedFiles);
 
   // Function to handle file selection
   const handleFilePick = async () => {
@@ -155,14 +170,20 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       if (result && result.assets) {
         // Add the selected file to the files array
         setFiles([...files, result.assets.at(0)!]);
+        task.unobservedFiles = [...files, result.assets.at(0)!]
       }
     } catch (error) {
       console.log('Error selecting file:', error);
     }
   };
 
+  const handleRemoveFile = (doc:DocumentPicker.DocumentPickerAsset) => {
+    const newFiles = files.filter(document => document.uri !== doc.uri)
+    setFiles(newFiles)
+  }
+
   // For adding AI observed files
-  const [observedFiles, setObservedFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
+  const [observedFiles, setObservedFiles] = useState<DocumentPicker.DocumentPickerAsset[]>(task.contextFiles);
 
   // Function to handle file selection
   const handleObservedFilePick = async () => {
@@ -172,11 +193,17 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       if (result && result.assets) {
         // Add the selected file to the files array
         setObservedFiles([...observedFiles, result.assets.at(0)!]);
+        task.contextFiles = [...observedFiles, result.assets.at(0)!]
       }
     } catch (error) {
       console.log('Error selecting file:', error);
     }
   };
+
+  const handleRemoveContextFile = (doc:DocumentPicker.DocumentPickerAsset) => {
+    const newFiles = observedFiles.filter(document => document.uri !== doc.uri)
+    setObservedFiles(newFiles)
+  }
 
   // For Creating subtask
   const [createSubTask, setCreateSubTask] = useState<boolean>(false);
@@ -192,22 +219,34 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
 
                     {task.children.map((task, index) => (
-                        <TouchableOpacity key={index} style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', height:50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems:'center', marginTop: 10}} onPress={()=>{MainController.getInstance().setSelectedTask(task)}}>
+                        <TouchableOpacity key={index} style={{ height: selectedTask && selectedTask.id == task.id ? 300 : 50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginTop: 10}} onPress={()=>{
+                            if (selectedTask && selectedTask.id == task.id)
+                            {
+                                MainController.getInstance().setSelectedTask(selectedTask)
+                            }
+                            else
+                            {
+                                setSelectedTask(task)
+                            }
                             
-                                <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
-                                    <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                                    <Text style={{color:'white'}}>{task.title}</Text>
+                            }}>
+                                <View style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', alignItems:'center', width:'100%', height:50}}>
+                                    <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
+                                        <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
+                                        <Text style={{color:'white'}}>{task.title}</Text>
+                                    </View>
+                                    <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
+                                    <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
+
+                                            <CircularProgressBar percentage={task.getPercentCompleteness()}></CircularProgressBar>
+
+                                            <Text style={{color: 'gray'}}>{(task.getPercentCompleteness()*100).toFixed(1)}%</Text>
+
+                                    </View>
+                                    <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
+                                    <View style={[{height:320, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
                                 </View>
-                                <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
-                                <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
-
-                                        <CircularProgressBar percentage={task.getPercentCompleteness()}></CircularProgressBar>
-
-                                        <Text style={{color: 'gray'}}>{(task.getPercentCompleteness()*100).toFixed(1)}%</Text>
-
-                                </View>
-                                <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                <View style={[{height:60, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-58}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
+                                
                             
                         </TouchableOpacity>
                     ))}
@@ -311,13 +350,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         </View>
         <View style={[styles.container, isLeft ? styles.containerL : styles.containerR]}>
 
-            <ScrollView style={{ height: useWindowDimensions().height - 20, padding:39}}>
+            <ScrollView style={{ height: useWindowDimensions().height, padding:39}}>
                 <View style ={{flexDirection: isLeft ? 'row' : 'row-reverse', width:'100%', paddingBottom: 20, paddingTop:20 }}>
 
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center'}}>
                         <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
-                        {(task.children.length > 0 || createSubTask)  && <View style={{width:3, height: task.children.length > 0 ? '87.65%' : '77%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || createSubTask)  && <View style={{width:3, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
                     </View>
 
                     {/* Content */}
@@ -370,7 +409,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         )}
                         
                         {/* View displaying dates */}
-                        <View style={[{width:'100%'}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
+                        <View style={[{width:'100%', zIndex:3}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
                             <TouchableOpacity onPress={showDatepicker}>
                                 <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20}}>
                                     <View style={{flexDirection:'row'}}>
@@ -385,7 +424,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
                             </TouchableOpacity>
                             
-                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10, zIndex:3}}>
                                 <View style={{flexDirection:'row'}}>
                                 <Image
                                     style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
@@ -394,7 +433,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 />
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
-                                <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                                <DateSelector></DateSelector>
+                                {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
                             <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
                                 <View style={{flexDirection:'row'}}>
@@ -407,19 +447,22 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
                                 <Text style={{color:'gray', marginHorizontal: 10}}>7 days</Text>
                             </View>
-                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
-                                <View style={{flexDirection:'row'}}>
-                                <Image
-                                    style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                                    source={require('../../assets/robot_icon.png')}
-                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                                />
-                                <Text style={{color:'gray'}}>Is Movable?</Text>
+                            { task.children.length == 0 &&
+                                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                    <View style={{flexDirection:'row'}}>
+                                    <Image
+                                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                        source={require('../../assets/robot_icon.png')}
+                                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                    />
+                                    <Text style={{color:'gray'}}>Is Movable?</Text>
+                                    </View>
+                                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                        <Text style={{color:'gray', marginHorizontal: 10}}>{isMovable ? 'Yes' : 'No'}</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
-                                    <Text style={{color:'gray', marginHorizontal: 10}}>{isMovable ? 'Yes' : 'No'}</Text>
-                                </TouchableOpacity>
-                            </View>
+                            }
+                            
                         </View>
 
 
@@ -441,25 +484,36 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Extra Media</Text>
                             {/* Display list of items */}
                             <View style={{width:"100%", backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:5, marginTop:10, padding:10, justifyContent:'flex-start'}}>
-                                <View style={{marginTop: 10, width:'100%', borderBottomColor:'white', borderBottomWidth:2}}>
+                                <View style={{marginTop: 10, width:'100%', borderBottomColor:'white', borderBottomWidth:2, paddingBottom:20}}>
                                     {urlsMetadata && urlsMetadata.length > 0 && 
                                         urlsMetadata.map((item, index) => (
-                                            <TouchableOpacity key={urls[index]} style={{flexDirection:'row', padding:5, margin:5, width:200}} onPress={() => Linking.openURL(urls[index])}>
-                                                <Image
-                                                    source={{ uri: item.image }}
-                                                    style={{ width: 100, height: 100, borderRadius:10, marginRight: 10}} // Adjust the dimensions as needed
-                                                />
-                                                <View style={{flexDirection:'column'}}>
-                                                    <Text numberOfLines={2} style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:15, color:'white', width:300,}}>{item.title}</Text>
-                                                    <Text style={{color:'gray', width:300, height:75, overflow:'hidden'}}>{item.description}</Text>
-                                                </View>
-                                                
-                                            </TouchableOpacity>
+                                            <View style={{justifyContent:'center'}}>
+                                                <TouchableOpacity key={urls[index]} style={{flexDirection:'row', padding:5, margin:5, width:200}} onPress={() => Linking.openURL(urls[index])}>
+                                                    <Image
+                                                        source={{ uri: item.image }}
+                                                        style={{ width: 100, height: 100, borderRadius:10, marginRight: 10}} // Adjust the dimensions as needed
+                                                    />
+                                                    <View style={{flexDirection:'column'}}>
+                                                        <Text numberOfLines={2} style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:15, color:'white', width:300,}}>{item.title}</Text>
+                                                        <Text style={{color:'gray', width:300, height:75, overflow:'hidden'}}>{item.description}</Text>
+                                                    </View>
+                                                    
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={{position:'absolute', backgroundColor:"#151515", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', right:10}} onPress={()=>{handleDeleteMedia(item.url)}}>
+                                                    <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                                </TouchableOpacity>
+                                            </View>
                                         ))
                                     }
                                     {(!urlsMetadata ||( urlsMetadata.length == 0 && urls.length > 0 )) &&
                                         urls.map((item, index) => (
-                                            <Text key={index} style={{color:'white', paddingBottom: 10}}>{item}</Text>
+                                            <View>
+                                                <Text key={index} style={{color:'white', paddingBottom: 10}}>{item}</Text>
+                                                <TouchableOpacity style={{position:'absolute', backgroundColor:"#151515", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', right:-10}} onPress={()=>{handleDeleteMedia(item)}}>
+                                                    <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                                </TouchableOpacity>
+                                            </View>
+                                            
                                         ))
                                     }
                                 </View>
@@ -492,6 +546,9 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
+                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                        </TouchableOpacity>
                                     </View>
                                     ))}
                                 </View>
@@ -539,6 +596,9 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
+                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                        </TouchableOpacity>
                                     </View>
                                     ))}
                                 </View>
@@ -583,7 +643,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                             </View>
                                             <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                            <View style={[{height:50, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-48}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
+                                            <View style={[{height:320, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
                                         
                                     </View>
 

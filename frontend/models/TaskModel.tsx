@@ -1,6 +1,8 @@
+import { DocumentPickerAsset } from "expo-document-picker"
+
 class TaskModel
 {
-    constructor(id:string, creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:string[])
+    constructor(id:string, creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
     {
         this.id = id
         this.creatorId = creatorId
@@ -24,6 +26,7 @@ class TaskModel
 
         this.contextText = contextText
         this.contextFiles = contextFiles
+        this.unobservedFiles = unobservedFiles
 
         this.offset = 0
     }
@@ -48,7 +51,8 @@ class TaskModel
     isRoot:boolean
 
     contextText:string
-    contextFiles:string[]
+    contextFiles:DocumentPickerAsset[]
+    unobservedFiles:DocumentPickerAsset[]
 
     isLeft:boolean = false
     completeness:number = 0
