@@ -11,6 +11,7 @@ import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 import CircularProgressBar from './CircularProgressView';
 
 import DateSelector from './DateSelection';
+import TimeSelector from './TimeSelector';
 
 interface TaskViewProps {
   task: TaskModel;
@@ -403,26 +404,22 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </View>
                         {/* Display users/ancestor tasks */}
                         {!viewUsers && renderAncestors()}
-
-                        {showDatePicker && (
-                             <input type="date" value={date.toISOString().split('T')[0]} onChange={onChange} />
-                        )}
                         
                         {/* View displaying dates */}
-                        <View style={[{width:'100%', zIndex:3}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
-                            <TouchableOpacity onPress={showDatepicker}>
-                                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20}}>
-                                    <View style={{flexDirection:'row'}}>
-                                        <Image
-                                            style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                                            source={require('../../assets/calendar_icon.png')}
-                                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                                        />
-                                        <Text style={{color:'gray'}}>Start Date</Text>
-                                    </View>
-                                    <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                        <View style={[{width:'100%', zIndex:4}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
+                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
+                                <View style={{flexDirection:'row'}}>
+                                    <Image
+                                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                        source={require('../../assets/calendar_icon.png')}
+                                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                    />
+                                    <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
-                            </TouchableOpacity>
+                                <DateSelector></DateSelector>
+                                <TimeSelector></TimeSelector>
+                                {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
+                            </View>
                             
                             <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10, zIndex:3}}>
                                 <View style={{flexDirection:'row'}}>
@@ -434,6 +431,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
                                 <DateSelector></DateSelector>
+                                <TimeSelector></TimeSelector>
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
                             <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>

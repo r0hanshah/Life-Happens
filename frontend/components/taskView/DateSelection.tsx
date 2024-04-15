@@ -121,7 +121,7 @@ const DateSelector = () => {
         for(var i = 0; i < calendarDays.length; i+=7)
         {
             calendarDisplay.push(
-                <View key={`row${i/7}`} style={[{ height: 20, paddingTop: 40, justifyContent:'space-around', flexDirection:'row'}]}>
+                <View key={`row${i/7}`} style={[{ height: 20, marginTop:20, flexDirection:'row'}]}>
                     {calendarDays.slice(i,i+7)}
                 </View>
             )
@@ -137,13 +137,16 @@ const DateSelector = () => {
             <Text style={{color:'gray'}}>Monday, April 27, 2024</Text> 
         </View>
       </TouchableOpacity>
-      <View style={[styles.square, { opacity: isSquareVisible ? 1 : 0 }]}>
+      {isSquareVisible && 
+        <View style={[styles.square]}>
         <View style={{flexDirection:'row', zIndex:1}}>
             {renderMonthsDropdown()}
             {renderYearsDropdown()}
         </View>
         {renderCalendar()}
       </View>
+      }
+      
     </View>
   );
 };
@@ -170,13 +173,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     marginTop:350,
     marginRight:200,
-    zIndex:1
+    zIndex:1,
+    justifyContent:'center',
+    alignItems:'center'
   },
   dropdownContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
+    minWidth:100
   },
   calendarContainer: {
     flexDirection: 'row',
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
   },
   yearDropdown: {
     position: 'absolute',
-    top: '100%',
+    top:'100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
