@@ -235,7 +235,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                     </View>
                                     <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                    <View style={[{height:320, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
+                                    <View style={[{height:320, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
                                 </View>
 
                                 {(selectedTask && selectedTask.id == task.id) && 
@@ -442,7 +442,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center'}}>
                         <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
-                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:3, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
                     </View>
 
                     {/* Content */}
@@ -743,7 +743,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                             </View>
                                             <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                            <View style={[{height:320, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
+                                            <View style={[{height:320, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
                                         
                                     </View>
 
