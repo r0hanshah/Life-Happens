@@ -210,7 +210,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
 
                     {task.children.map((task, index) => (
-                        <TouchableOpacity key={index} style={{ height: selectedTask && selectedTask.id == task.id ? 300 : 50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginTop: 10}} onPress={()=>{
+                        <TouchableOpacity key={index} style={{ height: selectedTask && selectedTask.id == task.id ? 250 : 50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginTop: 10, zIndex:-index}} onPress={()=>{
                             if (selectedTask && selectedTask.id == task.id)
                             {
                                 MainController.getInstance().setSelectedTask(selectedTask)
@@ -237,12 +237,87 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
                                     <View style={[{height:320, width: 2.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.5} : {marginRight:-50.5}]}></View>
                                 </View>
+
+                                {(selectedTask && selectedTask.id == task.id) && 
+                                <View style={[{width:'100%', zIndex:4, paddingHorizontal:25}]}>
+                                    <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
+                                        <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/calendar_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>Start Date</Text>
+                                        </View>
+                                        <View style={{flexDirection:'row'}}>
+                                            <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                        </View>
+                                        
+                                        {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
+                                    </View>
+                                    
+                                    <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10, zIndex:3}}>
+                                        <View style={{flexDirection:'row'}}>
+                                        <Image
+                                            style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                            source={require('../../assets/calendar_icon.png')}
+                                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                        />
+                                        <Text style={{color:'gray'}}>End Date</Text>
+                                        </View>
+                                        <View style={{flexDirection:'row'}}>
+                                            <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                        </View>
+                                        {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
+                                    </View>
+                                    <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                        <View style={{flexDirection:'row'}}>
+                                        <Image
+                                            style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                            source={require('../../assets/clock_icon.png')}
+                                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                        />
+                                        <Text style={{color:'gray'}}>Duration</Text>
+                                        </View>
+                                        <Text style={{color:'gray'}}>{duration}</Text>
+                                    </View>
+                                    <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                        <View style={{flexDirection:'row'}}>
+                                        <Image
+                                            style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                            source={require('../../assets/clock_icon.png')}
+                                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                        />
+                                        <Text style={{color:'gray'}}>Duration From Now</Text>
+                                        </View>
+                                        <Text style={{color:'gray'}}>{durationFromNow}</Text>
+                                    </View>
+                                    { task.children.length == 0 &&
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                            <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/robot_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>Is Movable?</Text>
+                                            </View>
+                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                                <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    }
+                                    
+                                </View>
+                                }
                                 
                             
                         </TouchableOpacity>
                     ))}
 
-                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40}}>
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40, zIndex:-999}}>
 
                     <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
                     <Image
@@ -651,8 +726,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                             {newTasks.length > 0 &&  
                             newTasks.toReversed().map((task, index) => (
-                                <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, zIndex:4}}>
-                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:300, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:4}}>
+                                <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, zIndex:newTasks.length - index}}>
+                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:300, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:newTasks.length - index}}>
                                     <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
                                             
                                             <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
