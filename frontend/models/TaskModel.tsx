@@ -1,8 +1,9 @@
 import { DocumentPickerAsset } from "expo-document-picker"
+import uuid from 'react-native-uuid';
 
 class TaskModel
 {
-    constructor(id:string, creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[], title:string, color:string, ancestors:TaskModel[], children:TaskModel[], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any}, notes:string, extraMedia:string[], isRoot:boolean, contextText:string, contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
+    constructor(id:string = uuid.v4().toString(), creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[] = [], title:string, color:string, ancestors:TaskModel[], children:TaskModel[] = [], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any} = {}, notes:string = "", extraMedia:string[] = [], isRoot:boolean = false, contextText:string = "", contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
     {
         this.id = id
         this.creatorId = creatorId

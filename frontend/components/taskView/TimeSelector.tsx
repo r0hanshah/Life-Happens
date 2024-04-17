@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
-import moment from 'moment';
+import moment, { Duration } from 'moment';
+import TaskModel from '../../models/TaskModel';
 
 
-const TimeSelector = () => {
+const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string) => void>}) => {
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
-    const [hours, setHours] = useState<string>("00");
-    const [minutes, setMinutes] = useState<string>("00");
-    const [isPM, setIsPM] = useState<boolean>(false);
-    const [timeZone, setTimeZone] = useState<string>('EST');
-    const [showTimeZoneModal, setShowTimeZoneModal] = useState<boolean>(false);
+    const [hours, setHours] = useState<string>(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
+    const [hoursInt, setHoursInt] = useState<number>(parseInt(hours))
+    const [minutes, setMinutes] = useState<string>(modStartDate ? task.startDate.getMinutes().toString() : task.endDate.getMinutes().toString());
+    const [minInts, setMinInts] = useState<number>(parseInt(minutes))
+    const [isPM, setIsPM] = useState<boolean>((modStartDate ? task.startDate.getHours() > 12 : task.endDate.getHours() > 12));
 
     const handleContainerClick = () => {
       setIsSquareVisible(!isSquareVisible);
@@ -18,11 +19,6 @@ const TimeSelector = () => {
 
     const togglePeriod = () => {
       setIsPM(prevState => !prevState);
-    };
-
-    const handleTimeZoneChange = (zone: string) => {
-      setTimeZone(zone);
-      setShowTimeZoneModal(false);
     };
 
     const validateAndExtractTime = (hourStr: string, minuteStr: string): { hour: number, minute: number } | string => {
@@ -42,6 +38,22 @@ const TimeSelector = () => {
       return { hour, minute };
     };
 
+    const calculateDuration = (startDate:Date, endDate:Date) => {
+      const diffMs = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
+  
+      if (diffMinutes < 60) {
+          return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+      } else if (diffHours < 24) {
+          return `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+      } else {
+          return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+      }
+    };
+
     const handleValidation = () => {
       const validationResult = validateAndExtractTime(hours, minutes);
       if (typeof validationResult === 'string') {
@@ -49,21 +61,21 @@ const TimeSelector = () => {
       } else {
         // Handle the valid time data here
         const { hour, minute } = validationResult;
-        console.log(`Valid time: Hour ${hour}, Minute ${minute}`);
+        setHoursInt(hour);
+        setMinInts(minute);
+        (modStartDate ? task.startDate : task.endDate).setHours(hour + (isPM ? 12 : 0));
+        (modStartDate ? task.startDate : task.endDate).setMinutes(minute);
+        updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
+        updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
+        setIsSquareVisible(false);
       }
     };
-  
-    const renderTimeZoneItem = ({ item }: { item: string }) => (
-      <TouchableOpacity onPress={() => handleTimeZoneChange(item)} style={styles.timeZoneItem}>
-        <Text>{item}</Text>
-      </TouchableOpacity>
-    );
 
     return (
       <View style={styles.container}>
         <TouchableOpacity onPress={handleContainerClick}>
           <View style={[styles.pickerContainer, {alignItems:'flex-end'}]}>
-              <Text style={{color:'gray'}}>4:00 PM EST</Text> 
+              <Text style={{color:'gray'}}>{hoursInt}:{minInts} {isPM ? 'PM' : 'AM'}</Text> 
           </View>
         </TouchableOpacity>
         {isSquareVisible && 
@@ -100,7 +112,7 @@ const TimeSelector = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width:100,
+    width:80,
     justifyContent: 'center',
     alignItems: 'flex-end',
   },

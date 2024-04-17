@@ -32,20 +32,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   // For subtask interaction
   const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null)
 
-  // For date pickers
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const onChange = (event: { target: { value: string | number | Date; }; }) => {
-    const selectedDate = new Date(event.target.value);
-    setDate(selectedDate);
-    setShowDatePicker(false);
-  };
-
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };
-
   // For progress circle
   const [completion, setCompletion] = useState(task.getPercentCompleteness())
   
@@ -207,7 +193,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   }
 
   // For Creating subtask
-  const [createSubTask, setCreateSubTask] = useState<boolean>(false);
+  const [newTasks, setNewTasks] = useState<TaskModel[]>([]);
+
+  const handleDeleteNewTask = (taskToDelete:TaskModel) => {
+    setNewTasks(newTasks.filter(task => task.id !== taskToDelete.id))
+  }
   
 
   // Render subtasks
@@ -341,6 +331,26 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     
   }
 
+  const calculateDuration = (startDate:Date, endDate:Date) => {
+    const diffMs = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 60) {
+        return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+    } else if (diffHours < 24) {
+        return `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+    } else {
+        return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+    }
+  };
+
+  // For date pickers
+    const [duration, setDuration] = useState(calculateDuration(task.startDate, task.endDate));
+    const [durationFromNow, setDurationFromNow] = useState(calculateDuration(new Date(), task.endDate));
+
 
   return(
     <View style={{overflow:'hidden', minHeight:'100%'}}>
@@ -357,7 +367,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center'}}>
                         <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
-                        {(task.children.length > 0 || createSubTask)  && <View style={{width:3, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:3, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
                     </View>
 
                     {/* Content */}
@@ -417,8 +427,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={true}></DateSelector>
-                                    <TimeSelector></TimeSelector>
+                                    <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
                                 </View>
                                 
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
@@ -434,8 +444,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={false}></DateSelector>
-                                    <TimeSelector></TimeSelector>
+                                    <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
                                 </View>
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
@@ -448,7 +458,18 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 />
                                 <Text style={{color:'gray'}}>Duration</Text>
                                 </View>
-                                <Text style={{color:'gray', marginHorizontal: 10}}>7 days</Text>
+                                <Text style={{color:'gray'}}>{duration}</Text>
+                            </View>
+                            <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                <View style={{flexDirection:'row'}}>
+                                <Image
+                                    style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                    source={require('../../assets/clock_icon.png')}
+                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                />
+                                <Text style={{color:'gray'}}>Duration From Now</Text>
+                                </View>
+                                <Text style={{color:'gray'}}>{durationFromNow}</Text>
                             </View>
                             { task.children.length == 0 &&
                                 <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
@@ -461,7 +482,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'gray'}}>Is Movable?</Text>
                                     </View>
                                     <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
-                                        <Text style={{color:'gray', marginHorizontal: 10}}>{isMovable ? 'Yes' : 'No'}</Text>
+                                        <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                     </TouchableOpacity>
                                 </View>
                             }
@@ -619,7 +640,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         <View style={{width:'100%'}}>
                             <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'flex-end'}}>
                                 <Text style={[{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40}, {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>{task.children.length} Sub tasks</Text>
-                                <TouchableOpacity style={{justifyContent:'center', alignItems:'center', width:30, height:30, backgroundColor:'rgba(50,50,50,1)', borderRadius:30, margin:5, marginRight:isLeft ? 20 : 0}} onPress={()=>{setCreateSubTask(true)}}>
+                                <TouchableOpacity style={{justifyContent:'center', alignItems:'center', width:30, height:30, backgroundColor:'rgba(50,50,50,1)', borderRadius:30, margin:5, marginRight:isLeft ? 20 : 0}} onPress={()=>{setNewTasks([...newTasks, new TaskModel(undefined, task.creatorId, task.rootId, task.users, undefined, "Sub Task " + (task.children.length + newTasks.length + 1), task.color, [task ,...task.ancestors], undefined, task.startDate.toISOString(), task.endDate.toISOString(), false)])}}>
                                     <Image
                                         style={{width: 10, height: 10, marginHorizontal: 10, transform:[{rotate: '45deg'}], margin:5}}
                                         source={require('../../assets/x_mark_white.png')}
@@ -628,14 +649,15 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </TouchableOpacity>
                             </View>
 
-                            {createSubTask &&  
-                            <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
-                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:260, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30}}>
+                            {newTasks.length > 0 &&  
+                            newTasks.toReversed().map((task, index) => (
+                                <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, zIndex:4}}>
+                                <View style={{flexDirection:'column', alignItems:'flex-start',  height:300, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:4}}>
                                     <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
                                             
                                             <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                                                 <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                                                <Text style={{color:'white'}}>Sub Task {task.children.length + 1}</Text>
+                                                <Text style={{color:'white'}}>{task.title}</Text>
                                             </View>
                                             <Text style={{color:'white'}}>Leaf Task</Text>
                                             <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
@@ -652,7 +674,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                     {/* Set start date and end date and say whether the event is movable */}
                                     <View style={[{width:'100%', paddingHorizontal:25}]}>
-                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20}}>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
                                             <View style={{flexDirection:'row'}}>
                                                 <Image
                                                     style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
@@ -661,9 +683,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                                 />
                                                 <Text style={{color:'gray'}}>Start Date</Text>
                                             </View>
-                                            <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                                            <View style={{flexDirection:'row'}}>
+                                                <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                                <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            </View>
                                         </View>
-                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                        
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10, zIndex:3}}>
                                             <View style={{flexDirection:'row'}}>
                                             <Image
                                                 style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
@@ -672,7 +698,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             />
                                             <Text style={{color:'gray'}}>End Date</Text>
                                             </View>
-                                            <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text>
+                                            <View style={{flexDirection:'row'}}>
+                                                <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
+                                                <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            </View>
                                         </View>
                                         <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
                                             <View style={{flexDirection:'row'}}>
@@ -683,7 +712,18 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             />
                                             <Text style={{color:'gray'}}>Duration</Text>
                                             </View>
-                                            <Text style={{color:'gray', marginHorizontal: 10}}>7 days</Text>
+                                            <Text style={{color:'gray'}}>{duration}</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
+                                            <View style={{flexDirection:'row'}}>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
+                                                source={require('../../assets/clock_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            <Text style={{color:'gray'}}>Duration From Now</Text>
+                                            </View>
+                                            <Text style={{color:'gray'}}>{durationFromNow}</Text>
                                         </View>
                                         <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
                                             <View style={{flexDirection:'row'}}>
@@ -694,13 +734,15 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             />
                                             <Text style={{color:'gray'}}>Is Movable?</Text>
                                             </View>
-                                            <Text style={{color:'gray', marginHorizontal: 10}}>Yes</Text>
+                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                                <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
 
                                     {/* Cancel or Create sub task */}
-                                    <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingVertical:10}}>
-                                        <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'red', justifyContent:'center', alignItems:'center'}} onPress={()=>{setCreateSubTask(false)}}>
+                                    <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingVertical:10, zIndex:-1}}>
+                                        <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'red', justifyContent:'center', alignItems:'center'}} onPress={()=>{handleDeleteNewTask(task)}}>
                                             <Text style={{color:'white'}}>Cancel</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'white', justifyContent:'center', alignItems:'center'}}>
@@ -712,6 +754,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
                                 
                             </View>
+                            ))
+                            
                             }
 
                             {renderSubtasks()}
