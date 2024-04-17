@@ -133,7 +133,7 @@ const TimeSelector = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handleContainerClick}>
-        <View style={styles.pickerContainer}>
+        <View style={[styles.pickerContainer, {alignItems:'flex-end'}]}>
             <Text style={{color:'gray'}}>4:00 PM EST</Text> 
         </View>
       </TouchableOpacity>
@@ -153,33 +153,34 @@ const TimeSelector = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width:100,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   pickerContainer: {
-    width: 200,
-    height: 50,
-    borderWidth: 1,
-    borderColor: 'white',
+    width:80,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex:1
   },
   square: {
-    width: 400,
-    height: 300,
+    width: 350,
+    height: 350,
     position:'absolute',
-    backgroundColor: 'red',
-    marginTop:350,
-    marginRight:200,
-    zIndex:1
+    backgroundColor: 'rgba(30,30,30,1)',
+    marginTop:380,
+    marginRight:0,
+    zIndex:1,
+    justifyContent:'center',
+    alignItems:'center',
+    borderRadius: 20,
   },
   dropdownContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
+    minWidth:100
   },
   calendarContainer: {
     flexDirection: 'row',
@@ -190,10 +191,11 @@ const styles = StyleSheet.create({
   },
   yearDropdown: {
     position: 'absolute',
+    top:'100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
-    borderColor: 'black',
+    borderColor: 'white',
     borderWidth: 1,
     height:100
   },
@@ -206,8 +208,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'black',
+    borderRadius: 40,
   },
   disabledDay: {
     backgroundColor: '#ddd',

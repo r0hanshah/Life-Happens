@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Text, ScrollView, Dimensions, Image  } from 'react-native';
+import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
 
 
-const DateSelector = () => {
+const DateSelector = ({task, modStartDate} : {task:TaskModel, modStartDate:boolean}) => {
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedDate, setSelectedDate] = useState(modStartDate ? task.startDate : task.endDate)
     const [isYearDropdownVisible, setIsYearDropdownVisible] = useState(false);
+
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const dayOfWeek = daysOfWeek[(modStartDate ? task.startDate : task.endDate).getDay()];
+    const monthName = months[(modStartDate ? task.startDate : task.endDate).getMonth()];
+    const dayOfMonth = (modStartDate ? task.startDate : task.endDate).getDate();
+    const year = (modStartDate ? task.startDate : task.endDate).getFullYear();
+    
+    const [formattedDate, setFormattedDate] = useState(`${dayOfWeek}, ${monthName} ${dayOfMonth}, ${year}`);
   
     const handleContainerClick = () => {
       setIsSquareVisible(!isSquareVisible);
@@ -37,8 +49,29 @@ const DateSelector = () => {
       setIsYearDropdownVisible(false);
     };
 
-    const handleDaySelect = (day:number|"") => {
+    const handleDaySelect = (year:number , month:number, day:number|"") => {
+   
+      if (typeof day === 'number')
+      {
+        const date = new Date(year, month-1, day)
+        setSelectedDate(date)
 
+        const dayOfWeek = daysOfWeek[date.getDay()];
+        const monthName = months[date.getMonth()];
+        const dayOfMonth = date.getDate();
+        const yearOfDay = date.getFullYear();
+
+        // Format the date string
+        const formattedDate = `${dayOfWeek}, ${monthName} ${dayOfMonth}, ${yearOfDay}`;
+        setFormattedDate(formattedDate);
+
+        // Update task date
+        (modStartDate ? task.startDate : task.endDate).setFullYear(year);
+        (modStartDate ? task.startDate : task.endDate).setMonth(month-1);
+        (modStartDate ? task.startDate : task.endDate).setDate(day);
+
+      }
+     
     }
   
     const renderMonthsDropdown = () => {
@@ -50,14 +83,29 @@ const DateSelector = () => {
       return (
         <View style={[styles.dropdownContainer, {width:'50%'}]}>
           <TouchableOpacity onPress={handlePrevMonth}>
-            <Text>{'<'}</Text>
+              <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, transform:[{rotate: '90deg'}]}}></Image>
           </TouchableOpacity>
-          <Text>{months[selectedMonth]}</Text>
+          <Text style={{color:'white'}}>{months[selectedMonth]}</Text>
           <TouchableOpacity onPress={handleNextMonth}>
-            <Text>{'>'}</Text>
+              <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, transform:[{rotate: '-90deg'}]}}></Image>
           </TouchableOpacity>
         </View>
       );
+    };
+
+    const scrollViewRef = useRef<ScrollView>(null);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+
+    useEffect(() => {
+      if (scrollViewRef.current) {
+        const { height: screenHeight } = Dimensions.get('window');
+        const middleY = (contentHeight - screenHeight) / 2;
+        scrollViewRef.current.scrollTo({ y: middleY + 350, animated: true });
+      }
+    }, [contentHeight]);
+
+    const onContentSizeChange = (width: number, height: number) => {
+      setContentHeight(height);
     };
   
     const renderYearsDropdown = () => {
@@ -67,16 +115,19 @@ const DateSelector = () => {
       return (
         <View style={[styles.dropdownContainer, {width:'25%', zIndex:1}]}>
           <TouchableOpacity onPress={handlePrevYear}>
-            <Text>{'<'}</Text>
+          <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, transform:[{rotate: '90deg'}]}}></Image>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsYearDropdownVisible(!isYearDropdownVisible)}>
-            <Text>{selectedYear}</Text>
+            <Text style={{color:'white'}}>{selectedYear}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNextYear}>
-            <Text>{'>'}</Text>
+          <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, transform:[{rotate: '-90deg'}]}}></Image>
           </TouchableOpacity>
           {isYearDropdownVisible && (
-            <ScrollView style={[styles.yearDropdown, {zIndex: 1}]}>
+            <ScrollView 
+            ref={scrollViewRef}
+            onContentSizeChange={onContentSizeChange}
+            style={[styles.yearDropdown, {zIndex: 1}]}>
               {years.map((year) => (
                 <TouchableOpacity key={year} onPress={() => handleYearSelect(year)}>
                   <Text>{year}</Text>
@@ -90,6 +141,12 @@ const DateSelector = () => {
 
     const renderCalendar = () => {
         const currentMonth = moment(new Date(selectedYear, selectedMonth));
+        const currentDate = moment(new Date());
+
+        const selectedDay = moment(selectedDate)
+        const otherDay = moment(!modStartDate ? task.startDate : task.endDate)
+
+
         const firstDayOfMonth = currentMonth.clone().startOf('month');
         const daysInMonth = currentMonth.daysInMonth();
         const startDay = firstDayOfMonth.clone().startOf('week');
@@ -101,15 +158,21 @@ const DateSelector = () => {
         var offset:number = 0;
         while (currentDay.isBefore(endDay)) 
         {
+          const day = parseInt(currentDay.format('D'),);
+          const month = parseInt(currentDay.format('M'),);
+          const year = parseInt(currentDay.format('YYYY'),);
             calendarDays.push(
                 <TouchableOpacity
                     key={currentDay.toString()}
-                    onPress={() => handleDaySelect(offset)}
+                    onPress={() => { handleDaySelect(year, month, day)}}
                     style={[
-                    styles.dayCell
+                    styles.dayCell,
+                    {backgroundColor: (selectedDay.year() == currentDay.year() && selectedDay.month() == currentDay.month() && selectedDay.date() == currentDay.date())? '#D35454' :
+                    (otherDay.year() == currentDay.year() && otherDay.month() == currentDay.month() && otherDay.date() == currentDay.date()) ? '#783333' :
+                    (currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()) ? '#00488A' : 'clear'},
                     ]}
                 >
-                    <Text>{parseInt(currentDay.format('D'),)}</Text>
+                    <Text style={{color: currentDay.month() == firstDayOfMonth.month() ? 'white' : 'gray'}}>{parseInt(currentDay.format('D'),)}</Text>
                 </TouchableOpacity>
             );
 
@@ -129,22 +192,32 @@ const DateSelector = () => {
     
         return calendarDisplay;
       };
+    
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleContainerClick}>
-        <View style={styles.pickerContainer}>
-            <Text style={{color:'gray'}}>Monday, April 27, 2024</Text> 
+      <TouchableOpacity style={{alignItems:'flex-end'}} onPress={handleContainerClick}>
+        <View style={[styles.pickerContainer, {alignItems:'flex-end'}]}>
+            <Text style={{color:'gray'}}>{formattedDate}</Text> 
         </View>
       </TouchableOpacity>
       {isSquareVisible && 
         <View style={[styles.square]}>
-        <View style={{flexDirection:'row', zIndex:1}}>
-            {renderMonthsDropdown()}
-            {renderYearsDropdown()}
+          <View style={{flexDirection:'row', zIndex:1}}>
+              {renderMonthsDropdown()}
+              {renderYearsDropdown()}
+          </View>
+          {renderCalendar()}
+          <View style={{flexDirection:'row', justifyContent:'space-around', paddingTop:30, width:'80%'}}>
+            <Text style={{color:'gray'}}>Su</Text>
+            <Text style={{color:'gray'}}>M</Text>
+            <Text style={{color:'gray'}}>T</Text>
+            <Text style={{color:'gray'}}>W</Text>
+            <Text style={{color:'gray'}}>Th</Text>
+            <Text style={{color:'gray'}}>F</Text>
+            <Text style={{color:'gray'}}>S</Text>
+          </View>
         </View>
-        {renderCalendar()}
-      </View>
       }
       
     </View>
@@ -155,27 +228,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   pickerContainer: {
-    width: 200,
-    height: 50,
-    borderWidth: 1,
-    borderColor: 'white',
+    width:200,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex:1
   },
   square: {
-    width: 400,
-    height: 300,
+    width: 350,
+    height: 350,
     position:'absolute',
-    backgroundColor: 'red',
-    marginTop:350,
-    marginRight:200,
+    backgroundColor: 'rgba(30,30,30,1)',
+    marginTop:380,
+    marginRight:0,
     zIndex:1,
     justifyContent:'center',
-    alignItems:'center'
+    alignItems:'center',
+    borderRadius: 20,
   },
   dropdownContainer: {
     flexDirection: 'row',
@@ -197,7 +268,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#fff',
-    borderColor: 'black',
+    borderColor: 'white',
     borderWidth: 1,
     height:100
   },
@@ -210,8 +281,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'black',
+    borderRadius: 40,
   },
   disabledDay: {
     backgroundColor: '#ddd',

@@ -416,8 +416,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     />
                                     <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
-                                <DateSelector></DateSelector>
-                                <TimeSelector></TimeSelector>
+                                <View style={{flexDirection:'row'}}>
+                                    <DateSelector task={task} modStartDate={true}></DateSelector>
+                                    <TimeSelector></TimeSelector>
+                                </View>
+                                
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
                             
@@ -430,8 +433,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 />
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
-                                <DateSelector></DateSelector>
-                                <TimeSelector></TimeSelector>
+                                <View style={{flexDirection:'row'}}>
+                                    <DateSelector task={task} modStartDate={false}></DateSelector>
+                                    <TimeSelector></TimeSelector>
+                                </View>
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
                             <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
