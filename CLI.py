@@ -329,7 +329,7 @@ def create_subtask(user_id, task_id):
         print("Error creating subtask:", e)
 
 
-def invite_user_to_task(user_id, task_id, invited_users):
+def invite_user_to_task(user_id, task_id, invited_users): # puts invited user email to task field, 
     try:
         task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
         for invitee in invited_users:
@@ -340,6 +340,22 @@ def invite_user_to_task(user_id, task_id, invited_users):
                 invitee_id = invitee
             task_ref.update({"InvitedUsers": firestore.ArrayUnion([invitee_id])})
         print("Users invited to the task successfully!")
+        return True
+    except Exception as e:
+        print("Error inviting users to task:", e)
+        return False
+
+def invite_user_to_subtask(user_id, task_id, subtask_id, invited_users): # puts invited user email to subtask field, 
+    try:
+        subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).colletion('Subtasks').document(subtask_id)
+        for invitee in invited_users:
+            if "@" in invitee:
+                user = auth.get_user_by_email(invitee)
+                invitee_id = user.uid
+            else:
+                invitee_id = invitee
+            subtask_ref.update({"InvitedUsers": firestore.ArrayUnion([invitee_id])})
+        print("Users invited to the subtask successfully!")
         return True
     except Exception as e:
         print("Error inviting users to task:", e)
