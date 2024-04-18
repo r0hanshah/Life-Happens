@@ -6,7 +6,8 @@ import TaskModel from "../../models/TaskModel";
 class MainController {
     private static instance: MainController | null = null;
     private selectedTask: PropertyListener<TaskModel | null> = new PropertyListener<TaskModel | null>(null);
-  
+    private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
+
     // Private constructor to prevent instantiation from outside
     private constructor() {
       // Initialization code here
@@ -29,6 +30,15 @@ class MainController {
     // Method to increase the counter value
     public setSelectedTask(selectedTask: TaskModel | null): void {
         this.selectedTask.setValue(selectedTask)
+    }
+
+    // Rerender the main view
+    public getReRender(): PropertyListener<boolean> {
+      return this.reRender;
+    }
+
+    public setReRender(bool: boolean): void {
+        this.reRender.setValue(bool)
     }
   }
 

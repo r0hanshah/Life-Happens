@@ -38,6 +38,9 @@ const Main: React.FC<Tasks> = () => {
 
   const controller = MainController.getInstance();
   var selectedTask = controller.getSelectedTask();
+
+  const [reRender, setReRender] = useState<boolean>(false)
+
   const [task, setTask] = useState<TaskModel | null>(null);
   const [slideAnimation] = useState(new Animated.Value(0));
 
@@ -103,6 +106,28 @@ const Main: React.FC<Tasks> = () => {
       taskListener.removeListener(listener);
     };
   }, [controller]);
+
+  // Rerender the page
+  useEffect(() => {
+    const renderListener = controller.getReRender();
+
+    const listener = (bool: boolean) => {
+      setReRender(bool);
+    };
+
+    renderListener.addListener(listener)
+
+    return () => {
+      renderListener.removeListener(listener);
+    };
+  }, [controller]);
+
+  useEffect(() => {
+    console.log("Running from rerender")
+    const orderedMaps = getAllLeafNodes(rootTasks)
+    setLeafNodesMap(orderedMaps[0]);
+    setRootTaskMap(orderedMaps[1])
+  }, [reRender])
 
   const windowHeight = useWindowDimensions().height;
   const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
@@ -182,6 +207,7 @@ const Main: React.FC<Tasks> = () => {
 
     // Set all leaf nodes
     useEffect(() => {
+      console.log("Running use effect")
       const orderedMaps = getAllLeafNodes(rootTasks)
       setLeafNodesMap(orderedMaps[0]);
       setRootTaskMap(orderedMaps[1])

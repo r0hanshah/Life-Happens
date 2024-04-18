@@ -400,7 +400,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     }
     else
     {
-        console.log("no ancestors")
         return (<View></View>)
     }
     

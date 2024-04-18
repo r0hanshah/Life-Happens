@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView, Dimensions, Image  } from 'react-native';
 import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
+import MainController from '../../controllers/main/MainController';
 
 
 const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string)=>void>}) => {
@@ -88,6 +89,10 @@ const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, m
 
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
         updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
+
+        // Refresh main view
+        const mainController = MainController.getInstance();
+        mainController.setReRender(mainController.getReRender().getValue() ? false : true)
       }
      
     }
