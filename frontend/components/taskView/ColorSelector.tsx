@@ -3,6 +3,8 @@ import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal,
 import moment, { Duration } from 'moment';
 import TaskModel from '../../models/TaskModel';
 
+import MainController from '../../controllers/main/MainController';
+
 
 const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:Boolean, updateFunctions:Array<(duration:string) => void>}) => {
 
@@ -13,15 +15,29 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
       setIsSquareVisible(!isSquareVisible);
     };
 
+    const handleChangeColor = () => {
+      const hexRegex = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+
+      if (hexRegex.test(hexCode))
+      {
+        task.color = "#" + hexCode
+        const mainController = MainController.getInstance();
+        mainController.setReRender(mainController.getReRender().getValue() ? false : true)
+      }
+      else
+      {
+        setHexCode(task.color.substring(1))
+      }
+    }
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {alignItems: isLeft ? 'flex-start' : 'flex-end',}]}>
         <TouchableOpacity onPress={handleContainerClick}>
             <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
         </TouchableOpacity>
         {isSquareVisible && 
         <View  style={[styles.square]}>
-          <View style={styles.timeInput}>
+          <View style={[styles.timeInput, {width:'90%'}]}>
             <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#" + hexCode}}/>
             <Text style={{color:'white', marginHorizontal:10}}>#</Text>
             <TextInput
@@ -30,6 +46,9 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
               onChangeText={(text) => {setHexCode(text)}}
               maxLength={6}
             />
+            <TouchableOpacity onPress={() => {handleChangeColor()}}>
+              <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
+            </TouchableOpacity>
           </View>
           <View style={{margin:10, width:'90%'}}>
             <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("FF0000")}}>
@@ -72,7 +91,6 @@ const styles = StyleSheet.create({
   container: {
     width:80,
     justifyContent: 'center',
-    alignItems: 'flex-end',
   },
   pickerContainer: {
     width:80,
@@ -139,7 +157,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   input: {
-    width: 100,
+    width: 80,
     height: 40,
     padding: 10,
     marginRight: 5,
