@@ -33,7 +33,7 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
     return (
       <View style={[styles.container, {alignItems: isLeft ? 'flex-start' : 'flex-end',}]}>
         <TouchableOpacity onPress={handleContainerClick}>
-            <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
+            <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27, marginHorizontal:25}}/>
         </TouchableOpacity>
         {isSquareVisible && 
         <View  style={[styles.square]}>
