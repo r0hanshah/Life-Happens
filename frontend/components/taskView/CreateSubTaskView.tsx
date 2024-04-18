@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
 
 
@@ -7,10 +7,10 @@ import TaskModel from '../../models/TaskModel';
 import MainController from '../../controllers/main/MainController';
 
 
-import DateSelector from './DateSelection';
+import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
 
-interface CreateTaskViewProps {
+interface CreateSubTaskViewProps {
   parentTask: TaskModel;
   task: TaskModel;
   isLeft: Boolean;
@@ -18,13 +18,19 @@ interface CreateTaskViewProps {
   handleDeleteNewTask: (task:TaskModel) => void;
 }
 
-const CreateTaskView: React.FC<CreateTaskViewProps> = ({ parentTask, task, isLeft, zIndex, handleDeleteNewTask }) => {
+const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task, isLeft, zIndex, handleDeleteNewTask }) => {
 
   const [isMovable, setIsMovable] = useState(task.isMovable)
+  const [title, setTitle] = useState(task.title)
 
   let [fontsLoaded] = useFonts({
     Inter_900Black
   });
+
+  const onChangeText = (newText: React.SetStateAction<string>) => {
+    setTitle(newText);
+    task.title = newText.toString()
+  }
 
   const calculateDuration = (startDate:Date, endDate:Date) => {
     const diffMs = Math.abs(endDate.getTime() - startDate.getTime());
@@ -61,7 +67,13 @@ const CreateTaskView: React.FC<CreateTaskViewProps> = ({ parentTask, task, isLef
                     
                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                         <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                        <Text style={{color:'white'}}>{task.title}</Text>
+                        <TextInput
+                                style={{color:'white', borderWidth:0, height:20, textAlign:'right'}}
+                                onChangeText={onChangeText}
+                                value={title}
+                                multiline={false}
+                                placeholder="Sub Task Title..."
+                            />
                     </View>
                     <Text style={{color:'white'}}>Leaf Task</Text>
                     <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
@@ -161,4 +173,4 @@ const CreateTaskView: React.FC<CreateTaskViewProps> = ({ parentTask, task, isLef
   );
 };
 
-export default CreateTaskView;
+export default CreateSubTaskView;

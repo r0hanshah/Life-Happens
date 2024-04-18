@@ -10,10 +10,11 @@ import MainController from '../../controllers/main/MainController';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 import CircularProgressBar from './CircularProgressView';
 
-import DateSelector from './DateSelection';
+import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
 
-import CreateTaskView from './CreateTaskView';
+import CreateSubTaskView from './CreateSubTaskView';
+import ColorSelector from './ColorSelector';
 
 interface TaskViewProps {
   task: TaskModel;
@@ -427,6 +428,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     const [duration, setDuration] = useState(calculateDuration(task.startDate, task.endDate));
     const [durationFromNow, setDurationFromNow] = useState(calculateDuration(new Date(), task.endDate));
 
+  // For editing title
+  const [title, setTitle] = useState(task.title)
+  const onChangeTitle = (newText: React.SetStateAction<string>) => {
+    setTitle(newText);
+    task.title = newText.toString()
+  }
+
 
   return(
     <View style={{overflow:'hidden', minHeight:'100%'}}>
@@ -441,8 +449,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 <View style ={{flexDirection: isLeft ? 'row' : 'row-reverse', width:'100%', paddingBottom: 20, paddingTop:20 }}>
 
                     {/* Circle with wire extending from it */}
-                    <View style={{width: '15%', alignItems:'center'}}>
-                        <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27}}/>
+                    <View style={{width: '15%', alignItems:'center', zIndex:5}}>
+                        <ColorSelector task={task} isLeft={isLeft} updateFunctions={[]}/>
                         {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
                     </View>
 
@@ -453,7 +461,14 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
 
-                                <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right'}}>{task.title}</Text>
+                                <TextInput 
+                                style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right', textAlignVertical:'bottom', minWidth:'50%', height: Math.max(50, (title.split('\n').length + Math.max(0, Math.ceil(title.replace(/\s+/g, '').length / 9)) - 1) * 50)}}
+                                scrollEnabled={false}
+                                onChangeText={onChangeTitle}
+                                value={title}
+                                multiline={true}
+                                placeholder='Task Title...'
+                                />
 
                                 <View style={{flexDirection: 'row', marginHorizontal: 20, height: 50, backgroundColor:'black', borderRadius: 30, borderColor: 'white', borderWidth: 2, alignItems:'center'}}>
                                     
@@ -727,7 +742,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                             {newTasks.length > 0 &&  
                             newTasks.toReversed().map((newTask, index) => (
-                                <CreateTaskView parentTask={task} task={newTask} isLeft={isLeft} zIndex={newTasks.length - index} handleDeleteNewTask={handleDeleteNewTask}/>
+                                <CreateSubTaskView parentTask={task} task={newTask} isLeft={isLeft} zIndex={newTasks.length - index} handleDeleteNewTask={handleDeleteNewTask}/>
                             ))
                             
                             }
