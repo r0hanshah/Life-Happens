@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, View, ScrollView, useWindowDimensions, Animated, Button, TouchableHighlight, Image, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, useWindowDimensions, Animated, Button, TouchableHighlight, TouchableOpacity, Image, Modal } from 'react-native';
 import WireFrame from './wireframe/WireFrame';
 import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
@@ -263,7 +263,18 @@ const Main: React.FC<Tasks> = () => {
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
             <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
           </View>
-          <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+          <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
+            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+            <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
+            onPress={() => {
+              if(controller.getSelectedTask().getValue() === null)
+                setRootTasks([...rootTasks, controller.createNewTask("TODO")])
+            }}
+            >
+              <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
+            </TouchableOpacity>
+          </View>
+          
           <View style={{maxWidth: "auto", alignItems:"center"}}>
             <RootTaskList rootTasksMap={rootTaskMap}/>
           </View>

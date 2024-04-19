@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, ViewStyle, useWindowDimensions, Text, Image, TouchableOpacity, TextInput, Alert, Button, ScrollView, FlatList, Platform, Linking } from 'react-native';
 import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -201,6 +201,34 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const handleDeleteNewTask = (taskToDelete:TaskModel) => {
     setNewTasks(newTasks.filter(task => task.id !== taskToDelete.id))
   }
+
+  // For Delete task
+  const [deleteTaskClicked, setDeleteTaskClicked] = useState(false)
+  const [validDeleteInput, setValidDeleteInput] = useState(false)
+  const [deleteInput, setDeleteInput] = useState("")
+
+  const handleDelete = () => {
+    // If task is root, then remove it from root task list in main controller
+
+    // otherwise, go to the parent, and remove the child and set the selected task in main to null
+  }
+
+  const validateDelete = () => {
+    setValidDeleteInput(deleteInput == task.title)
+  }
+
+  useEffect(() => {
+    validateDelete()
+  }, [deleteInput])
+
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToBottom = () => {
+    if (scrollViewRef.current)
+        scrollViewRef.current.scrollToEnd({ animated: true });
+  };
+
+  useEffect(() => {if(deleteTaskClicked) {scrollToBottom()}}, [deleteTaskClicked])
   
 
   // Render subtasks
@@ -445,7 +473,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         </View>
         <View style={[styles.container, isLeft ? styles.containerL : styles.containerR]}>
 
-            <ScrollView style={{ height: useWindowDimensions().height, padding:39}}>
+            <ScrollView ref={scrollViewRef} style={{ height: useWindowDimensions().height, padding:39}}>
                 <View style ={{flexDirection: isLeft ? 'row' : 'row-reverse', width:'100%', paddingBottom: 20, paddingTop:20 }}>
 
                     {/* Circle with wire extending from it */}
@@ -748,6 +776,76 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             }
 
                             {renderSubtasks()}
+
+                            {/* Delete Subtask */}
+                            <View style={{alignItems: isLeft? 'flex-start' : 'flex-end'}}>
+                                {deleteTaskClicked && 
+                                    <View style={{width:'90%', borderRadius:10, backgroundColor:'rgba(30,30,30,1)', margin:10, padding:20}}>
+                                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Deleting Task</Text>
+                                            <TouchableOpacity onPress={()=>{
+                                                setDeleteInput('')
+                                                setDeleteTaskClicked(false)
+                                                }}>
+                                            <Image
+                                                style={{width: 10, height: 10, marginHorizontal: 10, margin:5}}
+                                                source={require('../../assets/x_mark_white.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Text style={{color:'gray', margin:20}}>In order to delete this task and all sub tasks stemming from this task, type: <Text style={{color:'#ff0000'}}>{task.title}</Text></Text>
+
+                                        <View style={{flexDirection:'row', marginHorizontal:20, justifyContent:'space-around'}}>
+                                            <TextInput
+                                                style={{color:'white'}}
+                                                placeholderTextColor="gray"
+                                                onChangeText={setDeleteInput}
+                                                value={deleteInput}
+                                                placeholder={task.title}
+                                            />
+                                            <TouchableOpacity style={{height:40, paddingHorizontal:20, borderRadius:5, backgroundColor:validDeleteInput ? '#ff0000' : 'rgba(20,20,20,1)', alignItems:'center', justifyContent:'center', flexDirection:'row'}}>
+                                                <Text style={{color:!validDeleteInput ? '#ff0000' : 'rgba(20,20,20,1)'}}>Delete</Text>
+                                                {validDeleteInput && 
+                                                    <Image
+                                                    style={{width: 20, height: 20, marginHorizontal: 10}}
+                                                    source={require('../../assets/dark_trash_icon.png')}
+                                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                                />
+                                                }
+                                                {!validDeleteInput && 
+                                                    <Image
+                                                    style={{width: 20, height: 20, marginHorizontal: 10}}
+                                                    source={require('../../assets/red_trash_icon.png')}
+                                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                                />
+                                                }
+                                                
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={{height:40, paddingHorizontal:20, borderRadius:5, backgroundColor: 'rgba(20,20,20,1)', alignItems:'center', justifyContent:'center', flexDirection:'row'}}
+                                            onPress={()=>{
+                                                setDeleteInput('')
+                                                setDeleteTaskClicked(false)
+                                            }}
+                                            >
+                                                <Text style={{color:'white'}}>Cancel</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        
+                                    </View>
+                                    }
+                                {!deleteTaskClicked && <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(20, 20, 20, 1)', margin:10, zIndex:-999, borderWidth: 1, borderColor:'red'}} onPress={()=>{setDeleteTaskClicked(true);scrollToBottom()}}>
+
+                                    <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'red'}}>Delete</Text>
+                                    <Image
+                                        style={{width: 20, height: 20, marginHorizontal: 10}}
+                                        source={require('../../assets/red_trash_icon.png')}
+                                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                    />
+
+                                </TouchableOpacity>}
+                            </View>
+                            
 
                         </View>
                         
