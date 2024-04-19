@@ -8,8 +8,8 @@ import MainController from '../../controllers/main/MainController';
 const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string)=>void>}) => {
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(modStartDate ? task.startDate.getMonth() : task.endDate.getMonth());
+    const [selectedYear, setSelectedYear] = useState(modStartDate ? task.startDate.getFullYear() : task.endDate.getFullYear());
     const [selectedDate, setSelectedDate] = useState(modStartDate ? task.startDate : task.endDate)
     const [isYearDropdownVisible, setIsYearDropdownVisible] = useState(false);
 
@@ -22,6 +22,27 @@ const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, m
     const year = (modStartDate ? task.startDate : task.endDate).getFullYear();
     
     const [formattedDate, setFormattedDate] = useState(`${dayOfWeek}, ${monthName} ${dayOfMonth}, ${year}`);
+
+    useEffect(()=>{
+      setSelectedMonth(modStartDate ? task.startDate.getMonth() : task.endDate.getMonth());
+      setSelectedYear(modStartDate ? task.startDate.getFullYear() : task.endDate.getFullYear());
+      setSelectedDate(modStartDate ? task.startDate : task.endDate)
+      const dayOfWeek = daysOfWeek[(modStartDate ? task.startDate : task.endDate).getDay()];
+      const monthName = months[(modStartDate ? task.startDate : task.endDate).getMonth()];
+      const dayOfMonth = (modStartDate ? task.startDate : task.endDate).getDate();
+      const yearOfDay = (modStartDate ? task.startDate : task.endDate).getFullYear();
+      const formattedDate = `${dayOfWeek}, ${monthName} ${dayOfMonth}, ${yearOfDay}`;
+      setFormattedDate(formattedDate);
+      for(const parent of task.ancestors)
+      {
+        if(modStartDate ? parent.endDate < task.endDate : parent.startDate > task.startDate)
+          if(modStartDate) { parent.startDate = task.startDate }
+          else { parent.endDate = task.endDate}
+         
+      }
+      updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
+      updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
+    }, [task])
   
     const handleContainerClick = () => {
       setIsSquareVisible(!isSquareVisible);

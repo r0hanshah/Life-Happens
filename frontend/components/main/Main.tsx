@@ -62,27 +62,30 @@ const Main: React.FC<Tasks> = () => {
     // Load based off the month
     if( currentMonthAndYear == "March 2024")
     {
-      setRootTasks(
-        [
-          parent1, 
-          parent,
-          new TaskModel("123", "dp", "123", [], [], "One More Test", "#00ff00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("124", "dp", "124", [], [], "2 Test", "#0000ff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("125", "dp", "125", [], [], "3 Test", "#ff7a00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("126", "dp", "126", [], [], "4 Test", "#ff00e5", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("127", "dp", "127", [], [], "5 Test", "#a100bb", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("128", "dp", "128", [], [], "6 Test", "#ff0000", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("129", "dp", "129", [], [], "7 Test", "#ff4400", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          new TaskModel("130", "dp", "130", [], [], "8 Test", "#ffffff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-          ]
-      )
+      const taskArray =  [
+        parent1, 
+        parent,
+        new TaskModel("123", "dp", "123", [], [], "One More Test", "#00ff00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("124", "dp", "124", [], [], "2 Test", "#0000ff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("125", "dp", "125", [], [], "3 Test", "#ff7a00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("126", "dp", "126", [], [], "4 Test", "#ff00e5", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("127", "dp", "127", [], [], "5 Test", "#a100bb", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("128", "dp", "128", [], [], "6 Test", "#ff0000", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("129", "dp", "129", [], [], "7 Test", "#ff4400", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        new TaskModel("130", "dp", "130", [], [], "8 Test", "#ffffff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
+        ]
+
+      controller.setTasks(taskArray)
+      setRootTasks(taskArray)
     }
     else
     {
-      setRootTasks([
+      const taskArray = [
         new TaskModel("131", "dp", "131", [], [], "9 Test", "#2ef5e9", [], [], "2024-04-22T19:54:02+0000", "2024-04-23T20:54:02+0000", false, {}, "", [], true, "", []),
         new TaskModel("141", "dp", "141", [], [], "10 Test", "#fef5e0", [], [], "2024-04-27T19:54:02+0000", "2024-04-28T20:54:02+0000", false, {}, "", [], true, "", [])
-    ])
+    ]
+      controller.setTasks(taskArray)
+      setRootTasks(taskArray)
     }
   }
 
@@ -91,6 +94,21 @@ const Main: React.FC<Tasks> = () => {
     inputRange: [0, 1],
     outputRange: [0, windowWidth*0.49],
   });
+
+  // Update tasks array
+  useEffect(()=>{
+    const taskListener = controller.getTasks();
+
+    const listener = (tasks: TaskModel[]) => {
+      setRootTasks(tasks);
+    };
+
+    taskListener.addListener(listener)
+
+    return () => {
+      taskListener.removeListener(listener);
+    };
+  }, [controller])
 
   // Update counter state when counterProperty changes
   useEffect(() => {
@@ -268,7 +286,7 @@ const Main: React.FC<Tasks> = () => {
             <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
             onPress={() => {
               if(controller.getSelectedTask().getValue() === null)
-                setRootTasks([...rootTasks, controller.createNewTask("TODO")])
+                controller.createNewTask("TODO")
             }}
             >
               <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>

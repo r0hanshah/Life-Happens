@@ -8,6 +8,7 @@ import uuid from 'react-native-uuid'
 class MainController {
     private static instance: MainController | null = null;
     private selectedTask: PropertyListener<TaskModel | null> = new PropertyListener<TaskModel | null>(null);
+    private tasksArray: PropertyListener<TaskModel[]> = new PropertyListener<TaskModel[]>([]);
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
 
     // Private constructor to prevent instantiation from outside
@@ -32,6 +33,22 @@ class MainController {
     // Method to increase the counter value
     public setSelectedTask(selectedTask: TaskModel | null): void {
         this.selectedTask.setValue(selectedTask)
+    }
+
+    public getTasks(): PropertyListener<TaskModel[]> {
+        return this.tasksArray;
+    }
+
+    // Method to increase the counter value
+    public setTasks(tasks: TaskModel[]): void {
+        this.tasksArray.setValue(tasks)
+    }
+
+    public deleteRootTask(task:TaskModel)
+    {
+      const filteredTasks = this.tasksArray.getValue().filter(inTask => inTask.id !== task.id)
+      this.setTasks(filteredTasks)
+      this.setSelectedTask(null)
     }
 
 
@@ -65,6 +82,7 @@ class MainController {
       const oneHourAhead = new Date(currentDate.getTime() + 3600000)
       const newRootTask = new TaskModel(id, creatorId, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
       this.setSelectedTask(newRootTask)
+      this.setTasks([...this.tasksArray.getValue(), newRootTask])
       return newRootTask
     }
 

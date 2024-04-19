@@ -207,10 +207,23 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const [validDeleteInput, setValidDeleteInput] = useState(false)
   const [deleteInput, setDeleteInput] = useState("")
 
-  const handleDelete = () => {
+  const handleDeleteTask = () => {
     // If task is root, then remove it from root task list in main controller
+    const mainController = MainController.getInstance()
+    if(task.isRoot)
+    {
+        mainController.deleteRootTask(task);
+        return
+    }
+    else
+    {
+        // otherwise, go to the parent, and remove the child and set the selected task in main to null
+        const parent = task.ancestors[0]
+        parent.children = parent.children.filter(inTask => inTask.id !== task.id);
+        mainController.setSelectedTask(null)
+    }
 
-    // otherwise, go to the parent, and remove the child and set the selected task in main to null
+    
   }
 
   const validateDelete = () => {
@@ -463,6 +476,16 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     task.title = newText.toString()
   }
 
+  // For changes in task
+  useEffect(()=>{
+    setTitle(task.title)
+    setText(task.notes)
+    setFiles(task.unobservedFiles)
+    setObservedFiles(task.contextFiles)
+    setContext(task.contextText)
+    setUrls(task.extraMedia)
+  }, [task])
+
 
   return(
     <View style={{overflow:'hidden', minHeight:'100%'}}>
@@ -575,7 +598,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     source={require('../../assets/clock_icon.png')}
                                     resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                 />
-                                <Text style={{color:'gray'}}>Duration</Text>
+                                <Text style={{color:'gray'}}>{task.children.length > 0 ? "Span" : "Duration"}</Text>
                                 </View>
                                 <Text style={{color:'gray'}}>{duration}</Text>
                             </View>
@@ -586,7 +609,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     source={require('../../assets/clock_icon.png')}
                                     resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                 />
-                                <Text style={{color:'gray'}}>Duration From Now</Text>
+                                <Text style={{color:'gray'}}>{task.children.length > 0 ? "Span" : "Duration"} From Now</Text>
                                 </View>
                                 <Text style={{color:'gray'}}>{durationFromNow}</Text>
                             </View>
@@ -778,11 +801,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             {renderSubtasks()}
 
                             {/* Delete Subtask */}
-                            <View style={{alignItems: isLeft? 'flex-start' : 'flex-end'}}>
+                            <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', zIndex:-999}}>
                                 {deleteTaskClicked && 
-                                    <View style={{width:'90%', borderRadius:10, backgroundColor:'rgba(30,30,30,1)', margin:10, padding:20}}>
+                                    <View style={{width:'90%', borderRadius:10, backgroundColor:'rgba(30,30,30,1)', margin:10, padding:20, borderWidth:1, borderColor:'red'}}>
                                         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Deleting Task</Text>
+                                            <Text style={{color:'red', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Deleting Task</Text>
                                             <TouchableOpacity onPress={()=>{
                                                 setDeleteInput('')
                                                 setDeleteTaskClicked(false)
@@ -804,7 +827,15 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                                 value={deleteInput}
                                                 placeholder={task.title}
                                             />
-                                            <TouchableOpacity style={{height:40, paddingHorizontal:20, borderRadius:5, backgroundColor:validDeleteInput ? '#ff0000' : 'rgba(20,20,20,1)', alignItems:'center', justifyContent:'center', flexDirection:'row'}}>
+                                            <TouchableOpacity style={{height:40, paddingHorizontal:20, borderRadius:5, backgroundColor:validDeleteInput ? '#ff0000' : 'rgba(20,20,20,1)', alignItems:'center', justifyContent:'center', flexDirection:'row'}} onPress={()=>{
+                                                if(validDeleteInput)
+                                                    {
+                                                        handleDeleteTask()
+                                                        const mainController = MainController.getInstance();
+                                                        mainController.setReRender(mainController.getReRender().getValue() ? false : true)
+                                                    }
+                                                    
+                                            }}>
                                                 <Text style={{color:!validDeleteInput ? '#ff0000' : 'rgba(20,20,20,1)'}}>Delete</Text>
                                                 {validDeleteInput && 
                                                     <Image

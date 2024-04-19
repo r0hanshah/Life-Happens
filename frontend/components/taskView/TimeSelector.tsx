@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
 import moment, { Duration } from 'moment';
 import TaskModel from '../../models/TaskModel';
@@ -20,6 +20,16 @@ const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, mo
     const togglePeriod = () => {
       setIsPM(prevState => !prevState);
     };
+
+    useEffect(()=>{
+      setHours(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
+      setHoursInt(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()) :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()))
+      setMinutes(modStartDate ? task.startDate.getMinutes().toString() : task.endDate.getMinutes().toString());
+      setMinInts(modStartDate ? task.startDate.getMinutes() : task.endDate.getMinutes())
+      setIsPM((modStartDate ? task.startDate.getHours() > 12 : task.endDate.getHours() > 12));
+      updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
+      updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
+    }, [task])
 
     const validateAndExtractTime = (hourStr: string, minuteStr: string): { hour: number, minute: number } | string => {
       // Validate hour string
@@ -65,6 +75,13 @@ const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, mo
         setMinInts(minute);
         (modStartDate ? task.startDate : task.endDate).setHours(hour + (isPM ? 12 : 0));
         (modStartDate ? task.startDate : task.endDate).setMinutes(minute);
+        for(const parent of task.ancestors)
+        {
+          if(modStartDate ? parent.endDate < task.endDate : parent.startDate > task.startDate)
+            if(modStartDate) { parent.startDate = task.startDate }
+            else { parent.endDate = task.endDate}
+            
+        }
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
         updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
         setIsSquareVisible(false);
@@ -100,7 +117,7 @@ const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, mo
               <Text style={styles.period}>{isPM ? 'PM' : 'AM'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleValidation}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
+              <Image source={require('../../assets/chev_white.png')} style={{width:20, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
             </TouchableOpacity>
           </View>
         </View>

@@ -20,13 +20,29 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
 
       if (hexRegex.test(hexCode))
       {
-        task.color = "#" + hexCode
+        const color = "#" + hexCode
+        colorTree(task.ancestors.length > 0 ? task.ancestors[task.ancestors.length-1] : task, color)
+
         const mainController = MainController.getInstance();
         mainController.setReRender(mainController.getReRender().getValue() ? false : true)
       }
       else
       {
         setHexCode(task.color.substring(1))
+      }
+    }
+
+    const colorTree = (rootTask:TaskModel, color:string)=> {
+      // Conduct bfs
+      var q = [rootTask]
+      while(q.length > 0)
+      {
+        q[0].color = color
+        for(const subTask of q[0].children)
+        {
+          q.push(subTask)
+        }
+        q.shift()
       }
     }
 
@@ -47,7 +63,7 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
               maxLength={6}
             />
             <TouchableOpacity onPress={() => {handleChangeColor()}}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:15, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
+              <Image source={require('../../assets/chev_white.png')} style={{width:20, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
             </TouchableOpacity>
           </View>
           <View style={{margin:10, width:'90%'}}>

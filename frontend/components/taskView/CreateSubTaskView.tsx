@@ -50,6 +50,11 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
   const handleAddTask = () => {
     parentTask.children.push(task)
+    for(const parent of task.ancestors)
+    {
+        if (parent.endDate < task.endDate) {parent.endDate = task.endDate}
+        if (parent.startDate > task.startDate) { parent.startDate = task.startDate}
+    }
     handleDeleteNewTask(task)
     const mainController = MainController.getInstance();
     mainController.setReRender(mainController.getReRender().getValue() ? false : true)
@@ -68,7 +73,7 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                         <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
                         <TextInput
-                                style={{color:'white', borderWidth:0, height:20, textAlign:'right'}}
+                                style={{color:'white', borderWidth:0, height:20, textAlign: isLeft ? 'left' : 'right'}}
                                 onChangeText={onChangeText}
                                 value={title}
                                 multiline={false}
