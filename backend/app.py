@@ -106,6 +106,17 @@ def add_task(user_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
+def delete_task(user_id, task_id):
+    try:
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref.delete()
+        return jsonify({'message': 'Task deleted successfully'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 # AI backend
 @app.route('/generate', methods=['POST'])
@@ -120,6 +131,9 @@ def generateTasks():
     file_paths = data.get('files')
 
     return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
+
+
+
 
 # Run Flask app
 if __name__ == '__main__':

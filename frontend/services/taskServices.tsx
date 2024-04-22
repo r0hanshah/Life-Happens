@@ -45,3 +45,24 @@ export const addTask = async (userId, taskData) => {
   }
 };
 
+// taskServices.tsx
+
+export const deleteTask = async (userId, taskId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      console.log('Task deleted');
+      return true;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while deleting the task');
+    }
+  } catch (error) {
+    console.error('Failed to delete task:', error);
+    throw error;
+  }
+};
+
+
