@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import NavBar from "./NavBar";
-import UserProfilePopup from "./UserProfilePopup";
 interface LandingProps {
     navigateToSignUp: () => void;
     navigateToLogin: () => void;
@@ -9,12 +8,11 @@ interface LandingProps {
 }
 
 const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
-    const [showProfile, setShowProfile] = useState(false);
 
 
     return (
         <View style={styles.container}>
-            <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} setShowProfile={setShowProfile} />
+            <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} />
             <View style={styles.contentContainer}>
                 <View style={styles.topContainer}>
                     <Text style={styles.title}>Life Happens.</Text>
@@ -49,7 +47,6 @@ const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLog
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
             </View>
-            {showProfile && <UserProfilePopup onClose={() => setShowProfile(false)} />}
         </View>
     );
 }
