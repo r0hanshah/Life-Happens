@@ -5,8 +5,10 @@ from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-cred = credentials.Certificate('serviceAccountKey.json')
-firebase_admin.initialize_app(cred)
+CRED = credentials.Certificate('./serviceAccountKey.json')
+firebase_admin.initialize_app(CRED, {
+    'storageBucket': 'lifehappens-293da.appspot.com'
+})
 
 db = firestore.client()
 from ai_funcs import AIFunctions
@@ -38,8 +40,9 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     print("HERE")
-    email = request.form['email']
-    password = request.form['password']
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
     try:
         user = auth.sign_in_with_email_and_password(email, password)
         return jsonify({'message': 'Login successful'})
