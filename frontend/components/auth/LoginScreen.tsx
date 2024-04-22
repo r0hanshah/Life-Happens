@@ -2,18 +2,21 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from './types';
+import NavBar from "../landing/NavBar";
+import UserProfilePopup from "../landing/UserProfilePopup";
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 interface LoginScreenProps {
   navigateToSignUp: () => void;
+  navigateToLogin: () => void;
+  navigateToMain: () => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showProfile, setShowProfile] = useState(false);
+
 
 
   const handleLogin = async () => {
@@ -35,6 +38,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
 
       Alert.alert('Success', 'Login successful');
       // Redirect user or do something else on success
+      navigateToMain();
     } catch (error) {
       Alert.alert('Error', 'Login failed');
       console.error('Login error:', error);
@@ -57,6 +61,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
 
   return (
       <View style={styles.container}>
+        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} setShowProfile={setShowProfile} />
+        <View style={styles.contentContainer}>
         <Text style={styles.largeTitle}>Life Happens.</Text>
 
         <TextInput style={styles.input}
@@ -90,6 +96,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
         <TouchableOpacity>
           <Text onPress={navigateToSignUp} style={styles.signUpLink}>Don't have an account? Sign up here</Text>
         </TouchableOpacity>
+        {showProfile && <UserProfilePopup onClose={() => setShowProfile(false)} />}
+      </View>
       </View>
   );
 };
@@ -97,19 +105,27 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#151515',
     alignItems: 'center',
-    padding: 16,
+    width: '100%',
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
   },
   largeTitle: {
     fontSize: 48,
     fontWeight: 'bold',
     marginBottom: 24,
+    color: '#FFFFFF'
+
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
+    marginTop: 12,
   },
   signUpLink: {
     marginTop: 16,

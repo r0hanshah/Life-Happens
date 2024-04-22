@@ -9,7 +9,7 @@ import LandingScreen from './components/landing/LandingScreen';
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'Main'>('Main');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'Main'>('Landing');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -47,12 +47,12 @@ export default function App() {
   
   return (
         <View style={styles.container}>
-          {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToLanding={navigateToLanding} navigateToMain={navigateToMain}/>}
+          {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
           {currentScreen === 'Main' && <Main rootTasks={[]}/>}
           <View style={styles.signupLoginContainer}>
           <>
-            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
-            {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
+            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
+            {currentScreen === 'SignUp' && <SignUpScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain} />}
           </> 
             <StatusBar style="auto" />
           </View>
