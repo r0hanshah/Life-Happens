@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, ViewStyle, useWindowDimensions, Text, Image, TouchableOpacity, TextInput, Alert, Button, ScrollView, FlatList, Platform, Linking } from 'react-native';
+import { View, StyleSheet, ViewStyle, useWindowDimensions, Text, Image, TouchableOpacity, TextInput, Alert, Button, ScrollView, FlatList, Platform, Linking, ActivityIndicator } from 'react-native';
 import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as DocumentPicker from 'expo-document-picker';
@@ -25,12 +25,28 @@ interface TaskViewProps {
 const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const controller = new TaskViewController(task);
+  const mainController = MainController.getInstance();
   const [viewUsers, setViewUsers] = useState(false)
   const [isMovable, setIsMovable] = useState(task.isMovable)
+  const [generating, setGenerating] = useState(false)
 
   let [fontsLoaded] = useFonts({
     Inter_900Black
   });
+
+  useEffect(()=>{
+    const taskListener = mainController.getLoadingGenerateTasks();
+
+    const listener = (bool: boolean) => {
+      setGenerating(bool);
+    };
+
+    taskListener.addListener(listener)
+
+    return () => {
+      taskListener.removeListener(listener);
+    };
+  }, [mainController])
 
   // For subtask interaction
   const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null)
@@ -362,16 +378,24 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     ))}
 
                     <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40, zIndex:-999}} onPress={async ()=>{
-                        const generatedTasks = await MainController.getInstance().handleGenerateTasks(task)
-                        setNewTasks(newTasks.concat(generatedTasks))
+                        if (!generating)
+                        {
+                            const generatedTasks = await MainController.getInstance().handleGenerateTasks(task)
+                            setNewTasks(newTasks.concat(generatedTasks))
+                        }
                     }}>
 
-                    <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10}}
-                        source={require('../../assets/robot_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
+                    <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>{generating ? "Generating Sub Tasks...": "Generate Sub Tasks"}</Text>
+                    {generating && 
+                        <ActivityIndicator size="small" color="#ffffff" style={{width: 20, height: 20, marginHorizontal: 10}}/>
+                    }
+                    {!generating &&
+                        <Image
+                            style={{width: 20, height: 20, marginHorizontal: 10}}
+                            source={require('../../assets/robot_icon.png')}
+                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                        />
+                    }
 
                     </TouchableOpacity>
 
@@ -402,16 +426,24 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                 <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}} 
                 onPress={async ()=>{
+                    if(!generating)
+                    {
                         const generatedTasks = await MainController.getInstance().handleGenerateTasks(task)
                         setNewTasks(newTasks.concat(generatedTasks))
+                    }
                     }}>
 
-                <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
-                <Image
-                    style={{width: 20, height: 20, marginHorizontal: 10}}
-                    source={require('../../assets/robot_icon.png')}
-                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                />
+                <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>{generating ? "Generating Sub Tasks...": "Generate Sub Tasks"}</Text>
+                    {generating && 
+                        <ActivityIndicator size="small" color="#ffffff" style={{width: 20, height: 20, marginHorizontal: 10}}/>
+                    }
+                    {!generating &&
+                        <Image
+                            style={{width: 20, height: 20, marginHorizontal: 10}}
+                            source={require('../../assets/robot_icon.png')}
+                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                        />
+                    }
 
                 </TouchableOpacity>
             </View>
