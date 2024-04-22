@@ -19,3 +19,29 @@ export const getTask = async (userId, taskId) => {
     throw error;
   }
 };
+
+
+// taskServices.tsx
+
+export const addTask = async (userId, taskData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}/task`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+    const result = await response.json();
+    if (response.ok) {
+      console.log('Task added:', result);
+      return result;
+    } else {
+      throw new Error(result.error || 'An error occurred while adding the task');
+    }
+  } catch (error) {
+    console.error('Failed to add task:', error);
+    throw error;
+  }
+};
+

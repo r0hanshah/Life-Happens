@@ -79,6 +79,32 @@ def get_user_task(user_id, task_id):
         return jsonify(task), 200
     else:
         return jsonify({'error': 'Task not found'}), 404
+    
+
+
+
+
+# Assume a function in your model (TaskModel.py or similar)
+def add_task_to_firestore(user_id, task_data):
+    # Add the task to Firestore under the user's tasks collection
+    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+    task_ref.set(task_data)
+    return task_ref.id  # Returns the newly created task's ID
+
+
+
+@app.route('/user/<user_id>/task', methods=['POST'])
+def add_task(user_id):
+    try:
+        task_data = request.json
+        new_task_id = add_task_to_firestore(user_id, task_data)
+        return jsonify({'message': 'Task added successfully', 'taskId': new_task_id}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+
 # Run Flask app
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
