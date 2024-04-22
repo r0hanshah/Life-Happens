@@ -30,10 +30,10 @@ from file_extract_tools import extract_text_from_pdf_byte_content, extract_text_
 load_dotenv()
 OPENAI_APIKEY = os.getenv("OPENAI_API_KEY")
 
-CRED = credentials.Certificate('./serviceAccountKey.json')
-firebase_admin.initialize_app(CRED, {
-    'storageBucket': 'lifehappens-293da.appspot.com'
-})
+# CRED = credentials.Certificate('./serviceAccountKey.json')
+# firebase_admin.initialize_app(CRED, {
+#     'storageBucket': 'lifehappens-293da.appspot.com'
+# })
 
 def get_file_content_from_fb(fb_path):
     try:
