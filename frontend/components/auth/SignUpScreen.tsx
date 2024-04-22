@@ -1,17 +1,23 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import NavBar from "../landing/NavBar";
+import UserProfilePopup from "../landing/UserProfilePopup";
 
 interface SignUpScreenProps {
-  navigateBack: () => void;
+  navigateToSignUp: () => void;
+  navigateToLogin: () => void;
+  navigateToMain: () => void;
 }
 
-const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showProfile, setShowProfile] = useState(false);
+
   const signUpWithGoogle = () => {
     // Add logic for Google sign-up
   };
@@ -26,7 +32,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
 
   const handleSignUp = async () => {
     try {
-      const response = await fetch('https://7897-128-227-7-219.ngrok-free.app/signup', {
+      const response = await fetch('http://127.0.0.1:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,6 +49,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
 
       Alert.alert('Success', 'Sign up successful');
       // Redirect user or do something else on success
+      navigateToMain();
     } catch (error) {
       Alert.alert('Error', 'Sign up failed');
       console.error('Sign up error:', error);
@@ -51,6 +58,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
 
   return (
       <View style={styles.container}>
+        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} setShowProfile={setShowProfile} />
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
             style={styles.input}
@@ -99,9 +107,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateBack }) => {
           <Ionicons name="logo-github" size={24} color="white" />
           <Text style={styles.buttonText}>Sign up with GitHub</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={navigateBack}>
+        <TouchableOpacity onPress={navigateToLogin}>
           <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
         </TouchableOpacity>
+        {showProfile && <UserProfilePopup onClose={() => setShowProfile(false)} />}
       </View>
   );
 };
@@ -118,6 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 24,
     color: 'white',
+    marginTop: 12,
   },
   input: {
     width: '100%',

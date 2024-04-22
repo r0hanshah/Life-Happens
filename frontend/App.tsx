@@ -53,13 +53,13 @@ export default function App() {
   
   return (
         <View style={styles.container}>
-          {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToLanding={navigateToLanding} navigateToMain={navigateToMain}/>}
+          {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
           {currentScreen === 'Main' && <Main rootTasks={[]}/>}
           {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}
           <View style={styles.signupLoginContainer}>
           <>
-            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} />}
-            {currentScreen === 'SignUp' && <SignUpScreen navigateBack={navigateBack} />}
+            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
+            {currentScreen === 'SignUp' && <SignUpScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain} />}
           </> 
             <StatusBar style="auto" />
           </View>
