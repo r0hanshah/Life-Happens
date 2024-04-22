@@ -6,10 +6,12 @@ import SignUpScreen from './components/auth/SignUpScreen';
 import Main from './components/main/Main';
 import TaskModel from './models/TaskModel';
 import LandingScreen from './components/landing/LandingScreen';
+import ButtonTest from './components/buttonTest/ButtonTest'; // Import the ButtonTest component
+
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'Main'>('Landing');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('ButtonTest');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -44,11 +46,16 @@ export default function App() {
   childOfParent1.children.push(new TaskModel("003", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   parent1.children.push(childOfParent1)
+
+  const userId = '3fh7J42CtTMuxmRrXflm7znrl5g1'; // Placeholder, replace with actual logic to get the user ID
+  const taskId = 'XwpYzrByr016BURbQdEp'; // Placeholder, replace with actual logic to get the task ID
+
   
   return (
         <View style={styles.container}>
           {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
           {currentScreen === 'Main' && <Main rootTasks={[]}/>}
+          {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}
           <View style={styles.signupLoginContainer}>
           <>
             {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}

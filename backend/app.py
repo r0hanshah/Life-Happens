@@ -1,11 +1,19 @@
+import firebase_admin
 from flask import Flask, request, jsonify
 from firebase_auth import auth
 from flask_cors import CORS
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate('lifehappens-293da-firebase-adminsdk-77os9-bdebc62647.json')
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 from ai_funcs import AIFunctions
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 #user passwords are all 123456
@@ -38,7 +46,7 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-# Dummy data route
+# Dummy data route  
 @app.route('/data')
 def get_time():
     # Returning dummy data
@@ -48,6 +56,55 @@ def get_time():
         "Date": 'x',
         "programming": "python"
     }
+
+
+
+def get_task_by_user_and_task_id(user_id, task_id):
+    try:
+        # Navigating to the Task document within the User subcollection
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task = task_ref.get()
+        if task.exists:
+            return task.to_dict()
+        else:
+            return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+# Route to get a specific task for a user
+@app.route('/user/<user_id>/task/<task_id>', methods=['GET'])
+def get_user_task(user_id, task_id):
+    task = get_task_by_user_and_task_id(user_id, task_id)
+    if task:
+        return jsonify(task), 200
+    else:
+        return jsonify({'error': 'Task not found'}), 404
+    
+
+
+
+
+# Assume a function in your model (TaskModel.py or similar)
+def add_task_to_firestore(user_id, task_data):
+    # Add the task to Firestore under the user's tasks collection
+    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+    task_ref.set(task_data)
+    return task_ref.id  # Returns the newly created task's ID
+
+
+
+@app.route('/user/<user_id>/task', methods=['POST'])
+def add_task(user_id):
+    try:
+        task_data = request.json
+        new_task_id = add_task_to_firestore(user_id, task_data)
+        return jsonify({'message': 'Task added successfully', 'taskId': new_task_id}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 # AI backend
 @app.route('/generate', methods=['POST'])
