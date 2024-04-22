@@ -266,15 +266,26 @@ const Main: React.FC<Tasks> = () => {
             </Animated.View>
           
         <ScrollView style={{width:"100%"}}>
-          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop:80}]}>
-            <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
-            </TouchableHighlight>
-            
-            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonthAndYear}</Text>
+          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
+            <View style={styles.hstack}>
+              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
+                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
+              </TouchableHighlight>
+              
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonthAndYear}</Text>
 
-            <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.add(1, 'months'))}}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
+              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.add(1, 'months'))}}>
+                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
+              </TouchableHighlight>
+            </View>
+            
+
+            <TouchableHighlight style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50}}
+            onPress={()=>{// Display user data
+
+            }}
+            >
+              <Text style={{color:'white', fontSize:40}}>D</Text>
             </TouchableHighlight>
           </View>          
           
@@ -293,7 +304,7 @@ const Main: React.FC<Tasks> = () => {
             </TouchableOpacity>
           </View>
           
-          <View style={{maxWidth: "auto", alignItems:"center"}}>
+          <View style={{maxWidth: "auto", alignItems:"center", paddingBottom:80}}>
             <RootTaskList rootTasksMap={rootTaskMap}/>
           </View>
         </ScrollView>
