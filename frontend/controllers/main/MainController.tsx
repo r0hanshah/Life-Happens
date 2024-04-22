@@ -11,6 +11,7 @@ class MainController {
     private selectedTask: PropertyListener<TaskModel | null> = new PropertyListener<TaskModel | null>(null);
     private tasksArray: PropertyListener<TaskModel[]> = new PropertyListener<TaskModel[]>([]);
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
+    private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
 
     // Private constructor to prevent instantiation from outside
     private constructor() {
@@ -36,9 +37,18 @@ class MainController {
         this.selectedTask.setValue(selectedTask)
     }
 
-    public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
-      try {
+    // Rerender the main view
+    public getLoadingGenerateTasks(): PropertyListener<boolean> {
+      return this.reRender;
+    }
 
+    public setLoadingGenerateTasks(bool: boolean): void {
+        this.reRender.setValue(bool)
+    }
+
+    public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
+      this.setLoadingGenerateTasks(true)
+      try {
         const context = task.contextText
         const start = task.startDate.toISOString()
         const end = task.endDate.toISOString()
@@ -78,10 +88,14 @@ class MainController {
           taskModels.push(new TaskModel(undefined, "creatorId", task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
         }
         console.log(taskModels)
+        this.setLoadingGenerateTasks(false)
         return taskModels;
-      } catch (error) {
+      } 
+      catch (error) 
+      {
         Alert.alert('Error', 'Generation failed');
         console.error('Generation error:', error);
+        this.setLoadingGenerateTasks(false)
         return [];
       }
     };

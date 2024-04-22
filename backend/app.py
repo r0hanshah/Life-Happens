@@ -5,8 +5,10 @@ from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-cred = credentials.Certificate('./serviceAccountKey.json')
-firebase_admin.initialize_app(cred)
+CRED = credentials.Certificate('./serviceAccountKey.json')
+firebase_admin.initialize_app(CRED, {
+    'storageBucket': 'lifehappens-293da.appspot.com'
+})
 
 db = firestore.client()
 from ai_funcs import AIFunctions
