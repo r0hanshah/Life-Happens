@@ -1,7 +1,7 @@
 // ButtonTest.tsx
 import React, { useState } from 'react';
 import { Button, View, Text } from 'react-native';
-import { getTask, addTask, deleteTask } from '../../services/taskServices'; // Adjust the import path as necessary
+import { getTask, addTask, deleteTask, updateTask } from '../../services/taskServices'; // Adjust the import path as necessary
 
 
 interface Task {
@@ -88,6 +88,57 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle the error, e.g., display an error message to the user
         }
     };
+    const handleEditTask = async () => {
+        try {
+            const taskData = {
+                // Include the fields that you want to update
+                    "Ancestors": [
+                        "XwpY...(Previous Task Id)"
+                    ],
+                    "Children": [
+                        "Rohan's Child 1",
+                        "Rohan's Child 2"
+                    ],
+                    "Content": {
+                        "field1": "value1",
+                        "field2": "value2"
+                    },
+                    "ContextFiles": [
+                        "https://example.com/file1.pdf",
+                        "https://example.com/file2.docx"
+                    ],
+                    "ContextText": "Example context",
+                    "CreatorID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
+                    "DueDate": "2024-02-12",
+                    "EndDate": "2024-02-10",
+                    "ExpectedTimeOfCompletion": 20,
+                    "ExtraMedia": [
+                        "https://example.com/image.jpg",
+                        "https://example.com/video.mp4"
+                    ],
+                    "ID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
+                    "InvitedUsers": [
+                        "email1@example.com",
+                        "username2"
+                    ],
+                    "IsMovable": true,
+                    "Notes": "Example notes with links: www.example.com",
+                    "StartDate": "2024-02-01",
+                    "Title": "Essay",
+                    "Users": [
+                        "user1",
+                        "user2"
+                    ],
+                    "isRoot": false
+                }
+            await updateTask(userId, taskId, taskData);
+            // Handle the UI update or inform the user of a successful update
+            console.log(`Task ${taskId} updated successfully`);
+        } catch (e) {
+            console.error('Error updating task:', e);
+            // Handle the error, e.g., display an error message to the user
+        }
+    };
 
     
 
@@ -96,6 +147,7 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
            <Button title="Get Task" onPress={handleGetTask} />
               <Button title="Add Task" onPress={handleAddTask} />
               <Button title="Delete Task" onPress={handleDeleteTask} />
+              <Button title="Edit Task" onPress={handleEditTask} />
 
 
             {task && <Text style={{color:'white'}}>{task.name}</Text>} {/* Adjust based on your task data structure */}

@@ -11,7 +11,7 @@ import ButtonTest from './components/buttonTest/ButtonTest'; // Import the Butto
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Landing');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('ButtonTest');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -48,7 +48,7 @@ export default function App() {
   parent1.children.push(childOfParent1)
 
   const userId = '3fh7J42CtTMuxmRrXflm7znrl5g1'; // Placeholder, replace with actual logic to get the user ID
-  const taskId = 'XwpYzrByr016BURbQdEp'; // Placeholder, replace with actual logic to get the task ID
+  const taskId = 'H9tiWY5n26BLjhE07rHE'; // Placeholder, replace with actual logic to get the task ID
 
   
   return (

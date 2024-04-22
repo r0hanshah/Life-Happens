@@ -133,6 +133,18 @@ def generateTasks():
 
 
 
+@app.route('/user/<user_id>/task/<task_id>', methods=['PUT'])
+def update_task(user_id, task_id):
+    try:
+        task_data = request.json
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref.update(task_data)
+        return jsonify({'message': 'Task updated successfully'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 # Run Flask app
 if __name__ == '__main__':

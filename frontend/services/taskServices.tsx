@@ -66,3 +66,27 @@ export const deleteTask = async (userId, taskId) => {
 };
 
 
+// taskServices.tsx
+
+export const updateTask = async (userId, taskId, taskData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (response.ok) {
+      console.log('Task updated');
+      return true;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while updating the task');
+    }
+  } catch (error) { 
+    console.error('Failed to update task:', error);
+    throw error;
+  }
+};
+
