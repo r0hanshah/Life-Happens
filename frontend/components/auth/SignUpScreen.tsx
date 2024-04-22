@@ -58,7 +58,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
 
   return (
       <View style={styles.container}>
-        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} setShowProfile={setShowProfile} />
+        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} />
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
             style={styles.input}
@@ -110,7 +110,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
         <TouchableOpacity onPress={navigateToLogin}>
           <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
         </TouchableOpacity>
-        {showProfile && <UserProfilePopup onClose={() => setShowProfile(false)} />}
       </View>
   );
 };
