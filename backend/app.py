@@ -1,5 +1,6 @@
 import firebase_admin
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_mail import Mail, Message
 from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
@@ -14,6 +15,16 @@ from ai_funcs import AIFunctions
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'lifehappensnotif@gmail.com'
+app.config['MAIL_PASSWORD'] = 'pzyilmwlsyohszip'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
+
+mail = Mail(app)
+
 
 
 #user passwords are all 123456
@@ -26,6 +37,9 @@ def signup():
         password = request.json.get('password')
         print(email, password)
         user = auth.create_user_with_email_and_password(email, password)
+        msg = Message('Welcome to Life Happens!', recipients=[email])
+        msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
+        mail.send(msg)
 
         # find way to print out user id, then store ids in doc
         return jsonify({'message': 'Signup successful'})
@@ -130,7 +144,6 @@ def generateTasks():
     file_paths = data.get('files')
 
     return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
-
 
 
 
