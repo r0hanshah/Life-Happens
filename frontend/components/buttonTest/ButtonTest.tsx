@@ -1,7 +1,7 @@
 // ButtonTest.tsx
 import React, { useState } from 'react';
 import { Button, View, Text } from 'react-native';
-import { getTask, addTask } from '../../services/taskServices'; // Adjust the import path as necessary
+import { getTask, addTask, deleteTask } from '../../services/taskServices'; // Adjust the import path as necessary
 
 
 interface Task {
@@ -77,12 +77,26 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             console.error('Error adding task:', e);
         }
     };
+
+    const handleDeleteTask = async () => {
+        try {
+            await deleteTask(userId, taskId);
+            // Update state or inform the user of successful deletion
+            console.log(`Task ${taskId} deleted successfully`);
+        } catch (e) {
+            console.error('Error deleting task:', e);
+            // Handle the error, e.g., display an error message to the user
+        }
+    };
+
     
 
     return (
         <View>
            <Button title="Get Task" onPress={handleGetTask} />
               <Button title="Add Task" onPress={handleAddTask} />
+              <Button title="Delete Task" onPress={handleDeleteTask} />
+
 
             {task && <Text style={{color:'white'}}>{task.name}</Text>} {/* Adjust based on your task data structure */}
             {error && <Text style={{color:'white'}}>{error}</Text>}
