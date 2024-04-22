@@ -5,9 +5,8 @@ interface NavProps {
     navigateToSignUp: () => void;
     navigateToLogin: () => void;
     navigateToMain: () => void;
-    setShowProfile: (value: boolean) => void; // Define setShowProfile prop
 }
-const NavBar: React.FC<NavProps> = ({ navigateToMain, navigateToSignUp, navigateToLogin, setShowProfile }) => {
+const NavBar: React.FC<NavProps> = ({ navigateToMain, navigateToSignUp, navigateToLogin }) => {
     return (
         <View style={styles.navBar}>
             <TouchableOpacity style={styles.navButton} onPress={navigateToMain}>
@@ -18,9 +17,6 @@ const NavBar: React.FC<NavProps> = ({ navigateToMain, navigateToSignUp, navigate
             </TouchableOpacity>
             <TouchableOpacity style={styles.navButton} onPress={navigateToLogin}>
                 <Text style={styles.navButtonText}>Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.navButton} onPress={() => setShowProfile(true)}>
-                <Text style={styles.navButtonText}>Profile</Text>
             </TouchableOpacity>
         </View>
     );

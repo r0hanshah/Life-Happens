@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import NavBar from "../landing/NavBar";
-import UserProfilePopup from "../landing/UserProfilePopup";
 
 
 interface LoginScreenProps {
@@ -15,8 +14,6 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showProfile, setShowProfile] = useState(false);
-
 
 
   const handleLogin = async () => {
@@ -61,7 +58,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
 
   return (
       <View style={styles.container}>
-        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} setShowProfile={setShowProfile} />
+        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin}/>
         <View style={styles.contentContainer}>
         <Text style={styles.largeTitle}>Life Happens.</Text>
 
@@ -96,7 +93,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
         <TouchableOpacity>
           <Text onPress={navigateToSignUp} style={styles.signUpLink}>Don't have an account? Sign up here</Text>
         </TouchableOpacity>
-        {showProfile && <UserProfilePopup onClose={() => setShowProfile(false)} />}
       </View>
       </View>
   );
