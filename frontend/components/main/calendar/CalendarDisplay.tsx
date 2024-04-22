@@ -30,6 +30,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     const daysInMonth = currentMonth.daysInMonth();
     const startDay = firstDayOfMonth.clone().startOf('week');
     const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
+    const currentDate = moment(new Date())
 
     const calendarDays = [];
     let currentDay = startDay.clone();
@@ -38,7 +39,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     while (currentDay.isBefore(endDay)) 
     {
         calendarDays.push(
-            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDay.year() == currentMonth.year() && currentDay.month() == currentMonth.month() && currentDay.toDate().getDate() == currentMonth.toDate().getDate()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()}/>
+            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()}/>
         );
 
         currentDay.add(1, 'day');

@@ -294,11 +294,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset) + (ROWS == 5 ? 0.33 : 0)) : 1, rootId, leftBound])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset) + (ROWS == 5 ? 0.33 : 0)) : 1, rootId, leftBound]])
             }
           }
 
@@ -316,7 +316,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
           else
           {
-            console.log(offset, ((index)-4)%3+1, hexcode, index)
             colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.38 + 0.051* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
           }
 
