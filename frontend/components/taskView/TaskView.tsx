@@ -361,7 +361,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </TouchableOpacity>
                     ))}
 
-                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40, zIndex:-999}}>
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10, marginTop:40, zIndex:-999}} onPress={async ()=>{
+                        const generatedTasks = await MainController.getInstance().handleGenerateTasks(task)
+                        setNewTasks(newTasks.concat(generatedTasks))
+                    }}>
 
                     <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
                     <Image
@@ -397,7 +400,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}}>
+                <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}} 
+                onPress={async ()=>{
+                        const generatedTasks = await MainController.getInstance().handleGenerateTasks(task)
+                        setNewTasks(newTasks.concat(generatedTasks))
+                    }}>
 
                 <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Generate Subtasks</Text>
                 <Image

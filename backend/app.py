@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from firebase_auth import auth
 from flask_cors import CORS
+from ai_funcs import AIFunctions
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -47,6 +48,20 @@ def get_time():
         "Date": 'x',
         "programming": "python"
     }
+
+# AI backend
+@app.route('/generate', methods=['POST'])
+def generateTasks():
+    print(request.json)
+    # return []
+    data = request.json
+    context = data.get('contextText')
+    start_date_iso_string = data.get('start')
+    end_date_iso_string = data.get('end')
+    pre_existing_subtasks = data.get('subtasks')
+    file_paths = data.get('files')
+
+    return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
 
 # Run Flask app
 if __name__ == '__main__':

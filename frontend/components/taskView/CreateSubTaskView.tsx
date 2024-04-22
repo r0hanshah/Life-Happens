@@ -67,7 +67,7 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
   return(
     <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, zIndex:zIndex}}>
-        <View style={{flexDirection:'column', alignItems:'flex-start',  height:300, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:zIndex}}>
+        <View style={{flexDirection:'column', alignItems:'flex-start',  height:300 + (task.notes.length > 0 ? 100 : 0), width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:zIndex}}>
             <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
                     
                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
@@ -159,6 +159,16 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
                         <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                     </TouchableOpacity>
                 </View>
+                {
+                    task.notes.length > 0 &&
+                    <View style={{flexDirection: 'column', justifyContent:'space-between', marginTop: 15}}>
+                        <View style={{flexDirection:'row'}}>
+                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>AI Notes</Text>
+                        </View>
+                        <Text style={{color:'gray', marginVertical: 20}}>{task.notes}</Text>
+                    </View>
+                }
+                
             </View>
 
             {/* Cancel or Create sub task */}
