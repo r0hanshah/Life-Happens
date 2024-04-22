@@ -2,6 +2,7 @@ import PropertyListener from "../Listener";
 import TaskModel from "../../models/TaskModel"; 
 
 import uuid from 'react-native-uuid'
+import { Alert } from "react-native";
 
 // This will control anything that happens inside Main view
 
@@ -34,6 +35,56 @@ class MainController {
     public setSelectedTask(selectedTask: TaskModel | null): void {
         this.selectedTask.setValue(selectedTask)
     }
+
+    public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
+      try {
+
+        const context = task.contextText
+        const start = task.startDate.toISOString()
+        const end = task.endDate.toISOString()
+        const pre_existing_subtasks = task.children.map(task => {
+          return {
+            title:task.title,
+            start:task.startDate.toISOString(),
+            end:task.endDate.toISOString()
+          }
+        })
+        const file_paths = ["Users/user-1/task-1/DailyScrum 4_3.xlsx", "Users/user-1/task-1/Sprint 1 Presentation.pdf"]
+
+        const response = await fetch('http://127.0.0.1:5000/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "contextText": context,
+            "start":start,
+            "end": end,
+            "subtasks": pre_existing_subtasks,
+            "files": file_paths
+          })
+        });
+  
+        if (!response.ok) {
+          throw new Error('Generation failed');
+        }
+  
+        Alert.alert('Success', 'Generation successful');
+        // Redirect user or do something else on success
+        const responseData = await response.json();
+        const taskModels:TaskModel[] = []
+        for (const taskJSON of responseData)
+        {
+          taskModels.push(new TaskModel(undefined, "creatorId", task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
+        }
+        console.log(taskModels)
+        return taskModels;
+      } catch (error) {
+        Alert.alert('Error', 'Generation failed');
+        console.error('Generation error:', error);
+        return [];
+      }
+    };
 
     public getTasks(): PropertyListener<TaskModel[]> {
         return this.tasksArray;
