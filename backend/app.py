@@ -9,6 +9,7 @@ cred = credentials.Certificate('lifehappens-293da-firebase-adminsdk-77os9-bdebc6
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
+from ai_funcs import AIFunctions
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -104,6 +105,20 @@ def add_task(user_id):
         return jsonify({'error': str(e)}), 500
 
 
+
+# AI backend
+@app.route('/generate', methods=['POST'])
+def generateTasks():
+    print(request.json)
+    # return []
+    data = request.json
+    context = data.get('contextText')
+    start_date_iso_string = data.get('start')
+    end_date_iso_string = data.get('end')
+    pre_existing_subtasks = data.get('subtasks')
+    file_paths = data.get('files')
+
+    return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
 
 # Run Flask app
 if __name__ == '__main__':
