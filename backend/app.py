@@ -117,6 +117,9 @@ def delete_task(user_id, task_id):
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+    
+
+
 
 
 
@@ -146,6 +149,21 @@ def update_task(user_id, task_id):
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        user_ref = db.collection('User').document(user_id)
+        user = user_ref.get()
+        if user.exists:
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 
 

@@ -90,3 +90,22 @@ export const updateTask = async (userId, taskId, taskData) => {
   }
 };
 
+
+// taskServices.tsx or userServices.tsx
+
+export const getUser = async (userId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}`);
+    if (response.ok) {
+      const user = await response.json();
+      console.log('User data:', user);
+      return user;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while fetching the user data');
+    }
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw error;
+  }
+};

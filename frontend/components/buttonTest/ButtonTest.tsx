@@ -1,7 +1,7 @@
 // ButtonTest.tsx
 import React, { useState } from 'react';
 import { Button, View, Text } from 'react-native';
-import { getTask, addTask, deleteTask, updateTask } from '../../services/taskServices'; // Adjust the import path as necessary
+import { getTask, addTask, deleteTask, updateTask, getUser} from '../../services/taskServices'; // Adjust the import path as necessary
 
 
 interface Task {
@@ -11,6 +11,8 @@ interface Task {
 const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
     const [task, setTask] = useState<Task | null>(null); // Provide type for task
     const [error, setError] = useState('');
+    const [userData, setUserData] = useState(null);
+
 
     const handleGetTask = async () => {
         console.log('handleGetTask called');
@@ -139,6 +141,16 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle the error, e.g., display an error message to the user
         }
     };
+    const handleGetUser = async () => {
+        try {
+            const data = await getUser(userId);
+            setUserData(data);
+            setError('');
+        } catch (e) {
+            setError((e as Error).message);
+            console.error('Error fetching user:', e);
+        }
+    };
 
     
 
@@ -148,6 +160,8 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
               <Button title="Add Task" onPress={handleAddTask} />
               <Button title="Delete Task" onPress={handleDeleteTask} />
               <Button title="Edit Task" onPress={handleEditTask} />
+              <Button title="Get User" onPress={handleGetUser} />
+
 
 
             {task && <Text style={{color:'white'}}>{task.name}</Text>} {/* Adjust based on your task data structure */}
