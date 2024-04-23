@@ -6,9 +6,11 @@ import moment from 'moment';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import RootTaskList from './rootTaskList/RootTaskList';
 import TaskView from '../taskView/TaskView';
+import ProfileView from '../profileView/ProfileView';
 
 import MainController from '../../controllers/main/MainController';
 import PropertyListener from '../../controllers/Listener';
+import UserModel from '../../models/UserModel';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
@@ -46,6 +48,8 @@ const Main: React.FC<Tasks> = () => {
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
   const [isLoaded, setIsLoaded] = useState(false)
+
+  const [profileClicked, setProfileClicked] = useState(false)
 
   // Load in tasks on appear
   useEffect(() => {
@@ -232,6 +236,7 @@ const Main: React.FC<Tasks> = () => {
     }, [rootTasks]);
 
     const animationRef = useRef(new Animated.Value(task ? 0 : 222)).current;
+    const animationProfileRef = useRef(new Animated.Value(profileClicked ? 0 : 222)).current;
 
     useEffect(() => {
       if (task) {
@@ -250,6 +255,23 @@ const Main: React.FC<Tasks> = () => {
       }
     }, [task]);
 
+    useEffect(() => {
+      if (profileClicked) {
+        Animated.timing(animationProfileRef, {
+          toValue: windowWidth * 0.49,
+          delay: 100,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      } else {
+        Animated.timing(animationProfileRef, {
+          toValue:0,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+      }
+    }, [profileClicked]);
+
     return (
       <View style={{flex: 1, width:'100%'}}>
         
@@ -262,6 +284,18 @@ const Main: React.FC<Tasks> = () => {
               >
                 {/* Content of the sliding view */}
                 {task && <TaskView task={task} isLeft={!task.isLeftBound()} onPress={()=>{controller.setSelectedTask(null)}}/>}
+
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.slideInView,
+                { transform: [{ translateX: slideFromLeft }], width: animationProfileRef },
+                {left: 0}
+              ]}
+              >
+                {/* Content of the sliding view */}
+                {profileClicked && <ProfileView user={new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu")} onPress={()=>{setProfileClicked(false)}}/>}
 
             </Animated.View>
           
@@ -280,13 +314,14 @@ const Main: React.FC<Tasks> = () => {
             </View>
             
 
-            <TouchableHighlight style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50}}
+            <TouchableOpacity style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50}}
             onPress={()=>{// Display user data
-
+              setProfileClicked(profileClicked ? false :true)
+              controller.setSelectedTask(null)
             }}
             >
               <Text style={{color:'white', fontSize:40}}>D</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>          
           
           <View style={[styles.container, {height: windowHeight * 0.95}]}>
