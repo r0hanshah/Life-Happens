@@ -1,5 +1,6 @@
 import firebase_admin
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_mail import Mail, Message
 from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
@@ -23,6 +24,15 @@ from ai_funcs import AIFunctions
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'lifehappensnotif@gmail.com'
+app.config['MAIL_PASSWORD'] = 'pzyilmwlsyohszip'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
+mail = Mail(app)
+
 
 
 #user passwords are all 123456
@@ -35,6 +45,11 @@ def signup():
         password = request.json.get('password')
         print(email, password)
         user = auth.create_user_with_email_and_password(email, password)
+        msg = Message('Welcome to Life Happens!', recipients=[email])
+        msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
+        mail.send(msg)
+        
+        print(user)
 
         # find way to print out user id, then store ids in doc
         return jsonify({'message': 'Signup successful'})
@@ -52,6 +67,7 @@ def login():
     password = data.get('password')
     try:
         user = auth.sign_in_with_email_and_password(email, password)
+        print(user)
         return jsonify({'message': 'Login successful'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -99,7 +115,11 @@ def get_user_task(user_id, task_id):
 def add_task_to_firestore(user_id, task_data):
     # Add the task to Firestore under the user's tasks collection
     task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+    task_data['due_date'] = datetime.strptime(task_data['due_date'], '%Y-%m-%d').date() #not sure if this line works to get the due date
     task_ref.set(task_data)
+
+    schedule_due_task_reminder(user_id, task_ref.id, task_data['due_date']) #calling the email notification scheduler for task
+
     return task_ref.id  # Returns the newly created task's ID
 
 
@@ -207,8 +227,41 @@ def get_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 
+from datetime import datetime, timedelta
+from apscheduler.schedulers.background import BackgroundScheduler
 
+#this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
+def schedule_due_task_reminder(user_id, task_id, due_date):
+    try:
+        # Calculate reminder date (24 hours before due date)
+        reminder_date = due_date - timedelta(days=1)
 
+        # Schedule email reminder
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date, args=[user_id, task_id])
+        scheduler.start()
+
+        print('Task reminder scheduled successfully.')
+    except Exception as e:
+        print(f"An error occurred while scheduling task reminder: {e}")
+
+#this function is called automatically by the scheduler
+def send_due_task_email(user_id, task_id):
+    try:
+        # Retrieve user's email and task name from Firestore
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_data = task_ref.get().to_dict()
+        user_email = db.collection('User').document(user_id).get().get('email')
+        task_name = task_data.get('name')
+
+        # Send email to user
+        msg = Message('Reminder: Task Due Soon', recipients=[user_email])
+        msg.body = f'Hi there!\n\nThis is a reminder that your task "{task_name}" is due soon.'
+        mail.send(msg)
+
+        print('Task reminder email sent successfully.')
+    except Exception as e:
+        print(f"An error occurred while sending task reminder email: {e}")
 
 # Run Flask app
 if __name__ == '__main__':

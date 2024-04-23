@@ -2,6 +2,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import auth
+from firebase_admin import storage
+
 
 import pyrebase
 from firebase_admin.auth import get_user
@@ -12,18 +14,20 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-firebaseConfig={
-  'apiKey': "AIzaSyBgDOWWLjlJXgWRtN_hkBk4InUCr6QqHng",
-  'authDomain': "lifehappens-293da.firebaseapp.com",
-  'projectId': "lifehappens-293da",
-  'storageBucket': "lifehappens-293da.appspot.com",
-  'messagingSenderId': "482058299460",
-  'appId': "1:482058299460:web:92eff3955d7cf348c33411",
-  'measurementId': "G-XDMYBRH5SV",
-  'databaseURL': "https://lifehappens-293da-default-rtdb.firebaseio.com/"
+firebaseConfig = {
+    'apiKey': "AIzaSyBgDOWWLjlJXgWRtN_hkBk4InUCr6QqHng",
+    'authDomain': "lifehappens-293da.firebaseapp.com",
+    'projectId': "lifehappens-293da",
+    'storageBucket': "lifehappens-293da.appspot.com",
+    'messagingSenderId': "482058299460",
+    'appId': "1:482058299460:web:92eff3955d7cf348c33411",
+    'measurementId': "G-XDMYBRH5SV",
+    'databaseURL': "https://lifehappens-293da-default-rtdb.firebaseio.com/"
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
+
+
 class User:
     def __init__(self, ID, Name, WeeklyAITimesAllowed, ProfilePicture="", TaskTreeRoots=[], Settings={}, AllowAIMoveTasks=False, SharedTaskTrees=[], ParentsOfLeafNodesByTask={}):
         self.ID = ID
@@ -210,6 +214,28 @@ def getTasks(user_id):
         print("Error fetching tasks:", e)
         return None
 
+def upload_file(local_file_path, firebase_storage_path):
+    try:
+        # Upload the file to Firebase Storage
+        storage.child(firebase_storage_path).put(local_file_path)
+        print("File uploaded successfully.")
+    except Exception as e:
+        print("Error uploading file:", e)
+
+def upload_file_to_task(user_id, task_id, local_file_path, file_name):
+    try:
+        firebase_storage_path = f"Users/{user_id}/{task_id}/{file_name}"
+        upload_file(local_file_path, firebase_storage_path)
+    except Exception as e:
+        print("Error uploading file to task:", e)
+
+def upload_file_to_subtask(user_id, task_id, subtask_id, local_file_path, file_name):
+    try:
+        firebase_storage_path = f"Users/{user_id}/{task_id}/{subtask_id}/{file_name}"
+        upload_file(local_file_path, firebase_storage_path)
+    except Exception as e:
+        print("Error uploading file to subtask:", e)
+
 
 def sign_up():
     print("Sign up...")
@@ -227,14 +253,17 @@ def sign_up():
 
     if user_id:
         try:
-            weekly_ai_times = input("Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
+            weekly_ai_times = input(
+                "Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
             weekly_ai_times_dict = dict(item.split(":::") for item in weekly_ai_times.split(","))
+
+            # Create user data
             user_data = {
                 "ID": user_id,
                 "ProfilePicture": "https://example.com/profile.jpg",
                 "TaskTreeRoots": ["root1", "root2"],
                 "Name": name,
-                "WeeklyAITimesAllowed":  weekly_ai_times_dict ,
+                "WeeklyAITimesAllowed": weekly_ai_times_dict,
                 "Settings": {
                     "setting1": "value1",
                     "setting2": "value2"
@@ -246,8 +275,13 @@ def sign_up():
                     "root2": ["2024-02-24:::leafNode3"]
                 }
             }
-            user_data= User(**user_data)
+
+            # Create user in Firestore
+            user_data = User(**user_data)
             user_ref = db.collection('User').document(user_id).set(user_data.__dict__)
+
+            createUser_folder(f"{user_id}")
+
             print("Successfully created account!")
             print("Your user ID is:", user_id)
             return user_id  # Return the user ID after successful sign up
@@ -255,6 +289,25 @@ def sign_up():
             print("Error:", e)
             return None
 
+def createUser_folder(new_folder_name):
+    # Define the parent folder path ("Users")
+    parent_folder_path = "Users"
+
+    # Combine the parent folder path and the new folder name to get the full path
+    new_folder_path = f"{parent_folder_path}/{new_folder_name}"
+
+    # Create the new folder
+    storage.child(new_folder_path).put(None)
+
+    print("Folder created successfully.")
+def createTask_folder(new_folder_name, user_id):
+    parent_folder_path = f"Users/{user_id}"
+    new_folder_path = f"{parent_folder_path}/{new_folder_name}"
+    storage.child(new_folder_path).put(None)
+def createSubTask_folder(new_folder_name, user_id, task_id):
+    parent_folder_path = f"Users/{user_id}/{task_id}"
+    new_folder_path = f"{parent_folder_path}/{new_folder_name}"
+    storage.child(new_folder_path).put(None)
 
 def create_task(user_id):
     print("Create a task...")
@@ -263,6 +316,7 @@ def create_task(user_id):
     end_date = input("Enter End Date (YYYY-MM-DD): ")
     due_date = input("Enter Due Date (YYYY-MM-DD): ")
     expected_time = int(input("Enter Expected Time of Completion (in hours): "))
+
     try:
         task_data = {
             "ID": user_id,
@@ -288,6 +342,11 @@ def create_task(user_id):
         task_ref = db.collection('User').document(user_id).collection('Tasks').add(task_data.__dict__)
         task_id = task_ref[1].id
 
+        parent_folder_path = f"Users/{user_id}"
+        new_folder_path = f"{parent_folder_path}/{task_id}"
+        storage.child(new_folder_path).put(None)
+
+        #createTask_folder(f"{task_id}", user_id)
         print("Task created successfully!")
         print("Task ID:", task_id)
         return task_id
@@ -303,31 +362,32 @@ def create_subtask(user_id, task_id):
     due_date = input("Enter Due Date (YYYY-MM-DD): ")
     expected_time = int(input("Enter Expected Time of Completion (in hours): "))
 
-    subtask_data = {
-        "CreatorID": user_id,
-        "Title": title,
-        "StartDate": start_date,
-        "EndDate": end_date,
-        "DueDate": due_date,
-        "ExpectedTimeOfCompletion": expected_time,
-        "IsMovable": True,
-        "Content": {"field1": "value1", "field2": "value2"},
-        "Notes": "Example notes with links: www.example.com",
-        "ExtraMedia": ["https://example.com/image.jpg", "https://example.com/video.mp4"],
-        "isRoot": False,
-        "ContextText": "Example context",
-        "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
-    }
 
     try:
+        subtask_data = {
+            "CreatorID": user_id,
+            "Title": title,
+            "StartDate": start_date,
+            "EndDate": end_date,
+            "DueDate": due_date,
+            "ExpectedTimeOfCompletion": expected_time,
+            "IsMovable": True,
+            "Content": {"field1": "value1", "field2": "value2"},
+            "Notes": "Example notes with links: www.example.com",
+            "ExtraMedia": ["https://example.com/image.jpg", "https://example.com/video.mp4"],
+            "isRoot": False,
+            "ContextText": "Example context",
+            "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
+        }
         subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection(
             'Subtasks').add(subtask_data)
-        subtask_id = subtask_ref.id
+        subtask_id = subtask_ref[1].id
+
+        createSubTask_folder(f"{subtask_id}",user_id, task_id)
         print("Subtask created successfully!")
         print("Subtask ID:", subtask_id)
     except Exception as e:
         print("Error creating subtask:", e)
-
 
 def invite_user_to_task(user_id, task_id, invited_users): # puts invited user email to task field,
     try:
