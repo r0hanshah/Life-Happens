@@ -151,3 +151,23 @@ export const addUser = async (userData) => {
     throw error;
   }
 };
+
+// In your services file, add this function to handle user updates
+export const updateUser = async (userId, userData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      throw new Error('Problem updating user');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};

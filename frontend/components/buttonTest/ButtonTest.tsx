@@ -1,7 +1,7 @@
 // ButtonTest.tsx
 import React, { useState } from 'react';
 import { Button, View, Text } from 'react-native';
-import { getTask, addTask, deleteTask, updateTask, getUser, deleteUser, addUser} from '../../services/taskServices'; // Adjust the import path as necessary
+import { getTask, addTask, deleteTask, updateTask, getUser, deleteUser, addUser, updateUser} from '../../services/taskServices'; // Adjust the import path as necessary
 
 
 interface Task {
@@ -206,6 +206,48 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
         }
     };
 
+    const handleEditUser = async () => {
+        try {
+            const userUpdates = {
+                "AllowAIMoveTasks": true,
+                "ID": "80085",
+                "Name": "Edit Test",
+                "ParentsOfLeafNodesByTask": {
+                    "root1": [
+                        "2024-02-22:::leafNode1",
+                        "2024-02-23:::leafNode2"
+                    ],
+                    "root2": [
+                        "2024-02-24:::leafNode3"
+                    ]
+                },
+                "ProfilePicture": "https://example.com/profile.jpg",
+                "Settings": {
+                    "setting1": "value1",
+                    "setting2": "value2"
+                },
+                "SharedTaskTrees": [
+                    "sharedRoot1:::sharedNode1",
+                    "sharedRoot2:::sharedNode2"
+                ],
+                "TaskTreeRoots": [
+                    "root1",
+                    "root2"
+                ],
+                "WeeklyAITimesAllowed": {
+                    " Tuesday:09:00": "18:00",
+                    "Monday:08:00": "17:00"
+                }
+            };
+            const response = await updateUser(userId, userUpdates);
+            console.log('User updated:', response);
+            // Handle response and update UI accordingly
+        } catch (error) {
+            console.error('Error updating user:', error);
+            // Handle error
+        }
+    };
+
     
 
     return (
@@ -217,6 +259,7 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
               <Button title="Get User" onPress={handleGetUser} />
               <Button title="Delete User" onPress={handleDeleteUser} />
               <Button title="Add User" onPress={handleAddUser} />
+              <Button title="Edit User" onPress={handleEditUser} />
 
 
 
