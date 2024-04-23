@@ -6,6 +6,13 @@ from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
 
+
+
+
+
+
+
+
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
     'storageBucket': 'lifehappens-293da.appspot.com'
@@ -126,6 +133,26 @@ def add_task(user_id):
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/user', methods=['POST'])
+def add_user():
+    try:
+        # Parse request data
+        user_data = request.json
+        
+        # Generate a new document reference with a random unique ID
+        new_user_ref = db.collection('User').document()
+        
+        # Set the new user data
+        new_user_ref.set(user_data)
+
+        # Retrieve the ID of the newly created document
+        user_id = new_user_ref.id
+
+        return jsonify({'message': 'User added successfully', 'userId': user_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
@@ -134,6 +161,24 @@ def delete_task(user_id, task_id):
         task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
         task_ref.delete()
         return jsonify({'message': 'Task deleted successfully'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/user/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    try:
+        # First, delete all tasks in the 'Tasks' subcollection
+        tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        tasks = tasks_ref.stream()
+        for task in tasks:
+            tasks_ref.document(task.id).delete()
+
+        # Now, delete the user document
+        user_ref = db.collection('User').document(user_id)
+        user_ref.delete()
+
+        return jsonify({'message': 'User and all associated tasks deleted successfully'}), 200
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
@@ -153,6 +198,34 @@ def generateTasks():
     file_paths = data.get('files')
 
     return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
+
+
+
+@app.route('/user/<user_id>/task/<task_id>', methods=['PUT'])
+def update_task(user_id, task_id):
+    try:
+        task_data = request.json
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref.update(task_data)
+        return jsonify({'message': 'Task updated successfully'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        user_ref = db.collection('User').document(user_id)
+        user = user_ref.get()
+        if user.exists:
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler

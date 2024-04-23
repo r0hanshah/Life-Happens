@@ -66,3 +66,88 @@ export const deleteTask = async (userId, taskId) => {
 };
 
 
+// taskServices.tsx
+
+export const updateTask = async (userId, taskId, taskData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (response.ok) {
+      console.log('Task updated');
+      return true;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while updating the task');
+    }
+  } catch (error) { 
+    console.error('Failed to update task:', error);
+    throw error;
+  }
+};
+
+
+// taskServices.tsx or userServices.tsx
+
+export const getUser = async (userId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}`);
+    if (response.ok) {
+      const user = await response.json();
+      console.log('User data:', user);
+      return user;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while fetching the user data');
+    }
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw error;
+  }
+};
+
+// taskServices.tsx or userServices.tsx
+
+export const deleteUser = async (userId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      console.log('User deleted');
+      return true;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while deleting the user');
+    }
+  } catch (error) {
+    console.error('Failed to delete user:', error);
+    throw error;
+  }
+};
+
+export const addUser = async (userData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    const result = await response.json();
+    if (response.ok) {
+      // console.log('User added:', result);
+      return result;
+    } else {
+      throw new Error(result.error || 'An error occurred while adding the user');
+    }
+  } catch (error) {
+    console.error('Error adding user:', error);
+    throw error;
+  }
+};

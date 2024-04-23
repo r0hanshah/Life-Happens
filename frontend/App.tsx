@@ -11,7 +11,7 @@ import ButtonTest from './components/buttonTest/ButtonTest'; // Import the Butto
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Main');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('ButtonTest');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -47,8 +47,8 @@ export default function App() {
   childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "red", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
   parent1.children.push(childOfParent1)
 
-  const userId = '3fh7J42CtTMuxmRrXflm7znrl5g1'; // Placeholder, replace with actual logic to get the user ID
-  const taskId = 'XwpYzrByr016BURbQdEp'; // Placeholder, replace with actual logic to get the task ID
+  const userId = 'Afkdg24O0SQrzBX8V0MLlxaRuRh1'; // Placeholder, replace with actual logic to get the user ID
+  const taskId = 'H9tiWY5n26BLjhE07rHE'; // Placeholder, replace with actual logic to get the task ID
 
   
   return (
