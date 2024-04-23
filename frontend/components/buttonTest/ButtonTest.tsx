@@ -27,51 +27,33 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
         }
     };
 
-    const handleAddTask = async () => {
+    type TaskData = {
+        Ancestors: string[],
+        Children: string[],
+        Content: {
+            field1: string,
+            field2: string
+        },
+        ContextFiles: string[],
+        ContextText: string,
+        CreatorID: string,
+        DueDate: string,
+        EndDate: string,
+        ExpectedTimeOfCompletion: number,
+        ExtraMedia: string[],
+        ID: string,
+        InvitedUsers: string[],
+        IsMovable: boolean,
+        Notes: string,
+        StartDate: string,
+        Title: string,
+        Users: string[],
+        isRoot: boolean
+    };
+    
+    const handleAddTask = async (userId: string, newTaskData: TaskData) => {
         console.log('handleAddTask called');
         try {
-            // Define the new task data structure as per your Firestore model
-            const newTaskData = {
-                "Ancestors": [
-                    "XwpY...(Previous Task Id)"
-                ],
-                "Children": [
-                    "Subtask Id",
-                    "Rohan's Child"
-                ],
-                "Content": {
-                    "field1": "value1",
-                    "field2": "value2"
-                },
-                "ContextFiles": [
-                    "https://example.com/file1.pdf",
-                    "https://example.com/file2.docx"
-                ],
-                "ContextText": "Example context",
-                "CreatorID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
-                "DueDate": "2024-02-12",
-                "EndDate": "2024-02-10",
-                "ExpectedTimeOfCompletion": 20,
-                "ExtraMedia": [
-                    "https://example.com/image.jpg",
-                    "https://example.com/video.mp4"
-                ],
-                "ID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
-                "InvitedUsers": [
-                    "email1@example.com",
-                    "username2"
-                ],
-                "IsMovable": true,
-                "Notes": "Example notes with links: www.example.com",
-                "StartDate": "2024-02-01",
-                "Title": "Essay",
-                "Users": [
-                    "user1",
-                    "user2"
-                ],
-                "isRoot": false
-            }
-    
             const result = await addTask(userId, newTaskData);
             console.log('New task added with ID:', result.taskId);
             // Optionally, you can now fetch the new task to update the UI
@@ -90,51 +72,9 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle the error, e.g., display an error message to the user
         }
     };
-    const handleEditTask = async () => {
+    const handleEditTask = async (userId: string, taskId: string, taskData: TaskData) => {
         try {
-            const taskData = {
-                // Include the fields that you want to update
-                    "Ancestors": [
-                        "XwpY...(Previous Task Id)"
-                    ],
-                    "Children": [
-                        "Rohan's Child 1",
-                        "Rohan's Child 2"
-                    ],
-                    "Content": {
-                        "field1": "value1",
-                        "field2": "value2"
-                    },
-                    "ContextFiles": [
-                        "https://example.com/file1.pdf",
-                        "https://example.com/file2.docx"
-                    ],
-                    "ContextText": "Example context",
-                    "CreatorID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
-                    "DueDate": "2024-02-12",
-                    "EndDate": "2024-02-10",
-                    "ExpectedTimeOfCompletion": 20,
-                    "ExtraMedia": [
-                        "https://example.com/image.jpg",
-                        "https://example.com/video.mp4"
-                    ],
-                    "ID": "3fh7J42CtTMuxmRrXflm7znrl5g1",
-                    "InvitedUsers": [
-                        "email1@example.com",
-                        "username2"
-                    ],
-                    "IsMovable": true,
-                    "Notes": "Example notes with links: www.example.com",
-                    "StartDate": "2024-02-01",
-                    "Title": "Essay",
-                    "Users": [
-                        "user1",
-                        "user2"
-                    ],
-                    "isRoot": false
-                }
             await updateTask(userId, taskId, taskData);
-            // Handle the UI update or inform the user of a successful update
             console.log(`Task ${taskId} updated successfully`);
         } catch (e) {
             console.error('Error updating task:', e);
@@ -161,42 +101,20 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle the error, e.g., display an error message to the user
         }
     };
-    const handleAddUser = async () => {
+    type UserData = {
+        AllowAIMoveTasks: boolean;
+        ID: string;
+        Name: string;
+        ParentsOfLeafNodesByTask: any; // You may define a more specific type here if you know the structure
+        ProfilePicture: string;
+        Settings: any; // Define a more specific type based on the settings structure
+        SharedTaskTrees: any[]; // Define a more specific type if possible
+        TaskTreeRoots: any[]; // Define a more specific type if possible
+        WeeklyAITimesAllowed: number;
+    };
+    
+    const handleAddUser = async (newUser: UserData) => {
         try {
-            const newUser = {
-                // Define the user object based on your data structure
-                "AllowAIMoveTasks": true,
-                "ID": "80085",
-                "Name": "R  ohan Shah Test",
-                "ParentsOfLeafNodesByTask": {
-                    "root1": [
-                        "2024-02-22:::leafNode1",
-                        "2024-02-23:::leafNode2"
-                    ],
-                    "root2": [
-                        "2024-02-24:::leafNode3"
-                    ]
-                },
-                "ProfilePicture": "https://example.com/profile.jpg",
-                "Settings": {
-                    "setting1": "value1",
-                    "setting2": "value2"
-                },
-                "SharedTaskTrees": [
-                    "sharedRoot1:::sharedNode1",
-                    "sharedRoot2:::sharedNode2"
-                ],
-                "TaskTreeRoots": [
-                    "root1",
-                    "root2"
-                ],
-                "WeeklyAITimesAllowed": {
-                    " Tuesday:09:00": "18:00",
-                    "Monday:08:00": "17:00"
-                }
-
-            };
-
             const response = await addUser(newUser);
             console.log('User added:', response);
             // Handle response and update UI accordingly
@@ -205,40 +123,9 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle error
         }
     };
-
-    const handleEditUser = async () => {
+    
+    const handleEditUser = async (userId: string, userUpdates: UserData) => {
         try {
-            const userUpdates = {
-                "AllowAIMoveTasks": true,
-                "ID": "80085",
-                "Name": "Edit Test",
-                "ParentsOfLeafNodesByTask": {
-                    "root1": [
-                        "2024-02-22:::leafNode1",
-                        "2024-02-23:::leafNode2"
-                    ],
-                    "root2": [
-                        "2024-02-24:::leafNode3"
-                    ]
-                },
-                "ProfilePicture": "https://example.com/profile.jpg",
-                "Settings": {
-                    "setting1": "value1",
-                    "setting2": "value2"
-                },
-                "SharedTaskTrees": [
-                    "sharedRoot1:::sharedNode1",
-                    "sharedRoot2:::sharedNode2"
-                ],
-                "TaskTreeRoots": [
-                    "root1",
-                    "root2"
-                ],
-                "WeeklyAITimesAllowed": {
-                    " Tuesday:09:00": "18:00",
-                    "Monday:08:00": "17:00"
-                }
-            };
             const response = await updateUser(userId, userUpdates);
             console.log('User updated:', response);
             // Handle response and update UI accordingly
@@ -247,19 +134,83 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             // Handle error
         }
     };
+    
 
+    
     
 
     return (
         <View>
            <Button title="Get Task" onPress={handleGetTask} />
-              <Button title="Add Task" onPress={handleAddTask} />
+              <Button title="Add Task" onPress={() => handleEditTask("userID456", "taskID456", {
+                                                                        Ancestors: ["taskID789"],
+                                                                        Children: ["subtask3", "subtask4"],
+                                                                        Content: {
+                                                                            field1: "Updated Field1",
+                                                                            field2: "Updated Field2"
+                                                                        },
+                                                                        ContextFiles: ["https://example.com/files/updated_context.docx"],
+                                                                        ContextText: "Updated important context",
+                                                                        CreatorID: "creatorID456",
+                                                                        DueDate: "2024-06-01",
+                                                                        EndDate: "2024-05-30",
+                                                                        ExpectedTimeOfCompletion: 15,
+                                                                        ExtraMedia: ["https://example.com/images/updated_image.jpg"],
+                                                                        ID: "taskID456",
+                                                                        InvitedUsers: ["newuser@example.com"],
+                                                                        IsMovable: false,
+                                                                        Notes: "Updated notes with additional links",
+                                                                        StartDate: "2024-05-15",
+                                                                        Title: "Updated Project Planning",
+                                                                        Users: ["userID789", "userID101112"],
+                                                                        isRoot: false
+                                                                    })} />
               <Button title="Delete Task" onPress={handleDeleteTask} />
-              <Button title="Edit Task" onPress={handleEditTask} />
+              <Button title="Edit Task" onPress={() => handleAddTask("userID123", {
+                                                                        Ancestors: ["taskID123"],
+                                                                        Children: ["subtask1", "subtask2"],
+                                                                        Content: {
+                                                                            field1: "First Field",
+                                                                            field2: "Second Field"
+                                                                        },
+                                                                        ContextFiles: ["https://example.com/files/context.pdf"],
+                                                                        ContextText: "Important context here",
+                                                                        CreatorID: "creatorID123",
+                                                                        DueDate: "2024-05-01",
+                                                                        EndDate: "2024-04-30",
+                                                                        ExpectedTimeOfCompletion: 10,
+                                                                        ExtraMedia: ["https://example.com/images/image.png"],
+                                                                        ID: "taskID456",
+                                                                        InvitedUsers: ["user@example.com"],
+                                                                        IsMovable: true,
+                                                                        Notes: "Remember to review all documents",
+                                                                        StartDate: "2024-04-15",
+                                                                        Title: "Project Planning",
+                                                                        Users: ["userID123", "userID456"],
+                                                                        isRoot: true
+                                                                    })} />
               <Button title="Get User" onPress={handleGetUser} />
               <Button title="Delete User" onPress={handleDeleteUser} />
-              <Button title="Add User" onPress={handleAddUser} />
-              <Button title="Edit User" onPress={handleEditUser} />
+              <Button title="Add User" onPress={() => handleAddUser({
+                                                                AllowAIMoveTasks: true,
+                                                                ID: "newUser123",
+                                                                Name: "Jane Doe",
+                                                                ParentsOfLeafNodesByTask: { "task1": ["node1", "node2"] },
+                                                                ProfilePicture: "https://example.com/profile/jane.jpg",
+                                                                Settings: { theme: "dark", notifications: true },
+                                                                SharedTaskTrees: ["tree1", "tree2"],
+                                                                TaskTreeRoots: ["root1", "root2"],
+                                                                WeeklyAITimesAllowed: 5})} />
+              <Button title="Edit User" onPress={() => handleEditUser("existingUser456", {
+                                                            AllowAIMoveTasks: false,
+                                                            ID: "existingUser456",
+                                                            Name: "John Smith",
+                                                            ParentsOfLeafNodesByTask: { "task2": ["node3", "node4"] },
+                                                            ProfilePicture: "https://example.com/profile/john.jpg",
+                                                            Settings: { theme: "light", notifications: false },
+                                                            SharedTaskTrees: ["tree3", "tree4"],
+                                                            TaskTreeRoots: ["root3", "root4"],
+                                                            WeeklyAITimesAllowed: 3}) }/>
 
 
 

@@ -2,9 +2,47 @@
 
 // No need to import fetch as it's a global function available in React Native
 
+// types
+type UserData = {
+  AllowAIMoveTasks: boolean;
+  ID: string;
+  Name: string;
+  ParentsOfLeafNodesByTask: any; // You may define a more specific type here if you know the structure
+  ProfilePicture: string;
+  Settings: any; // Define a more specific type based on the settings structure
+  SharedTaskTrees: any[]; // Define a more specific type if possible
+  TaskTreeRoots: any[]; // Define a more specific type if possible
+  WeeklyAITimesAllowed: number;
+};
+
+
+type TaskData = {
+  Ancestors: string[],
+  Children: string[],
+  Content: {
+      field1: string,
+      field2: string
+  },
+  ContextFiles: string[],
+  ContextText: string,
+  CreatorID: string,
+  DueDate: string,
+  EndDate: string,
+  ExpectedTimeOfCompletion: number,
+  ExtraMedia: string[],
+  ID: string,
+  InvitedUsers: string[],
+  IsMovable: boolean,
+  Notes: string,
+  StartDate: string,
+  Title: string,
+  Users: string[],
+  isRoot: boolean
+};
+
 const BASE_URL = 'http://127.0.0.1:5000'; // Make sure to use the correct URL for your backend.
 
-export const getTask = async (userId, taskId) => {
+export const getTask = async (userId: string, taskId:string) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`);
     const task = await response.json();
@@ -23,7 +61,7 @@ export const getTask = async (userId, taskId) => {
 
 // taskServices.tsx
 
-export const addTask = async (userId, taskData) => {
+export const addTask = async (userId: string, taskData: TaskData) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}/task`, {
       method: 'POST',
@@ -47,7 +85,7 @@ export const addTask = async (userId, taskData) => {
 
 // taskServices.tsx
 
-export const deleteTask = async (userId, taskId) => {
+export const deleteTask = async (userId:string, taskId:string) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
       method: 'DELETE',
@@ -68,7 +106,7 @@ export const deleteTask = async (userId, taskId) => {
 
 // taskServices.tsx
 
-export const updateTask = async (userId, taskId, taskData) => {
+export const updateTask = async (userId:string, taskId:string, taskData: TaskData) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
       method: 'PUT',
@@ -93,7 +131,7 @@ export const updateTask = async (userId, taskId, taskData) => {
 
 // taskServices.tsx or userServices.tsx
 
-export const getUser = async (userId) => {
+export const getUser = async (userId:string) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}`);
     if (response.ok) {
@@ -112,7 +150,7 @@ export const getUser = async (userId) => {
 
 // taskServices.tsx or userServices.tsx
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userId:string) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}`, {
       method: 'DELETE',
@@ -130,7 +168,7 @@ export const deleteUser = async (userId) => {
   }
 };
 
-export const addUser = async (userData) => {
+export const addUser = async (userData: UserData) => {
   try {
     const response = await fetch(`${BASE_URL}/user`, {
       method: 'POST',
@@ -153,7 +191,7 @@ export const addUser = async (userData) => {
 };
 
 // In your services file, add this function to handle user updates
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userId:string, userData:UserData) => {
   try {
     const response = await fetch(`${BASE_URL}/user/${userId}`, {
       method: 'PUT',
