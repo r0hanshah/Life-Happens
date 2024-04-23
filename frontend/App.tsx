@@ -11,7 +11,7 @@ import ButtonTest from './components/buttonTest/ButtonTest'; // Import the Butto
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Main');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Landing');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -54,7 +54,7 @@ export default function App() {
   return (
         <View style={styles.container}>
           {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
-          {currentScreen === 'Main' && <Main rootTasks={[]}/>}
+          {currentScreen === 'Main' && <Main rootTasks={[]} signOut={navigateToLanding}/>}
           {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}
           <View style={styles.signupLoginContainer}>
           <>

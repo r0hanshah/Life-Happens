@@ -13,9 +13,10 @@ import TimeBlocker from './TimeBlocker';
 interface ProfileViewProps {
   user: UserModel;
   onPress: () => void;
+  signOut: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({user, onPress}) => {
+const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut}) => {
 
     let [fontsLoaded] = useFonts({
         Inter_900Black
@@ -43,13 +44,16 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress}) => {
                     </View>
                     <View style={{padding: 30}}>
                         <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginBottom:30}}>Rest Periods</Text>
-                        <TimeBlocker/>
+                        <TimeBlocker user={user}/>
                         <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>All Root Tasks</Text>
 
                         
                         <Text style={{color:"red", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginTop:30}}>Red Zone</Text>
 
+                        <TouchableOpacity onPress={signOut}>
                         <Text style={{color:"red", fontSize:15, marginVertical:10}}>Sign Out</Text>
+                        </TouchableOpacity>
+                        
 
                         <Text style={{color:"red", fontSize:15, marginVertical:10}}>Delete Account</Text>
                         

@@ -14,6 +14,7 @@ import UserModel from '../../models/UserModel';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
+    signOut: ()=>void;
 }
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
@@ -34,9 +35,35 @@ childOfParent1.children.push(new TaskModel("003", "dp", "121", [], [], "Test Roo
 childOfParent1.children.push(new TaskModel("004", "dp", "121", [], [], "Test Root Task", "#ff0000", [childOfParent1, parent1], [], "2024-03-14T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []))
 parent1.children.push(childOfParent1)
 
-const Main: React.FC<Tasks> = () => {
+const Main: React.FC<Tasks> = ({signOut}) => {
 
   const windowWidth = useWindowDimensions().width;
+  const tempUser = new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu", [
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+    [false,false,false,false,false,false,false],
+  ])
 
   const controller = MainController.getInstance();
   var selectedTask = controller.getSelectedTask();
@@ -295,7 +322,7 @@ const Main: React.FC<Tasks> = () => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu")} onPress={()=>{setProfileClicked(false)}}/>}
+                {profileClicked && <ProfileView user={tempUser} onPress={()=>{setProfileClicked(false)}} signOut={signOut}/>}
 
             </Animated.View>
           
