@@ -169,10 +169,10 @@ def delete_task(user_id, task_id):
 def delete_user(user_id):
     try:
         # First, delete all tasks in the 'Tasks' subcollection
-        tasks_ref = db.collection('User').document(user_id).collection('Tasks')
-        tasks = tasks_ref.stream()
-        for task in tasks:
-            tasks_ref.document(task.id).delete()
+        # tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        # tasks = tasks_ref.stream()
+        # for task in tasks:
+        #     tasks_ref.document(task.id).delete()
 
         # Now, delete the user document
         user_ref = db.collection('User').document(user_id)
