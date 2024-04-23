@@ -227,6 +227,24 @@ def get_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/user/<user_id>', methods=['PUT'])
+def update_user(user_id):
+    try:
+        # Parse request data
+        user_updates = request.json
+        
+        # Get a reference to the existing user document
+        user_ref = db.collection('User').document(user_id)
+        
+        # Update the user document with the new data
+        user_ref.update(user_updates)
+
+        return jsonify({'message': 'User updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 
