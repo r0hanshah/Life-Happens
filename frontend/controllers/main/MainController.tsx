@@ -39,11 +39,11 @@ class MainController {
 
     // Rerender the main view
     public getLoadingGenerateTasks(): PropertyListener<boolean> {
-      return this.reRender;
+      return this.loading;
     }
 
     public setLoadingGenerateTasks(bool: boolean): void {
-        this.reRender.setValue(bool)
+        this.loading.setValue(bool)
     }
 
     public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {

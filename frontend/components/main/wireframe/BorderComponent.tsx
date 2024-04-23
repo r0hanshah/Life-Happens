@@ -4,7 +4,7 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 
 interface BorderComponentProps {
   id: string;
-  colorQueue: Array<[string, number, string, boolean]>;
+  colorQueue: Array<[string, number, string, boolean, boolean?]>;
   orientation: 'horizontal' | 'vertical'; // Specify the valid values for orientation
   lastRow: boolean;
 }
@@ -17,7 +17,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
 
   const renderBorders = () => {
     return colorQueue.map((value, index) => {
-      const borderColor = value[0], amountFill = value[1] , rootTaskId = value[2], leftBound = value[3]
+      const borderColor = value[0], amountFill = value[1] , rootTaskId = value[2], leftBound = value[3], placedInlastRow= value[4] ? value[4] : false
       const borderStyle = orientation === 'horizontal' ? styles.horizontalBorder : styles.verticalBorder;
       const containerStyle = orientation === 'horizontal' ? (leftBound? styles.HLContainer : styles.HRContainer) : styles.VContainer
       const zIndex = -(index + 1); // Set zIndex to stack borders
@@ -28,7 +28,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
           height: orientation === 'vertical' ? lastRow ? ((windowHeight / 6) * 0.9 + 50) : ((windowHeight / 6) * 0.9) : 0,
           paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 - 104.5 : 0 : 0,
           justifyContent: lastRow ? "flex-start" : "center"
-        }]}>
+        }, placedInlastRow && orientation === 'vertical' ? {alignItems:'flex-end'} : orientation === 'vertical' ? {alignItems: 'center'} : {}]}>
           <View style={[{
             height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 0,
             display: orientation==='vertical'? 'flex' : 'none'
@@ -43,7 +43,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 0,
                 height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
                 paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 : 0,
-                // marginTop: orientation === 'vertical' && lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill * 0.5 : 0
+               marginTop: orientation === 'vertical' && placedInlastRow ? ((windowHeight / 6) * 0.9 + 50)*1.51: 0
               },
             ]}
           />
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'absolute',
     justifyContent: 'center',
-    alignItems: 'center'
   },
   container: {
     flex: 1,

@@ -111,15 +111,28 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                         {
                             const children = leafNode.ancestors[0].children
                             console.log("gettting parent indexes")
-                            const latestChild = children.reduce((max, child) => (child.startDate.getDate() >= max.startDate.getDate() ? child : max), children[0]);
-                            // Parent node will be placed one behind (left bound) or 2 infront (right bound) of the latest Child
-                            const momentOfStatrDate = moment(latestChild.startDate)
-                            const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
-                            console.log(daysFromStartDay)
+                            const latestChild = children.reduce((max, child) => (child.startDate.getDate() >= max.startDate.getDate() && child.startDate.getMonth() >= max.startDate.getMonth() && child.startDate.getFullYear() >= max.startDate.getFullYear() ? child : max), children[0]);
 
-                            pRow = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : -1
-                            pColumn = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 + (daysFromStartDay % 7 == 0 && leftBound == "1"? 1 : daysFromStartDay % 7 == 6 && leftBound == "0"? - 1 : leftBound == "1" ? -1 : 2) : daysFromStartDay > numberOfDaysBetween ? 999 : -1
-                            pColumn += leftBound == "1" ? 1 : 0
+                            
+                            const momentOfLatestStatrDate = moment(latestChild.startDate)
+
+                            const daysFromLatestStartDay = momentOfLatestStatrDate.dayOfYear() - startDay.dayOfYear()
+
+                            pRow = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? Math.floor((daysFromLatestStartDay)/7) : daysFromLatestStartDay > numberOfDaysBetween? 999 : -1
+                            pColumn = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? daysFromLatestStartDay % 7 : daysFromLatestStartDay > numberOfDaysBetween ? 999 : -1
+
+
+
+                            // Parent node will be placed one behind (left bound) or 2 infront (right bound) of the latest Child
+                            // const momentOfStatrDate = moment(latestChild.startDate)
+                            // const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
+                            // console.log(daysFromStartDay)
+
+                            // pRow = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : -1
+
+                            // pColumn = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 + (daysFromStartDay % 7 == 0 && leftBound == "1"? 1 : daysFromStartDay % 7 == 6 && leftBound == "0"? - 1 : leftBound == "1" ? -1 : 2) : daysFromStartDay > numberOfDaysBetween ? 999 : -1
+
+                            pColumn += leftBound == "1" ? 0 : 1
                             console.log("parent row and col", pRow, pColumn)
                             parentCache[parentId] = [pRow, pColumn]
                         }

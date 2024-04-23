@@ -54,7 +54,7 @@ export default function App() {
   return (
         <View style={styles.container}>
           {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
-          {currentScreen === 'Main' && <Main rootTasks={[]}/>}
+          {currentScreen === 'Main' && <Main rootTasks={[]} signOut={navigateToLanding}/>}
           {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}
           <View style={styles.signupLoginContainer}>
           <>
