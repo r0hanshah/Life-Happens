@@ -1,7 +1,7 @@
 // ButtonTest.tsx
 import React, { useState } from 'react';
 import { Button, View, Text } from 'react-native';
-import { getTask, addTask, deleteTask, updateTask, getUser} from '../../services/taskServices'; // Adjust the import path as necessary
+import { getTask, addTask, deleteTask, updateTask, getUser, deleteUser, addUser} from '../../services/taskServices'; // Adjust the import path as necessary
 
 
 interface Task {
@@ -151,6 +151,60 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
             console.error('Error fetching user:', e);
         }
     };
+    const handleDeleteUser = async () => {
+        try {
+            await deleteUser(userId);
+            console.log(`User ${userId} deleted successfully`);
+            // Here you might want to navigate away from the current view or reset the user state
+        } catch (e) {
+            console.error('Error deleting user:', e);
+            // Handle the error, e.g., display an error message to the user
+        }
+    };
+    const handleAddUser = async () => {
+        try {
+            const newUser = {
+                // Define the user object based on your data structure
+                "AllowAIMoveTasks": true,
+                "ID": "80085",
+                "Name": "R  ohan Shah Test",
+                "ParentsOfLeafNodesByTask": {
+                    "root1": [
+                        "2024-02-22:::leafNode1",
+                        "2024-02-23:::leafNode2"
+                    ],
+                    "root2": [
+                        "2024-02-24:::leafNode3"
+                    ]
+                },
+                "ProfilePicture": "https://example.com/profile.jpg",
+                "Settings": {
+                    "setting1": "value1",
+                    "setting2": "value2"
+                },
+                "SharedTaskTrees": [
+                    "sharedRoot1:::sharedNode1",
+                    "sharedRoot2:::sharedNode2"
+                ],
+                "TaskTreeRoots": [
+                    "root1",
+                    "root2"
+                ],
+                "WeeklyAITimesAllowed": {
+                    " Tuesday:09:00": "18:00",
+                    "Monday:08:00": "17:00"
+                }
+
+            };
+
+            const response = await addUser(newUser);
+            console.log('User added:', response);
+            // Handle response and update UI accordingly
+        } catch (error) {
+            console.error('Error adding user:', error);
+            // Handle error
+        }
+    };
 
     
 
@@ -161,6 +215,8 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
               <Button title="Delete Task" onPress={handleDeleteTask} />
               <Button title="Edit Task" onPress={handleEditTask} />
               <Button title="Get User" onPress={handleGetUser} />
+              <Button title="Delete User" onPress={handleDeleteUser} />
+              <Button title="Add User" onPress={handleAddUser} />
 
 
 

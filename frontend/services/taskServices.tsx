@@ -109,3 +109,45 @@ export const getUser = async (userId) => {
     throw error;
   }
 };
+
+// taskServices.tsx or userServices.tsx
+
+export const deleteUser = async (userId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/${userId}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      console.log('User deleted');
+      return true;
+    } else {
+      const error = await response.json();
+      throw new Error(error.error || 'An error occurred while deleting the user');
+    }
+  } catch (error) {
+    console.error('Failed to delete user:', error);
+    throw error;
+  }
+};
+
+export const addUser = async (userData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    const result = await response.json();
+    if (response.ok) {
+      // console.log('User added:', result);
+      return result;
+    } else {
+      throw new Error(result.error || 'An error occurred while adding the user');
+    }
+  } catch (error) {
+    console.error('Error adding user:', error);
+    throw error;
+  }
+};

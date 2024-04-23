@@ -429,5 +429,27 @@ def main():
     print("Exiting...")
 
 
+
+def delete_user2(user_id):
+    try:
+        # Delete all tasks in the 'Tasks' subcollection
+        tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        tasks = tasks_ref.stream()
+        for task in tasks:
+            task.reference.delete()
+        
+        # Delete the user document
+        db.collection('User').document(user_id).delete()
+        
+        # Delete the user from Firebase Authentication
+        auth.delete_user(user_id)
+        
+        print("User and associated tasks deleted successfully!")
+        return True
+    except Exception as e:
+        print("Error deleting user:", e)
+        return False
+
+
 if __name__ == "__main__":
     main()
