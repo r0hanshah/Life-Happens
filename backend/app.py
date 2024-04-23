@@ -41,6 +41,8 @@ def signup():
         msg = Message('Welcome to Life Happens!', recipients=[email])
         msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
         mail.send(msg)
+        
+        print(user)
 
         # find way to print out user id, then store ids in doc
         return jsonify({'message': 'Signup successful'})
@@ -58,6 +60,7 @@ def login():
     password = data.get('password')
     try:
         user = auth.sign_in_with_email_and_password(email, password)
+        print(user)
         return jsonify({'message': 'Login successful'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400

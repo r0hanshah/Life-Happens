@@ -93,9 +93,9 @@ const ButtonTest = ({ userId, taskId }: { userId: string, taskId: string }) => {
 
     return (
         <View>
-           <Button title="Get Task" onPress={handleGetTask} />
-              <Button title="Add Task" onPress={handleAddTask} />
-              <Button title="Delete Task" onPress={handleDeleteTask} />
+            <Button title="Get Task" onPress={handleGetTask} />
+            <Button title="Add Task" onPress={handleAddTask} />
+            <Button title="Delete Task" onPress={handleDeleteTask} />
 
 
             {task && <Text style={{color:'white'}}>{task.name}</Text>} {/* Adjust based on your task data structure */}

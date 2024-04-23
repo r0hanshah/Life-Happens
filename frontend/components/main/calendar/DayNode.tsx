@@ -11,9 +11,10 @@ interface DayNodeProps {
   leafTasks: TaskModel[];
   currentDay: boolean; 
   inMonth: boolean;
+  lastRowExtension: number;
 }
 
-const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth }) => {
+const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth, lastRowExtension }) => {
 
   const controller = MainController.getInstance();
 
@@ -87,15 +88,15 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
         </View>
         <View style={{flexDirection: "row", justifyContent: "flex-start", width: "100%"}}>
           <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3, marginLeft: windowWidth * 0.04}}/>
-          <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.043 + leafTasks[0].offset * 4 + 1 : 33, backgroundColor:leafTasks.length > 0 ? leafTasks[0].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+          <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.043 + leafTasks[0].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 0 ? leafTasks[0].color : "rgba(255,255,255,0)", marginRight: 3}}/>
           <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
 
           <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-          <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.043 + leafTasks[1].offset * 4 + 1 : 33, backgroundColor:leafTasks.length > 1 ? leafTasks[1].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+          <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.043 + leafTasks[1].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 1 ? leafTasks[1].color : "rgba(255,255,255,0)", marginRight: 3}}/>
           <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
 
           <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-          <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.043 + leafTasks[2].offset * 4 + 1 : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+          <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.043 + leafTasks[2].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
           <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
         </View>
       </View>

@@ -55,7 +55,7 @@ const TimeBlocker: React.FC<TimeBlockerInterface> = ({user}) => {
           
         </View>
       ))}
-      <View style={{flexDirection:'row', width:'100%', marginRight:50, justifyContent:'space-around'}}>
+      <View style={{flexDirection:'row', width:'100%', marginRight:50, justifyContent:'space-around', paddingHorizontal:20}}>
         <TouchableOpacity onPress={() => {
             for(var i = 0; i < gridColors.length; i++)
             {
