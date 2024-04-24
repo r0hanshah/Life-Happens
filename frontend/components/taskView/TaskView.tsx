@@ -316,7 +316,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <View style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', alignItems:'center', width:'100%', height:50}}>
                                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                                         <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                                        <Text style={{color:'white'}}>{task.title}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={{color:'white', width: 200, overflow:'hidden'}}>{task.title}</Text>
                                     </View>
                                     <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
                                     <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
@@ -327,7 +327,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                     </View>
                                     <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                    <View style={[{height:320, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
+                                    <View style={[{height:420, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-418}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
                                 </View>
 
                                 {(selectedTask && selectedTask.id == task.id) && 

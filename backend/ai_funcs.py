@@ -68,6 +68,8 @@ class AIFunctions:
         #TODO: Limit the number of tasks that can be produced by the AI based on user's membership
 
         # Find and load the observed documents in firebase firestore
+        print(file_paths)
+
         docs = []
 
         for file_path in file_paths:
@@ -148,4 +150,4 @@ if __name__ == "__main__":
         "title":"Collect documents",
         "start":"2024-04-22T19:54:02+0000",
         "end":"2024-04-22T20:54:02+0000"
-    }], ["Users/user-1/task-1/DailyScrum 4_3.xlsx", "Users/user-1/task-1/Sprint 1 Presentation.pdf"]))
+    }], ["Users/tdGGgBLDpzXr6HwGQwjtyLr0Mys1/3277be40-aa40-4948-816c-37ff45861083/Sprint 1 Presentation.pdf"]))

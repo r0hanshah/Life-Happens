@@ -60,6 +60,16 @@ class MainController {
         this.loading.setValue(bool)
     }
 
+    private generateFilePaths(task:TaskModel) {
+      var file_paths:string[] = []
+      for (const doc of task.contextFiles)
+      {
+        const file_path = "Users/"+task.creatorId+"/"+task.ancestors.toReversed().map(task=>task.id).join('/')+task.id+"/"+doc.name
+        file_paths.push(file_path)
+      }
+      return file_paths
+    }
+
     public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
       this.setLoadingGenerateTasks(true)
       try {
@@ -73,7 +83,7 @@ class MainController {
             end:task.endDate.toISOString()
           }
         })
-        const file_paths = ["Users/user-1/task-1/DailyScrum 4_3.xlsx", "Users/user-1/task-1/Sprint 1 Presentation.pdf"]
+        const file_paths = this.generateFilePaths(task)
 
         const response = await fetch('http://127.0.0.1:5000/generate', {
           method: 'POST',
@@ -97,9 +107,10 @@ class MainController {
         // Redirect user or do something else on success
         const responseData = await response.json();
         const taskModels:TaskModel[] = []
+        const user_id = this.getUser().getValue()?.id!
         for (const taskJSON of responseData)
         {
-          taskModels.push(new TaskModel(undefined, "creatorId", task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
+          taskModels.push(new TaskModel(undefined, user_id, task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
         }
         console.log(taskModels)
         this.setLoadingGenerateTasks(false)
