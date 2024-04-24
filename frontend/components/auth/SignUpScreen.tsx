@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../landing/NavBar";
+
 import UserProfilePopup from "../landing/UserProfilePopup";
 import MainController from '../../controllers/main/MainController';
 import UserModel from '../../models/UserModel';
@@ -10,30 +11,31 @@ interface SignUpScreenProps {
   navigateToSignUp: () => void;
   navigateToLogin: () => void;
   navigateToMain: () => void;
+  navigateToLanding: () => void;
 }
 
-const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain, navigateToLanding }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showProfile, setShowProfile] = useState(false);
 
-  const signUpWithGoogle = () => {
-    // Add logic for Google sign-up
-  };
-
-  const signUpWithApple = () => {
-    // Add logic for Apple sign-up
-  };
-
-  const signUpWithGitHub = () => {
-    // Add logic for GitHub sign-up
-  };
+  // const signUpWithGoogle = () => {
+  //   // Add logic for Google sign-up
+  // };
+  //
+  // const signUpWithApple = () => {
+  //   // Add logic for Apple sign-up
+  // };
+  //
+  // const signUpWithGitHub = () => {
+  //   // Add logic for GitHub sign-up
+  // };
 
   const handleSignUp = async () => {
-    try {
+    try{
+      //add user to authentication
       const response = await fetch('http://127.0.0.1:5000/signup', {
         method: 'POST',
         headers: {
@@ -47,7 +49,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
         })
       });
 
-      if (!response.ok) {
+      if (!(response.ok)) {
         throw new Error('Sign up failed');
       }
 
@@ -66,7 +68,18 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
 
   return (
       <View style={styles.container}>
-        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} />
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 50,
+          width: 50,
+          backgroundColor: '#007AFF',
+          borderRadius: 50,
+        }}
+                          onPress={navigateToLanding}
+        >
+          <Image source={require('../../assets/chev_white.png')} style={{width:20, height:20, transform:[{rotate: '90deg'}]}}></Image>
+        </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
             style={styles.input}
@@ -103,18 +116,18 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signUpWithGoogle}>
-          <Ionicons name="logo-google" size={24} color="white" />
-          <Text style={styles.buttonText}>Sign up with Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signUpWithApple}>
-          <Ionicons name="logo-apple" size={24} color="white" />
-          <Text style={styles.buttonText}>Sign up with Apple</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signUpWithGitHub}>
-          <Ionicons name="logo-github" size={24} color="white" />
-          <Text style={styles.buttonText}>Sign up with GitHub</Text>
-        </TouchableOpacity>
+        {/*<TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signUpWithGoogle}>*/}
+        {/*  <Ionicons name="logo-google" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Sign up with Google</Text>*/}
+        {/*</TouchableOpacity>*/}
+        {/*<TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signUpWithApple}>*/}
+        {/*  <Ionicons name="logo-apple" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Sign up with Apple</Text>*/}
+        {/*</TouchableOpacity>*/}
+        {/*<TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signUpWithGitHub}>*/}
+        {/*  <Ionicons name="logo-github" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Sign up with GitHub</Text>*/}
+        {/*</TouchableOpacity>*/}
         <TouchableOpacity onPress={navigateToLogin}>
           <Text style={styles.backToLoginLink}>Already have an account? Login</Text>
         </TouchableOpacity>

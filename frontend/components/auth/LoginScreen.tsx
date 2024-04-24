@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import NavBar from "../landing/NavBar";
@@ -10,9 +10,11 @@ interface LoginScreenProps {
   navigateToSignUp: () => void;
   navigateToLogin: () => void;
   navigateToMain: () => void;
+  navigateToLanding: () => void;
+
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain, navigateToLanding}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const controller = new AuthController()
@@ -45,23 +47,35 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
   };
 
 
-  const signInWithGoogle = () => {
-    // Add logic for Google sign-in
-  };
-
-  const signInWithApple = () => {
-    // Add logic for Apple sign-in
-  };
-
-  const signInWithGitHub = () => {
-    // Add logic for GitHub sign-in
-    console.log("Hello")
-  };
+  // const signInWithGoogle = () => {
+  //   // Add logic for Google sign-in
+  // };
+  //
+  // const signInWithApple = () => {
+  //   // Add logic for Apple sign-in
+  // };
+  //
+  // const signInWithGitHub = () => {
+  //   // Add logic for GitHub sign-in
+  //   console.log("Hello")
+  // };
 
   return (
       <View style={styles.container}>
-        <NavBar navigateToMain={navigateToMain} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin}/>
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 50,
+          width: 50,
+          backgroundColor: '#007AFF',
+          borderRadius: 50,
+        }}
+                          onPress={navigateToLanding}
+        >
+          <Image source={require('../../assets/chev_white.png')} style={{width:20, height:20, transform:[{rotate: '90deg'}]}}></Image>
+        </TouchableOpacity>
         <View style={styles.contentContainer}>
+
         <Text style={styles.largeTitle}>Life Happens.</Text>
 
         <TextInput style={styles.input}
@@ -80,18 +94,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
         <TouchableOpacity style={styles.button} onPress={()=>{controller.handleLogin(email, password, navigateToMain)}}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signInWithGoogle}>
-          <Ionicons name="logo-google" size={24} color="white" />
-          <Text style={styles.buttonText}>Log in with Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signInWithApple}>
-          <Ionicons name="logo-apple" size={24} color="white" />
-          <Text style={styles.buttonText}>Log in with Apple</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signInWithGitHub}>
-          <Ionicons name="logo-github" size={24} color="white" />
-          <Text style={styles.buttonText}>Log in with GitHub</Text>
-        </TouchableOpacity>
+        {/*<TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signInWithGoogle}>*/}
+        {/*  <Ionicons name="logo-google" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Log in with Google</Text>*/}
+        {/*</TouchableOpacity>*/}
+        {/*<TouchableOpacity style={[styles.button, styles.appleButton]} onPress={signInWithApple}>*/}
+        {/*  <Ionicons name="logo-apple" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Log in with Apple</Text>*/}
+        {/*</TouchableOpacity>*/}
+        {/*<TouchableOpacity style={[styles.button, styles.githubButton]} onPress={signInWithGitHub}>*/}
+        {/*  <Ionicons name="logo-github" size={24} color="white" />*/}
+        {/*  <Text style={styles.buttonText}>Log in with GitHub</Text>*/}
+        {/*</TouchableOpacity>*/}
         <TouchableOpacity>
           <Text onPress={navigateToSignUp} style={styles.signUpLink}>Don't have an account? Sign up here</Text>
         </TouchableOpacity>
@@ -115,7 +129,7 @@ const styles = StyleSheet.create({
   largeTitle: {
     fontSize: 48,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginVertical: 24,
     color: '#FFFFFF'
 
   },
@@ -145,7 +159,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginVertical: 16,
     justifyContent: 'center',
     width: 300
   },

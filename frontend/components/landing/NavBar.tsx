@@ -4,16 +4,16 @@ import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
 interface NavProps {
     navigateToSignUp: () => void;
     navigateToLogin: () => void;
-    navigateToMain: () => void;
+    navigateToLanding: () => void;
 }
-const NavBar: React.FC<NavProps> = ({ navigateToMain, navigateToSignUp, navigateToLogin }) => {
+const NavBar: React.FC<NavProps> = ({ navigateToLanding, navigateToSignUp, navigateToLogin }) => {
     return (
         <View style={styles.navBar}>
-            <TouchableOpacity style={styles.navButton} onPress={navigateToMain}>
-                <Text style={styles.navButtonText}>Main</Text>
+            <TouchableOpacity style={styles.navButton} onPress={navigateToLanding}>
+                <Text style={styles.navButtonText}>Landing</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navButton} onPress={navigateToSignUp}>
-                <Text style={styles.navButtonText}>SignUp</Text>
+                <Text style={styles.navButtonText}>Sign Up</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navButton} onPress={navigateToLogin}>
                 <Text style={styles.navButtonText}>Login</Text>

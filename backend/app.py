@@ -127,6 +127,15 @@ def add_task():
 
         add_task_to_firestore(task_data, task_path_array, db)
 
+# Assume a function in your model (TaskModel.py or similar)
+def add_task_to_firestore(user_id, task_data):
+    # Add the task to Firestore under the user's tasks collection
+    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+    task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+    task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
+    task_ref.set(task_data)
+
+    schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
         return jsonify({'message': 'Task added successfully'}), 201
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -157,7 +166,7 @@ def fetch_task():
         task_path_array = req_data.get('task_path_array')
 
         print("Loaded parameters...", task_id, task_path_array)
-
+        
         data = get_task_in_firestore(task_id, user_id, task_path_array, db)
 
         print(data)
@@ -381,16 +390,23 @@ def update_user(user_id):
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 
-
-# this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
-def schedule_due_task_reminder(user_id, task_id, due_date):
+#this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
+def schedule_due_task_reminder(user_id, task_id, due_date, start_date):
     try:
-        # Calculate reminder date (24 hours before due date)
-        reminder_date = due_date - timedelta(days=1)
+        # Calculate due date reminder
+        reminder_date = due_date
 
-        # Schedule email reminder
+        # Schedule due date reminder
         scheduler = BackgroundScheduler()
         scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date, args=[user_id, task_id])
+        scheduler.start()
+
+        # Calculate due date reminder
+        reminder_date2 = start_date
+
+        # Schedule due date reminder
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(send_start_task_email, 'date', run_date=reminder_date2, args=[user_id, task_id])
         scheduler.start()
 
         print('Task reminder scheduled successfully.')
@@ -410,6 +426,23 @@ def send_due_task_email(user_id, task_id):
         # Send email to user
         msg = Message('Reminder: Task Due Soon', recipients=[user_email])
         msg.body = f'Hi there!\n\nThis is a reminder that your task "{task_name}" is due soon.'
+        mail.send(msg)
+
+        print('Task reminder email sent successfully.')
+    except Exception as e:
+        print(f"An error occurred while sending task reminder email: {e}")
+
+def send_start_task_email(user_id, task_id):
+    try:
+        # Retrieve user's email and task name from Firestore
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_data = task_ref.get().to_dict()
+        user_email = db.collection('User').document(user_id).get().get('email')
+        task_name = task_data.get('name')
+
+        # Send email to user
+        msg = Message('Reminder: Task Starts Soon', recipients=[user_email])
+        msg.body = f'Hi there!\n\nThis is a reminder that your task "{task_name}" is starting soon.'
         mail.send(msg)
 
         print('Task reminder email sent successfully.')
