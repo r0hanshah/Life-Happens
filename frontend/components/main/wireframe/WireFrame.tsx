@@ -111,7 +111,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                         {
                             const children = leafNode.ancestors[0].children
                             console.log("gettting parent indexes")
-                            const latestChild = children.reduce((max, child) => (child.startDate.getDate() >= max.startDate.getDate() && child.startDate.getMonth() >= max.startDate.getMonth() && child.startDate.getFullYear() >= max.startDate.getFullYear() ? child : max), children[0]);
+                            const latestChild = children.reduce((max, child) => (child.startDate.toISOString() >= max.startDate.toISOString() ? child : max), children[0]);
 
                             
                             const momentOfLatestStatrDate = moment(latestChild.startDate)

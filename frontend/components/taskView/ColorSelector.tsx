@@ -25,6 +25,7 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
 
         const mainController = MainController.getInstance();
         mainController.setReRender(mainController.getReRender().getValue() ? false : true)
+        setIsSquareVisible(false)
       }
       else
       {
