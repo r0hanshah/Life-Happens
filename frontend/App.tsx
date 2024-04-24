@@ -58,8 +58,8 @@ export default function App() {
           {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}
           <View style={styles.signupLoginContainer}>
           <>
-            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
-            {currentScreen === 'SignUp' && <SignUpScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain} />}
+            {currentScreen === 'Login' && <LoginScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain} navigateToLanding={navigateToLanding} />}
+            {currentScreen === 'SignUp' && <SignUpScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain} navigateToLanding={navigateToLanding}/>}
           </> 
             <StatusBar style="auto" />
           </View>

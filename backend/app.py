@@ -115,11 +115,11 @@ def get_user_task(user_id, task_id):
 def add_task_to_firestore(user_id, task_data):
     # Add the task to Firestore under the user's tasks collection
     task_ref = db.collection('User').document(user_id).collection('Tasks').document()
-    task_data['due_date'] = datetime.strptime(task_data['due_date'], '%Y-%m-%d').date() #not sure if this line works to get the due date
-    task_data['start_date'] = datetime.strptime(task_data['start_date'], '%Y-%m-%d').date()
+    task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+    task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
     task_ref.set(task_data)
 
-    schedule_due_task_reminder(user_id, task_ref.id, task_data['due_date'], task_data['start_date']) #calling the email notification scheduler for task
+    schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
 
     return task_ref.id  # Returns the newly created task's ID
 
@@ -265,7 +265,7 @@ def schedule_due_task_reminder(user_id, task_id, due_date, start_date):
 
         # Schedule due date reminder
         scheduler = BackgroundScheduler()
-        scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date2, args=[user_id, task_id])
+        scheduler.add_job(send_start_task_email, 'date', run_date=reminder_date2, args=[user_id, task_id])
         scheduler.start()
 
         print('Task reminder scheduled successfully.')
@@ -284,6 +284,23 @@ def send_due_task_email(user_id, task_id):
         # Send email to user
         msg = Message('Reminder: Task Due Soon', recipients=[user_email])
         msg.body = f'Hi there!\n\nThis is a reminder that your task "{task_name}" is due soon.'
+        mail.send(msg)
+
+        print('Task reminder email sent successfully.')
+    except Exception as e:
+        print(f"An error occurred while sending task reminder email: {e}")
+
+def send_start_task_email(user_id, task_id):
+    try:
+        # Retrieve user's email and task name from Firestore
+        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_data = task_ref.get().to_dict()
+        user_email = db.collection('User').document(user_id).get().get('email')
+        task_name = task_data.get('name')
+
+        # Send email to user
+        msg = Message('Reminder: Task Starts Soon', recipients=[user_email])
+        msg.body = f'Hi there!\n\nThis is a reminder that your task "{task_name}" is starting soon.'
         mail.send(msg)
 
         print('Task reminder email sent successfully.')
