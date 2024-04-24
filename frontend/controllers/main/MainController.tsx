@@ -5,7 +5,7 @@ import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
-import { addTask, TaskData } from "../../services/taskServices";
+import { addTask, updateTask, TaskData } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -213,7 +213,28 @@ class MainController {
 
     private saveChangesToTask(task:TaskModel)
     {
-      // Send request to edit user
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot
+      }
+      updateTask(taskData, taskPathArray)
     }
 
     private debounce(func: Function, delay: number){
@@ -227,6 +248,11 @@ class MainController {
               timer = null;
           }, delay);
       };
+    }
+
+    public uploadFileToTask(task:TaskModel, fileName:string)
+    {
+      
     }
   }
 

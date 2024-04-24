@@ -105,8 +105,8 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
                         <Text style={{color:'gray'}}>Start Date</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
-                        <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                        <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                        <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></DateSelector>
+                        <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></TimeSelector>
                     </View>
                 </View>
                 
@@ -120,8 +120,8 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
                     <Text style={{color:'gray'}}>End Date</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
-                        <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                        <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                        <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></DateSelector>
+                        <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></TimeSelector>
                     </View>
                 </View>
                 <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>

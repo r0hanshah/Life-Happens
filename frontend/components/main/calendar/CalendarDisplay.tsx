@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import DayNode from './DayNode';
 import moment from 'moment';
 import TaskModel from '../../../models/TaskModel';
+import MainController from '../../../controllers/main/MainController';
 
 interface CalendarProps {
   offset: number;
@@ -22,8 +23,12 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
   useEffect(() => {
     // Fetch or set the initial month based on your requirements
     // For example, you can set it to the current month
-    setCurrentMonth(inMoment);
-  }, []);
+    console.log("updating from calendar")
+    setCurrentMonth(moment(inMoment));
+    const mainController = MainController.getInstance()
+    const reRenderState = mainController.getReRender().getValue()
+    mainController.setReRender(reRenderState ? false : true)
+  }, [inMoment]);
 
   const renderCalendar = () => {
     const firstDayOfMonth = currentMonth.clone().startOf('month');

@@ -36,16 +36,19 @@ class AuthController {
           const user = userData[0]
           const rootTaskIds = userData[1]
 
-          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds)
-
           const mainController = MainController.getInstance()
 
-          console.log(userTasks)
+          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds).then( (tasks) => {
+            console.log(tasks.length)
+            mainController.setUser(user)
+            mainController.setTasks(tasks)
+            
+            // Redirect user or do something else on success
+            completion();
+          }
+          )
 
-          mainController.setUser(user)
-          mainController.setTasks(userTasks)
-          // Redirect user or do something else on success
-          completion();
+          
         } catch (error) {
           Alert.alert('Error', 'Login failed');
           console.error('Login error:', error);
@@ -67,19 +70,29 @@ class AuthController {
     };
 
     private handleGetUserTasks = async (userId:string, taskIds:object):Promise<TaskModel[]> => {
-        var tasks:TaskModel[] = []
-        Object.keys(taskIds).forEach(async id => {
-            try
-            {
-                const task = await getTask(userId, id)
-                tasks.push(task)
-            }
-            catch (e) {
-                console.error('Error fetching user:', e);
-            }
-        })
-        return tasks
-    }
+      const tasks: TaskModel[] = [];
+      const promises: Promise<TaskModel | null>[] = [];
+  
+      // Map each task ID to a promise returned by getTask
+      Object.keys(taskIds).forEach(id => {
+          promises.push(getTask(userId, id).catch(e => {
+              console.error('Error fetching user:', e);
+              return null; // Return null in case of an error
+          }));
+      });
+  
+      // Wait for all promises to resolve using Promise.all
+      const resolvedTasks = await Promise.all(promises);
+  
+      // Filter out null values (in case of errors) and push valid tasks to the tasks array
+      resolvedTasks.forEach(task => {
+          if (task !== null) {
+              tasks.push(task);
+          }
+      });
+  
+      return tasks;
+  }
   }
 
 export default AuthController

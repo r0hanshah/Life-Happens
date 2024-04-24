@@ -5,7 +5,7 @@ import moment from 'moment';
 import MainController from '../../controllers/main/MainController';
 
 
-const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string)=>void>}) => {
+const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string)=>void>, updateServer:boolean}) => {
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(modStartDate ? task.startDate.getMonth() : task.endDate.getMonth());
@@ -120,6 +120,12 @@ const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, m
         // Refresh main view
         const mainController = MainController.getInstance();
         mainController.setReRender(mainController.getReRender().getValue() ? false : true)
+
+        if(updateServer)
+        {
+          mainController.saveEditToTask(task)
+        }
+        
       }
      
     }

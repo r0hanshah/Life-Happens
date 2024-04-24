@@ -133,14 +133,17 @@ export const deleteTask = async (userId:string, taskId:string) => {
 
 // taskServices.tsx
 
-export const updateTask = async (userId:string, taskId:string, taskData: TaskData) => {
+export const updateTask = async (taskData: TaskData, taskPathArray:string[]) => {
   try {
-    const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
+    const response = await fetch(`${BASE_URL}/editTask`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(taskData),
+      body: JSON.stringify({
+        'task': JSON.stringify(taskData),
+        'task_path_array':taskPathArray
+      }),
     });
     if (response.ok) {
       console.log('Task updated');

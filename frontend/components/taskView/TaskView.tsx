@@ -81,17 +81,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       setUrls([...urls, urlText]);
       task.extraMedia = [...urls, urlText]
       setUrlText('');
+      mainController.saveEditToTask(task)
     } else {
       alert('Invalid URL');
     }
   };
 
   const handleDeleteMedia = (urlToDelete:string) => {
+    const filteredUrls = urls.filter(url => url !== urlToDelete)
     setUrls(urls.filter(url => url !== urlToDelete))
+    task.extraMedia = filteredUrls
     if (urlsMetadata)
     {
         setUrlsMetadata(urlsMetadata!.filter(data => data.url !== urlToDelete))
     }
+    mainController.saveEditToTask(task)
   }
 
   const fetchMetadata = async (url:string) => {
@@ -145,6 +149,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setText(newText);
     task.notes = newText.valueOf().toString()
+    mainController.saveEditToTask(task)
   };
 
   const onSubmitEditing = () => {
@@ -158,6 +163,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeContext = (newText: React.SetStateAction<string>) => {
     setContext(newText);
     task.contextText = newText.valueOf().toString()
+    mainController.saveEditToTask(task)
   };
 
   const onSubmitContextEditing = () => {
@@ -177,6 +183,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         // Add the selected file to the files array
         setFiles([...files, result.assets.at(0)!]);
         task.unobservedFiles = [...files, result.assets.at(0)!]
+        mainController.saveEditToTask(task)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -185,6 +192,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const handleRemoveFile = (doc:DocumentPicker.DocumentPickerAsset) => {
     const newFiles = files.filter(document => document.uri !== doc.uri)
+    task.unobservedFiles = newFiles
+    mainController.saveEditToTask(task)
     setFiles(newFiles)
   }
 
@@ -197,9 +206,16 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
 
       if (result && result.assets) {
+
+        const fileName = result.assets.at(0)!.name;
+
+
+        console.log(result.assets.at(0)!)
+
         // Add the selected file to the files array
         setObservedFiles([...observedFiles, result.assets.at(0)!]);
         task.contextFiles = [...observedFiles, result.assets.at(0)!]
+        mainController.saveEditToTask(task)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -208,6 +224,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const handleRemoveContextFile = (doc:DocumentPicker.DocumentPickerAsset) => {
     const newFiles = observedFiles.filter(document => document.uri !== doc.uri)
+    task.contextFiles = newFiles
+    mainController.saveEditToTask(task)
     setObservedFiles(newFiles)
   }
 
@@ -310,8 +328,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             <Text style={{color:'gray'}}>Start Date</Text>
                                         </View>
                                         <View style={{flexDirection:'row'}}>
-                                            <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                            <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                         </View>
                                         
                                         {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
@@ -327,8 +345,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         <Text style={{color:'gray'}}>End Date</Text>
                                         </View>
                                         <View style={{flexDirection:'row'}}>
-                                            <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                            <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                         </View>
                                         {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                                     </View>
@@ -364,7 +382,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             />
                                             <Text style={{color:'gray'}}>Is Movable?</Text>
                                             </View>
-                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable);mainController.saveEditToTask(task)}}>
                                                 <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -513,6 +531,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeTitle = (newText: React.SetStateAction<string>) => {
     setTitle(newText);
     task.title = newText.toString()
+    mainController.saveEditToTask(task)
   }
 
   // For changes in task
@@ -546,7 +565,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                     {/* Content */}
                     <View style={{width:'80%', alignItems: isLeft ? 'flex-start' : 'flex-end'}}>
-                        <Text style={{color: 'white'}}>Created by: Daniel Parra</Text> {/* Get creator name */}
+                        <Text style={{color: 'white'}}>Created by: {mainController.getUser().getValue()?.name}</Text> {/* Get creator name */}
                         <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}}>
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
@@ -608,8 +627,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                    <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                    <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                 </View>
                                 
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
@@ -625,8 +644,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                    <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                    <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                 </View>
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
@@ -662,7 +681,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     />
                                     <Text style={{color:'gray'}}>Is Movable?</Text>
                                     </View>
-                                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable);mainController.saveEditToTask(task)}}>
                                         <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                     </TouchableOpacity>
                                 </View>

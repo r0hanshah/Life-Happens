@@ -4,8 +4,8 @@ from flask_mail import Mail, Message
 from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
-from firebase_admin import firestore
-from backend.task_funcs import add_task_to_firestore
+from firebase_admin import firestore, storage
+from task_funcs import add_task_to_firestore, edit_task_in_firestore
 
 
 CRED = credentials.Certificate('./serviceAccountKey.json')
@@ -28,6 +28,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
 mail = Mail(app)
 
+BUCKET = storage.bucket()
 
 # user passwords are all 123456
 # Signup route
@@ -95,6 +96,9 @@ def get_task_by_user_and_task_id(user_id, task_id):
 
 
 # Route to get a specific task for a user
+
+####################################################################
+
 @app.route('/addTask', methods=['POST'])
 def add_task():
     try:
@@ -108,6 +112,29 @@ def add_task():
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/editTask', methods=['PUT'])
+def edit_task():
+    try:
+        req_data = request.json
+        task_data = req_data.get('task')
+        task_path_array = req_data.get('task_path_array')
+
+        edit_task_in_firestore(task_data, task_path_array, db)
+
+        return jsonify({'message': 'Task added successfully'}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    blob = BUCKET.blob(file.filename)
+    blob.upload_from_file(file)
+    return 'File uploaded successfully', 200
+    
+####################################################################
 
 
 @app.route('/user/<user_id>/task/<task_id>', methods=['GET'])

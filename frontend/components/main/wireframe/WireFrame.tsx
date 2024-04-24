@@ -23,6 +23,11 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
     const [currentMonth, setCurrentMonth] = useState(inMoment);
 
+    useEffect(()=>{
+        console.log("Updating date from wireframe")
+        setCurrentMonth(moment(inMoment))
+    }, [inMoment])
+
     // Generate values for all parameters above
     const generateLeafAndParentNodeIds = (leafNodesMap:{[key:string]:TaskModel[]}):[{ [key: number]: string[] }, { [key: number]: string[] }, { [key: number]: TaskModel[] }, { [key: number]: TaskModel[] }] =>
     {
