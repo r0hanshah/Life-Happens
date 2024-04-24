@@ -116,9 +116,10 @@ def add_task_to_firestore(user_id, task_data):
     # Add the task to Firestore under the user's tasks collection
     task_ref = db.collection('User').document(user_id).collection('Tasks').document()
     task_data['due_date'] = datetime.strptime(task_data['due_date'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+    task_data['start_date'] = datetime.strptime(task_data['start_date'], '%Y-%m-%d').date()
     task_ref.set(task_data)
 
-    schedule_due_task_reminder(user_id, task_ref.id, task_data['due_date']) #calling the email notification scheduler for task
+    schedule_due_task_reminder(user_id, task_ref.id, task_data['due_date'], task_data['start_date']) #calling the email notification scheduler for task
 
     return task_ref.id  # Returns the newly created task's ID
 
@@ -249,12 +250,20 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 
 #this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
-def schedule_due_task_reminder(user_id, task_id, due_date):
+def schedule_due_task_reminder(user_id, task_id, due_date, start_date):
     try:
-        # Calculate reminder date (24 hours before due date)
-        reminder_date = due_date - timedelta(days=1)
+        # Calculate due date reminder
+        reminder_date = due_date
 
-        # Schedule email reminder
+        # Schedule due date reminder
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date, args=[user_id, task_id])
+        scheduler.start()
+
+        # Calculate due date reminder
+        reminder_date2 = start_date
+
+        # Schedule due date reminder
         scheduler = BackgroundScheduler()
         scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date, args=[user_id, task_id])
         scheduler.start()

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../landing/NavBar";
-import UserProfilePopup from "../landing/UserProfilePopup";
 
 interface SignUpScreenProps {
   navigateToSignUp: () => void;
@@ -16,7 +15,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showProfile, setShowProfile] = useState(false);
 
   const signUpWithGoogle = () => {
     // Add logic for Google sign-up
@@ -31,7 +29,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
   };
 
   const handleSignUp = async () => {
-    try {
+    try{
+      //add user to authentication
       const response = await fetch('http://127.0.0.1:5000/signup', {
         method: 'POST',
         headers: {
@@ -43,7 +42,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
         })
       });
 
-      if (!response.ok) {
+      if (!(response.ok)) {
         throw new Error('Sign up failed');
       }
 
