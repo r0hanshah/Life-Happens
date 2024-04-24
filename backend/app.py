@@ -5,7 +5,7 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore, storage
-from task_funcs import add_task_to_firestore, edit_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage
+from task_funcs import add_task_to_firestore, edit_task_in_firestore,delete_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage, get_task_in_firestore
 
 import base64
 
@@ -123,7 +123,42 @@ def edit_task():
 
         edit_task_in_firestore(task_data, task_path_array, db)
 
-        return jsonify({'message': 'Task added successfully'}), 201
+        return jsonify({'message': 'Task edited successfully'}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/fetchTask', methods=['POST'])
+def fetch_task():
+    try:
+        print("Just got called...")
+
+        req_data = request.json
+        task_id = req_data.get('task_id')
+        user_id = req_data.get('user_id')
+        task_path_array = req_data.get('task_path_array')
+
+        print("Loaded parameters...", task_id, task_path_array)
+
+        data = get_task_in_firestore(task_id, user_id, task_path_array, db)
+
+        print(data)
+
+        return data, 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/deleteTask', methods=['DELETE'])
+def delete_task():
+    try:
+        req_data = request.json
+        task_data = req_data.get('task')
+        task_path_array = req_data.get('task_path_array')
+
+        delete_task_in_firestore(task_data, task_path_array, db)
+
+        return jsonify({'message': 'Task deleted successfully'}), 201
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
@@ -236,15 +271,15 @@ def add_user():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
-def delete_task(user_id, task_id):
-    try:
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
-        task_ref.delete()
-        return jsonify({'message': 'Task deleted successfully'}), 200
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify({'error': str(e)}), 500
+# @app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
+# def delete_task(user_id, task_id):
+#     try:
+#         task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+#         task_ref.delete()
+#         return jsonify({'message': 'Task deleted successfully'}), 200
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/user/<user_id>', methods=['DELETE'])

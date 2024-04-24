@@ -258,6 +258,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const handleDeleteTask = () => {
     // If task is root, then remove it from root task list in main controller
     const mainController = MainController.getInstance()
+    mainController.deleteTaskOnFirestore(task)
     if(task.isRoot)
     {
         mainController.deleteRootTask(task);
@@ -270,7 +271,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         parent.children = parent.children.filter(inTask => inTask.id !== task.id);
         mainController.setSelectedTask(null)
     }
-
     
   }
 

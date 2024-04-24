@@ -5,7 +5,7 @@ import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
-import { addTask, updateTask, uploadFile, TaskData, deleteFile } from "../../services/taskServices";
+import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -180,7 +180,7 @@ class MainController {
         this.reRender.setValue(bool)
     }
 
-    private storeTaskOnFirestore(task:TaskModel)
+    public storeTaskOnFirestore(task:TaskModel)
     {
       const taskPathArray = task.ancestors.map(task => task.id).reverse()
       const taskData:TaskData = {
@@ -201,9 +201,37 @@ class MainController {
         StartDate: task.startDate.toISOString(),
         Title: task.title,
         Users: task.users.map(user => user.id),
-        IsRoot: task.isRoot
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
       }
       addTask(taskData, taskPathArray)
+    }
+
+    public deleteTaskOnFirestore(task:TaskModel)
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
+      }
+      deleteTask(taskData, taskPathArray)
     }
 
     public saveEditToTask(task:TaskModel)
@@ -232,7 +260,8 @@ class MainController {
         StartDate: task.startDate.toISOString(),
         Title: task.title,
         Users: task.users.map(user => user.id),
-        IsRoot: task.isRoot
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
       }
       updateTask(taskData, taskPathArray)
     }

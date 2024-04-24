@@ -49,14 +49,18 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
   };
 
   const handleAddTask = () => {
+    const mainController = MainController.getInstance();
+
     parentTask.children.push(task)
     for(const parent of task.ancestors)
     {
-        if (parent.endDate < task.endDate) {parent.endDate = task.endDate}
-        if (parent.startDate > task.startDate) { parent.startDate = task.startDate}
+        if (parent.endDate < task.endDate) {parent.endDate = task.endDate; mainController.saveEditToTask(parent)}
+        if (parent.startDate > task.startDate) { parent.startDate = task.startDate; mainController.saveEditToTask(parent)}
     }
+    mainController.storeTaskOnFirestore(task)
+    
     handleDeleteNewTask(task)
-    const mainController = MainController.getInstance();
+    
     mainController.setReRender(mainController.getReRender().getValue() ? false : true)
   }
 

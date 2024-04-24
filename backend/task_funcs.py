@@ -59,8 +59,7 @@ def edit_task_in_firestore(data, taskPathArray, db):
     except Exception as e:
         print(f"Error creating document: {e}")
 
-
-def delete_task_in_firestore(taskId, creatorId, taskPathArray, db):
+def get_task_in_firestore(task_Id, creatorId, taskPathArray, db):
     try:
 
         task_ref = db.collection('User').document(creatorId).collection('Tasks')
@@ -70,16 +69,47 @@ def delete_task_in_firestore(taskId, creatorId, taskPathArray, db):
             task_ref = task_ref.document(taskId).collection('Tasks')
 
         # Add current task id
-        task_ref = task_ref.document(taskId)
+        task_ref = task_ref.document(task_Id)
+
+        print(taskPathArray, task_Id)
+
+        task = task_ref.get()
+
+        if task.exists:
+            return task.to_dict()
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error creating document: {e}")
+
+
+def delete_task_in_firestore(data, taskPathArray, db):
+    try:
+
+        data = json.loads(data)
+        creatorId = data.get('CreatorID')
+        task_id = data.get('ID')
+        is_root = data.get('IsRoot')
+
+        task_ref = db.collection('User').document(creatorId).collection('Tasks')
+
+        # Create the path to the Task
+        for taskId in taskPathArray:
+            task_ref = task_ref.document(taskId).collection('Tasks')
+
+        # Add current task id
+        task_ref = task_ref.document(task_id)
 
         task_ref.delete()
 
         user_ref = db.collection('User').document(creatorId)
-
-        user_ref.update({f"TaskTreeRoots.{taskId}": firestore.DELETE_FIELD})
+        
+        if is_root:
+            user_ref.update({f"TaskTreeRoots.{task_id}": firestore.DELETE_FIELD})
 
     except Exception as e:
-        print(f"Error creating document: {e}")
+        print(f"Error deleting document: {e}")
 
 # Firebase Storage functions
 

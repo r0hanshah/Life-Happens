@@ -40,6 +40,7 @@ export type TaskData = {
   Title: string,
   Users: string[],
   IsRoot: boolean
+  Completeness: number
 };
 
 const BASE_URL = 'http://127.0.0.1:5000'; // Make sure to use the correct URL for your backend.
@@ -68,12 +69,23 @@ export const getTask = async (userId: string, taskId:string) => {
       const title = task['Title'] as string
       const unobservedFiles = task['UnobservedFiles'] as string[]
       const users = task['Users'] as string[]
+      const completeness = task['Completeness'] as number
      
       const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+      returnTask.completeness = completeness
 
       loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(()=>{
         loadFilesToUser(returnTask, "unobserved", unobservedFiles, id, ancestors, creatorId)
       })
+
+      console.log(children)
+      for(const child of children)
+      {
+        loadChildren(userId, child, [returnTask.id], returnTask)
+      }
+      
+
+
       return returnTask;
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
@@ -83,6 +95,103 @@ export const getTask = async (userId: string, taskId:string) => {
     throw error;
   }
 };
+
+export const fetchTask = async (userId: string, taskId:string, ancestorArray:string[], parent:TaskModel | null):Promise<[TaskModel, string[], string[]]> => {
+  console.log(taskId)
+  console.log(ancestorArray)
+  try {
+    const response = await fetch(`${BASE_URL}/fetchTask`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'task_id': taskId,
+        'user_id': userId,
+        'task_path_array': ancestorArray
+      }),
+    });
+    const task = await response.json();
+    if (response.ok) {
+      console.log('Fetched Task:', task);
+      const ancestors = task['Ancestors'] as string[]
+      const children = task['Children'] as string[]
+      const color = task['Color'] as string
+      const id = task['ID'] as string
+      const creatorId = task['CreatorID'] as string
+      const content = task['Content']
+      const contextFiles = task['ContextFiles'] as string[]
+      const contextText = task['ContextText'] as string
+      const endDate = task['EndDate'] as string
+      const extraMedia = task['ExtraMedia'] as string[]
+      const invitedUsers = task['InvitedUsers'] as string[]
+      const isMovable = task['IsMovable'] as boolean
+      const isRoot = task['IsRoot'] as boolean
+      const notes = task['Notes'] as string
+      const startDate = task['StartDate'] as string
+      const title = task['Title'] as string
+      const unobservedFiles = task['UnobservedFiles'] as string[]
+      const users = task['Users'] as string[]
+      const completeness = task['Completeness'] as number
+     
+      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+      returnTask.completeness = completeness
+
+      loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(()=>{
+        loadFilesToUser(returnTask, "unobserved", unobservedFiles, id, ancestors, creatorId)
+      })
+
+      if (parent != null){
+        parent.children.push(returnTask)
+        returnTask.ancestors = [parent, ...parent.ancestors]
+      }
+
+      return [returnTask, children, [returnTask.id, ...returnTask.ancestors.map(task=>task.id)]];
+    } else {
+      throw new Error(task.error || 'An error occurred while fetching the task');
+    }
+  } catch (error) {
+    console.error('Failed to fetch task:', error);
+    throw error;
+  }
+};
+
+export const loadChildren = (userId: string, taskId:string, ancestorArray:string[], parent:TaskModel | null) => {
+  const tree = preOrderTraversal(userId, taskId, ancestorArray, parent, fetchTask)
+
+  console.log('Tree: ',tree)
+
+  return tree
+}
+
+type VisitCallback = (userId: string, taskId:string, ancestorArray:string[], parent:TaskModel | null) => Promise<[TaskModel, string[], string[]] | null>;
+
+// Function to traverse a tree in pre-order
+async function preOrderTraversal(userId: string, taskId:string, ancestorArray:string[], parent:TaskModel | null, visit: VisitCallback) {
+  // Visit the root node
+  console.log(taskId, ancestorArray)
+  visit(userId, taskId, ancestorArray, parent).then(result => {
+    if (result != null)
+      {
+        const root = result[0]
+        const children = result[1]
+        const ancestors = result[2]
+      
+        console.log("Parent passed?", ancestors)
+        console.log("Children: ", children)
+      
+        // Recursively traverse each child node
+        children.forEach(child => {
+          preOrderTraversal(userId, child, ancestors, root, visit);
+        });
+      }
+      else {
+        console.log("Result was null while recursively loading tasks")
+      }
+    
+  })
+
+}
 
 const loadFilesToUser = async (task:TaskModel, fileArrayType:string, fileNameArray:string[], taskId:string, taskAncestors:string[], userId:string) => {
   const documents:DocumentPickerAsset[] = []
@@ -152,10 +261,17 @@ export const addTask = async (taskData: TaskData, taskPathArray:string[]) => {
 
 // taskServices.tsx
 
-export const deleteTask = async (userId:string, taskId:string) => {
+export const deleteTask = async (taskData: TaskData, taskPathArray:string[]) => {
   try {
-    const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`, {
+    const response = await fetch(`${BASE_URL}/deleteTask`, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'task': JSON.stringify(taskData),
+        'task_path_array':taskPathArray
+      }),
     });
     if (response.ok) {
       console.log('Task deleted');
