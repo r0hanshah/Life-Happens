@@ -39,16 +39,34 @@ def signup():
         print("HERE")
         email = request.json.get('email')
         password = request.json.get('password')
+        name = request.json.get('name')
+        username = request.json.get('username')
         print(email, password)
         user = auth.create_user_with_email_and_password(email, password)
-        msg = Message('Welcome to Life Happens!', recipients=[email])
-        msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
-        mail.send(msg)
+        user_id = user['localId']
+        print(user['localId'])
+        try:
+            msg = Message('Welcome to Life Happens!', recipients=[email])
+            msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
+            mail.send(msg)
+        except:
+            print("Invalid email")
 
-        print(user)
+        data = {
+            'ID': user_id,
+            'Name': name,
+            'ParentsOfLeafNodesByTask':[],
+            'ProfilePicture':'',
+            'Settings':[],
+            'SharedTaskTrees':[],
+            'TaskTreeRoots':[],
+            'WeeklyAITimesAllowed':[]
+        }
+
+        db.collection('User').document(user_id).set(data)
 
         # find way to print out user id, then store ids in doc
-        return jsonify({'message': 'Signup successful'})
+        return jsonify(data)
     except Exception as e:
         print(str(e))
         print(request.data.decode())

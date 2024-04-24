@@ -16,20 +16,29 @@ def add_task_to_firestore(data, taskPathArray, db):
         creatorID = data.get('CreatorID')
         ID = data.get('ID')
 
+        tempCount = 0
         task_ref = db.collection('User').document(creatorID).collection('Tasks')
 
         # Create the path to the Task
         for taskId in taskPathArray:
-            task_ref = task_ref.document(taskId).collection('Tasks')
+            task_ref = task_ref.document(taskId)
+
+            tempCount += 1
+            if(tempCount == len(taskPathArray)):
+                task_ref.update({'Children': firestore.ArrayUnion([ID])})
+
+            task_ref = task_ref.collection('Tasks')
+            
 
         # Add current task id
         task_ref = task_ref.document(ID)
 
         task_ref.set(data)
 
-        user_ref = db.collection('User').document(creatorID)
+        if (len(taskPathArray) == 0):
+            user_ref = db.collection('User').document(creatorID)
 
-        user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
+            user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
 
     except Exception as e:
         print(f"Error creating document: {e}")
