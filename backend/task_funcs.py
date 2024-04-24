@@ -25,3 +25,5 @@ def add_task_to_firestore(data, taskPathArray, db):
 
     except Exception as e:
         print(f"Error creating document: {e}")
+
+

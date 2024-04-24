@@ -40,6 +40,8 @@ class AuthController {
 
           const mainController = MainController.getInstance()
 
+          console.log(userTasks)
+
           mainController.setUser(user)
           mainController.setTasks(userTasks)
           // Redirect user or do something else on success
@@ -70,6 +72,7 @@ class AuthController {
             try
             {
                 const task = await getTask(userId, id)
+                tasks.push(task)
             }
             catch (e) {
                 console.error('Error fetching user:', e);

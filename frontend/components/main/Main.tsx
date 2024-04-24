@@ -49,22 +49,17 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const [slideAnimation] = useState(new Animated.Value(0));
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false)
-
   const [profileClicked, setProfileClicked] = useState(false)
 
   // Load in tasks on appear
   useEffect(() => {
-    if (!isLoaded)
-    {
       loadRootTasks()
-      setIsLoaded(true)
-    }
-  })
+  }, [controller])
 
   // Load in tasks
   const loadRootTasks = () =>
   {
+    setRootTasks(controller.getTasks().getValue())
     // Load based off the month
     //TODO: Filter out the tasks that match the month and year
   }
@@ -278,13 +273,13 @@ const Main: React.FC<Tasks> = ({signOut}) => {
         <ScrollView style={{width:"100%"}}>
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
             <View style={styles.hstack}>
-              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
+              <TouchableHighlight onPress={()=>{setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableHighlight>
               
               <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonthAndYear}</Text>
 
-              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.add(1, 'months'))}}>
+              <TouchableHighlight onPress={()=>{setCurrentMonth(currentMonth.add(1, 'months'))}}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
               </TouchableHighlight>
             </View>

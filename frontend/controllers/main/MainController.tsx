@@ -205,6 +205,29 @@ class MainController {
       }
       addTask(taskData, taskPathArray)
     }
+
+    public saveEditToTask(task:TaskModel)
+    {
+      this.debounce(this.saveChangesToTask, 1000)(task)
+    }
+
+    private saveChangesToTask(task:TaskModel)
+    {
+      // Send request to edit user
+    }
+
+    private debounce(func: Function, delay: number){
+      let timer: NodeJS.Timeout | null;
+      return (...args: any[]) => {
+          if (timer) {
+              clearTimeout(timer);
+          }
+          timer = setTimeout(() => {
+              func(...args);
+              timer = null;
+          }, delay);
+      };
+    }
   }
 
 export default MainController

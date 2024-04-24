@@ -47,8 +47,28 @@ export const getTask = async (userId: string, taskId:string) => {
     const task = await response.json();
     if (response.ok) {
       console.log('Task:', task);
-      // const returnTask = new TaskModel(task.get('ID'))
-      return task;
+      const ancestors = task['Ancestors'] as string[]
+      const children = task['Children'] as string[]
+      const color = task['Color'] as string
+      const id = task['ID'] as string
+      const creatorId = task['CreatorID'] as string
+      const content = task['Content']
+      const contextFiles = task['ContextFiles']
+      const contextText = task['ContextText'] as string
+      const endDate = task['EndDate'] as string
+      const extraMedia = task['ExtraMedia'] as string[]
+      const invitedUsers = task['InvitedUsers'] as string[]
+      const isMovable = task['IsMovable'] as boolean
+      const isRoot = task['IsRoot'] as boolean
+      const notes = task['Notes'] as string
+      const startDate = task['StartDate'] as string
+      const title = task['Title'] as string
+      const unobservedFiles = task['UnobservedFiles'] as string[]
+      const users = task['Users'] as string[]
+
+      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+
+      return returnTask;
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
     }

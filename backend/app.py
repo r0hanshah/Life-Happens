@@ -5,7 +5,7 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
-from add_task import add_task_to_firestore
+from backend.task_funcs import add_task_to_firestore
 
 
 
