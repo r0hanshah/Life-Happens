@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
 import moment, { Duration } from 'moment';
 import TaskModel from '../../models/TaskModel';
+import MainController from '../../controllers/main/MainController';
 
 
-const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string) => void>}) => {
+const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string) => void>, updateServer:boolean}) => {
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [hours, setHours] = useState<string>(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
@@ -84,6 +85,11 @@ const TimeSelector =({task, modStartDate, updateFunctions} : {task:TaskModel, mo
         }
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
         updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
+        if(updateServer)
+        {
+          MainController.getInstance().saveEditToTask(task)
+        }
+        
         setIsSquareVisible(false);
       }
     };

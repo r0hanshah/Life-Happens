@@ -114,7 +114,7 @@ def delete_user(user_id):
     delete_user_folder(user_id)
     try:
         # Delete the user's document
-        db.collection('User').document(user_id).delete()
+        db.collection('Users').document(user_id).delete()
         auth.delete_user(user_id)
         delete_user_folder(user_id)
         print("User deleted successfully!")
@@ -126,14 +126,14 @@ def delete_user(user_id):
 def delete_task(user_id, task_id):
     try:
         # Fetch all subtasks of the task
-        subtasks_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').get()
+        subtasks_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').get()
 
         # Delete each subtask
         for subtask in subtasks_ref:
             subtask.reference.delete()
 
         # Delete the task document
-        db.collection('User').document(user_id).collection('Tasks').document(task_id).delete()
+        db.collection('Users').document(user_id).collection('Tasks').document(task_id).delete()
         delete_task_folder(user_id, task_id)
 
         print("Task deleted successfully!")
@@ -146,7 +146,7 @@ def delete_task(user_id, task_id):
 def delete_subtask(user_id, task_id, subtask_id):
     try:
         # Delete the subtask document
-        db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).delete()
+        db.collection('Users').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).delete()
         delete_subtask_folder(user_id, task_id, subtask_id)
         print("Subtask deleted successfully!")
         return True
@@ -159,7 +159,7 @@ def update_user(user_id):
     # Example: update the name field
     new_name = input("Enter new Name: ")
     try:
-        db.collection('User').document(user_id).update({"Name": new_name})
+        db.collection('Users').document(user_id).update({"Name": new_name})
         print("User fields updated successfully!")
     except Exception as e:
         print("Error updating user fields:", e)
@@ -170,7 +170,7 @@ def update_task(user_id):
     task_id = input("Enter Task ID: ")
     new_title = input("Enter new Title: ")
     try:
-        db.collection('User').document(user_id).collection('Tasks').document(task_id).update({"Title": new_title})
+        db.collection('Users').document(user_id).collection('Tasks').document(task_id).update({"Title": new_title})
         print("Task fields updated successfully!")
     except Exception as e:
         print("Error updating task fields:", e)
@@ -182,7 +182,7 @@ def update_subtask(user_id):
     subtask_id = input("Enter Subtask ID: ")
     new_title = input("Enter new Title: ")
     try:
-        db.collection('User').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).update({"Title": new_title})
+        db.collection('Users').document(user_id).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id).update({"Title": new_title})
         print("Subtask fields updated successfully!")
     except Exception as e:
         print("Error updating subtask fields:", e)
@@ -190,7 +190,7 @@ def update_subtask(user_id):
 def getUser(user_id):
     try:
         # Fetch user document from Firestore
-        user_doc = db.collection('User').document(user_id).get()
+        user_doc = db.collection('Users').document(user_id).get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
             # Fetch user email from Firebase Authentication
@@ -209,7 +209,7 @@ def getUser(user_id):
 def getTasks(user_id):
     try:
         # Fetch tasks collection for the user
-        tasks_ref = db.collection('User').document(user_id).collection('Tasks').get()
+        tasks_ref = db.collection('Users').document(user_id).collection('Tasks').get()
         tasks_list = []
         for task_doc in tasks_ref:
             tasks_list.append(task_doc.to_dict())
@@ -277,7 +277,7 @@ def sign_up():
     password = input("Enter Password: ")
 
     # Check if the email already exists in the Firestore database
-    existing_users = db.collection('User').where('Email', '==', email).get()
+    existing_users = db.collection('Users').where('Email', '==', email).get()
     if existing_users:
         print("Email already exists!")
         return None
@@ -286,9 +286,7 @@ def sign_up():
 
     if user_id:
         try:
-            weekly_ai_times = input(
-                "Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
-            weekly_ai_times_dict = weekly_ai_times
+            weekly_ai_times_dict = 2
 
             # Create user data
             user_data = {
@@ -311,7 +309,7 @@ def sign_up():
 
             # Create user in Firestore
             user_data = User(**user_data)
-            user_ref = db.collection('User').document(user_id).set(user_data.__dict__)
+            user_ref = db.collection('Users').document(user_id).set(user_data.__dict__)
 
             create_user_folder(user_id)
 
@@ -394,7 +392,7 @@ def create_task(user_id):
             "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
         }
         task_data = Task(**task_data)
-        task_ref = db.collection('User').document(user_id).collection('Tasks').add(task_data.__dict__)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').add(task_data.__dict__)
         task_id = task_ref[1].id
 
         create_task_folder(user_id, task_id)
@@ -430,7 +428,7 @@ def create_subtask(user_id, task_id):
             "ContextText": "Example context",
             "ContextFiles": ["https://example.com/file1.pdf", "https://example.com/file2.docx"]
         }
-        subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).collection(
+        subtask_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id).collection(
             'Subtasks').add(subtask_data)
         subtask_id = subtask_ref[1].id
 
@@ -442,7 +440,7 @@ def create_subtask(user_id, task_id):
 
 def invite_user_to_task(user_id, task_id, invited_users): # puts invited user email to task field,
     try:
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         for invitee in invited_users:
             if "@" in invitee:
                 user = auth.get_user_by_email(invitee)
@@ -458,7 +456,7 @@ def invite_user_to_task(user_id, task_id, invited_users): # puts invited user em
 
 def invite_user_to_subtask(user_id, task_id, subtask_id, invited_users): # puts invited user email to subtask field,
     try:
-        subtask_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id).colletion('Subtasks').document(subtask_id)
+        subtask_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id).colletion('Subtasks').document(subtask_id)
         for invitee in invited_users:
             if "@" in invitee:
                 user = auth.get_user_by_email(invitee)
@@ -574,13 +572,13 @@ def main():
 def delete_user2(user_id):
     try:
         # Delete all tasks in the 'Tasks' subcollection
-        tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        tasks_ref = db.collection('Users').document(user_id).collection('Tasks')
         tasks = tasks_ref.stream()
         for task in tasks:
             task.reference.delete()
         
         # Delete the user document
-        db.collection('User').document(user_id).delete()
+        db.collection('Users').document(user_id).delete()
         
         # Delete the user from Firebase Authentication
         auth.delete_user(user_id)

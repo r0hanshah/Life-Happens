@@ -36,14 +36,19 @@ class AuthController {
           const user = userData[0]
           const rootTaskIds = userData[1]
 
-          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds)
-
           const mainController = MainController.getInstance()
+
+          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds).then( (tasks) => {
+            console.log(tasks.length)
+            mainController.setUser(user)
+            mainController.setTasks(tasks)
+            
+            // Redirect user or do something else on success
+            completion();
+          }
+          )
+
           
-          mainController.setUser(user)
-          mainController.setTasks(userTasks)
-          // Redirect user or do something else on success
-          completion();
         } catch (error) {
           Alert.alert('Error', 'Login failed');
           console.error('Login error:', error);
@@ -56,6 +61,7 @@ class AuthController {
             const name = data['Name']
             const picture = data['ProfilePicture']
             const rootTaskIds = data['TaskTreeRoots']
+            console.log(typeof rootTaskIds)
             return [new UserModel(userId, name, picture, email), rootTaskIds]
         } catch (e) {
             console.error('Error fetching user:', e);
@@ -63,14 +69,30 @@ class AuthController {
         }
     };
 
-    private handleGetUserTasks = async (userId:string, taskIds:string[]):Promise<TaskModel[]> => {
-        var tasks:TaskModel[] = []
-        for(const id of taskIds)
-        {
-            getTask(userId, id)
-        }
-        return tasks
-    }
+    private handleGetUserTasks = async (userId:string, taskIds:object):Promise<TaskModel[]> => {
+      const tasks: TaskModel[] = [];
+      const promises: Promise<TaskModel | null>[] = [];
+  
+      // Map each task ID to a promise returned by getTask
+      Object.keys(taskIds).forEach(id => {
+          promises.push(getTask(userId, id).catch(e => {
+              console.error('Error fetching user:', e);
+              return null; // Return null in case of an error
+          }));
+      });
+  
+      // Wait for all promises to resolve using Promise.all
+      const resolvedTasks = await Promise.all(promises);
+  
+      // Filter out null values (in case of errors) and push valid tasks to the tasks array
+      resolvedTasks.forEach(task => {
+          if (task !== null) {
+              tasks.push(task);
+          }
+      });
+  
+      return tasks;
+  }
   }
 
 export default AuthController

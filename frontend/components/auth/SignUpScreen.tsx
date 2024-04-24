@@ -3,6 +3,10 @@ import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from 
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../landing/NavBar";
 
+import UserProfilePopup from "../landing/UserProfilePopup";
+import MainController from '../../controllers/main/MainController';
+import UserModel from '../../models/UserModel';
+
 interface SignUpScreenProps {
   navigateToSignUp: () => void;
   navigateToLogin: () => void;
@@ -39,7 +43,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
         },
         body: JSON.stringify({
           "email": email,
-          "password":password
+          "password":password,
+          "name": fullName,
+          "username": username
         })
       });
 
@@ -49,7 +55,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
 
       Alert.alert('Success', 'Sign up successful');
       // Redirect user or do something else on success
-      navigateToMain();
+       await response.json().then(data=>{
+          MainController.getInstance().setUser(new UserModel(data['ID'], data['Name'], data['ProfilePicture'], email))
+          navigateToMain();
+       })
+      
     } catch (error) {
       Alert.alert('Error', 'Sign up failed');
       console.error('Sign up error:', error);

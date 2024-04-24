@@ -5,7 +5,7 @@ import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
-import { addTask } from "../../services/taskServices";
+import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -17,7 +17,7 @@ class MainController {
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
 
-    // Private constructor to prevent instantiation from outside
+    // Private constructor to prevent uploadFileinstantiation from outside
     private constructor() {
       // Initialization code here
     }
@@ -60,6 +60,16 @@ class MainController {
         this.loading.setValue(bool)
     }
 
+    private generateFilePaths(task:TaskModel) {
+      var file_paths:string[] = []
+      for (const doc of task.contextFiles)
+      {
+        const file_path = "Users/"+task.creatorId+"/"+task.ancestors.toReversed().map(task=>task.id).join('/')+task.id+"/"+doc.name
+        file_paths.push(file_path)
+      }
+      return file_paths
+    }
+
     public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
       this.setLoadingGenerateTasks(true)
       try {
@@ -73,7 +83,7 @@ class MainController {
             end:task.endDate.toISOString()
           }
         })
-        const file_paths = ["Users/user-1/task-1/DailyScrum 4_3.xlsx", "Users/user-1/task-1/Sprint 1 Presentation.pdf"]
+        const file_paths = this.generateFilePaths(task)
 
         const response = await fetch('http://127.0.0.1:5000/generate', {
           method: 'POST',
@@ -97,9 +107,10 @@ class MainController {
         // Redirect user or do something else on success
         const responseData = await response.json();
         const taskModels:TaskModel[] = []
+        const user_id = this.getUser().getValue()?.id!
         for (const taskJSON of responseData)
         {
-          taskModels.push(new TaskModel(undefined, "creatorId", task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
+          taskModels.push(new TaskModel(undefined, user_id, task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
         }
         console.log(taskModels)
         this.setLoadingGenerateTasks(false)
@@ -154,12 +165,18 @@ class MainController {
       return color;
     };
 
-    public createNewTask(creatorId:string):TaskModel
+    public createNewTask():TaskModel
     {
+      const user = this.user.getValue()
+      if (user == null) {throw Error("User is missing")}
       const id = uuid.v4().toString()
       const currentDate = new Date();
       const oneHourAhead = new Date(currentDate.getTime() + 3600000)
-      const newRootTask = new TaskModel(id, creatorId, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
+
+      const newRootTask = new TaskModel(id, user.id, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
+
+      this.storeTaskOnFirestore(newRootTask)
+
       this.setSelectedTask(newRootTask)
       this.setTasks([...this.tasksArray.getValue(), newRootTask])
       return newRootTask
@@ -172,6 +189,121 @@ class MainController {
 
     public setReRender(bool: boolean): void {
         this.reRender.setValue(bool)
+    }
+
+    public storeTaskOnFirestore(task:TaskModel)
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
+      }
+      addTask(taskData, taskPathArray)
+    }
+
+    public deleteTaskOnFirestore(task:TaskModel)
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
+      }
+      deleteTask(taskData, taskPathArray)
+    }
+
+    public saveEditToTask(task:TaskModel)
+    {
+      this.debounce(this.saveChangesToTask, 1000)(task)
+    }
+
+    private saveChangesToTask(task:TaskModel)
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot,
+        Completeness: task.completeness
+      }
+      updateTask(taskData, taskPathArray)
+    }
+
+    private debounce(func: Function, delay: number){
+      let timer: NodeJS.Timeout | null;
+      return (...args: any[]) => {
+          if (timer) {
+              clearTimeout(timer);
+          }
+          timer = setTimeout(() => {
+              func(...args);
+              timer = null;
+          }, delay);
+      };
+    }
+
+    public async uploadFileToTask(task:TaskModel, file: {
+        name: string;
+        size: number | undefined;
+        type: string;
+        uri: string;
+    })
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      await uploadFile(task.creatorId, taskPathArray, task.id, file)
+    }
+
+    public async deleteFileFromTask(task:TaskModel, filename:string){
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      await deleteFile(task.creatorId, taskPathArray, task.id, filename)
     }
   }
 

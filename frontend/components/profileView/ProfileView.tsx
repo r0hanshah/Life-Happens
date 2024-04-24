@@ -45,7 +45,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut}) => {
                     <View style={{padding: 30}}>
                         <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginBottom:30}}>Rest Periods</Text>
                         <TimeBlocker user={user}/>
-                        <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>All Root Tasks</Text>
+
+                        {/* <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>All Root Tasks</Text> */}
 
                         
                         <Text style={{color:"red", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginTop:30}}>Red Zone</Text>

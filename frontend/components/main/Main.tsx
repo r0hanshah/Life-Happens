@@ -49,22 +49,19 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const [slideAnimation] = useState(new Animated.Value(0));
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false)
-
   const [profileClicked, setProfileClicked] = useState(false)
 
   // Load in tasks on appear
   useEffect(() => {
-    if (!isLoaded)
-    {
-      loadRootTasks()
-      setIsLoaded(true)
-    }
-  })
+    console.log('Number of tasks', controller.getTasks().getValue().length)
+    loadRootTasks()
+  }, [controller])
 
   // Load in tasks
   const loadRootTasks = () =>
   {
+    const tasks: TaskModel[] = controller.getTasks().getValue()
+    setRootTasks(tasks)
     // Load based off the month
     //TODO: Filter out the tasks that match the month and year
   }
@@ -136,7 +133,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
   const [currentMonth, setCurrentMonth] = useState(moment());
 
-  const currentMonthAndYear = currentMonth.format('MMMM YYYY');
+  var currentMonthAndYear = currentMonth.format('MMMM YYYY');
 
   let [fontsLoaded] = useFonts({
       Inter_900Black
@@ -278,15 +275,15 @@ const Main: React.FC<Tasks> = ({signOut}) => {
         <ScrollView style={{width:"100%"}}>
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
             <View style={styles.hstack}>
-              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.subtract(1, 'months'))}}>
+              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).subtract(1, 'months')); console.log(currentMonth)}}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
-              </TouchableHighlight>
+              </TouchableOpacity>
               
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonthAndYear}</Text>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format('MMMM YYYY')}</Text>
 
-              <TouchableHighlight onPress={()=>{ setIsLoaded(false); setCurrentMonth(currentMonth.add(1, 'months'))}}>
+              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).add(1, 'months')); console.log(currentMonth)}}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
-              </TouchableHighlight>
+              </TouchableOpacity>
             </View>
             
 
@@ -308,7 +305,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
             <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
             onPress={() => {
               if(controller.getSelectedTask().getValue() === null)
-                controller.createNewTask("TODO")
+                controller.createNewTask()
             }}
             >
               <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
