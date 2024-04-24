@@ -39,7 +39,7 @@ class AuthController {
           const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds)
 
           const mainController = MainController.getInstance()
-          
+
           mainController.setUser(user)
           mainController.setTasks(userTasks)
           // Redirect user or do something else on success
@@ -56,6 +56,7 @@ class AuthController {
             const name = data['Name']
             const picture = data['ProfilePicture']
             const rootTaskIds = data['TaskTreeRoots']
+            console.log(typeof rootTaskIds)
             return [new UserModel(userId, name, picture, email), rootTaskIds]
         } catch (e) {
             console.error('Error fetching user:', e);
@@ -63,12 +64,17 @@ class AuthController {
         }
     };
 
-    private handleGetUserTasks = async (userId:string, taskIds:string[]):Promise<TaskModel[]> => {
+    private handleGetUserTasks = async (userId:string, taskIds:object):Promise<TaskModel[]> => {
         var tasks:TaskModel[] = []
-        for(const id of taskIds)
-        {
-            getTask(userId, id)
-        }
+        Object.keys(taskIds).forEach(async id => {
+            try
+            {
+                const task = await getTask(userId, id)
+            }
+            catch (e) {
+                console.error('Error fetching user:', e);
+            }
+        })
         return tasks
     }
   }
