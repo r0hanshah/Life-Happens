@@ -63,7 +63,7 @@ def signup():
             'WeeklyAITimesAllowed':[]
         }
 
-        db.collection('User').document(user_id).set(data)
+        db.collection('Users').document(user_id).set(data)
 
         # find way to print out user id, then store ids in doc
         return jsonify(data)
@@ -103,7 +103,7 @@ def get_time():
 def get_task_by_user_and_task_id(user_id, task_id):
     try:
         # Navigating to the Task document within the User subcollection
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task = task_ref.get()
         if task.exists:
             return task.to_dict()
@@ -276,7 +276,7 @@ def add_user():
         user_data = request.json
 
         # Generate a new document reference with a random unique ID
-        new_user_ref = db.collection('User').document()
+        new_user_ref = db.collection('Users').document()
 
         # Set the new user data
         new_user_ref.set(user_data)
@@ -292,7 +292,7 @@ def add_user():
 # @app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
 # def delete_task(user_id, task_id):
 #     try:
-#         task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+#         task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
 #         task_ref.delete()
 #         return jsonify({'message': 'Task deleted successfully'}), 200
 #     except Exception as e:
@@ -304,13 +304,13 @@ def add_user():
 def delete_user(user_id):
     try:
         # First, delete all tasks in the 'Tasks' subcollection
-        # tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        # tasks_ref = db.collection('Users').document(user_id).collection('Tasks')
         # tasks = tasks_ref.stream()
         # for task in tasks:
         #     tasks_ref.document(task.id).delete()
 
         # Now, delete the user document
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
         user_ref.delete()
 
         return jsonify({'message': 'User and all associated tasks deleted successfully'}), 200
@@ -339,7 +339,7 @@ def generateTasks():
 def update_task(user_id, task_id):
     try:
         task_data = request.json
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task_ref.update(task_data)
         return jsonify({'message': 'Task updated successfully'}), 200
     except Exception as e:
@@ -350,7 +350,7 @@ def update_task(user_id, task_id):
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
     try:
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
         user = user_ref.get()
         if user.exists:
             return jsonify(user.to_dict()), 200
@@ -368,7 +368,7 @@ def update_user(user_id):
         user_updates = request.json
 
         # Get a reference to the existing user document
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
 
         # Update the user document with the new data
         user_ref.update(user_updates)
@@ -402,9 +402,9 @@ def schedule_due_task_reminder(user_id, task_id, due_date):
 def send_due_task_email(user_id, task_id):
     try:
         # Retrieve user's email and task name from Firestore
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task_data = task_ref.get().to_dict()
-        user_email = db.collection('User').document(user_id).get().get('email')
+        user_email = db.collection('Users').document(user_id).get().get('email')
         task_name = task_data.get('name')
 
         # Send email to user

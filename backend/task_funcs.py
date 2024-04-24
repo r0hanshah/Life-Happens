@@ -17,7 +17,7 @@ def add_task_to_firestore(data, taskPathArray, db):
         ID = data.get('ID')
 
         tempCount = 0
-        task_ref = db.collection('User').document(creatorID).collection('Tasks')
+        task_ref = db.collection('Users').document(creatorID).collection('Tasks')
 
         # Create the path to the Task
         for taskId in taskPathArray:
@@ -36,7 +36,7 @@ def add_task_to_firestore(data, taskPathArray, db):
         task_ref.set(data)
 
         if (len(taskPathArray) == 0):
-            user_ref = db.collection('User').document(creatorID)
+            user_ref = db.collection('Users').document(creatorID)
 
             user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
 
@@ -50,7 +50,7 @@ def edit_task_in_firestore(data, taskPathArray, db):
         creatorID = data.get('CreatorID')
         ID = data.get('ID')
 
-        task_ref = db.collection('User').document(creatorID).collection('Tasks')
+        task_ref = db.collection('Users').document(creatorID).collection('Tasks')
 
         # Create the path to the Task
         for taskId in taskPathArray:
@@ -61,7 +61,7 @@ def edit_task_in_firestore(data, taskPathArray, db):
 
         task_ref.update(data)
 
-        user_ref = db.collection('User').document(creatorID)
+        user_ref = db.collection('Users').document(creatorID)
 
         user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
 
@@ -71,7 +71,7 @@ def edit_task_in_firestore(data, taskPathArray, db):
 def get_task_in_firestore(task_Id, creatorId, taskPathArray, db):
     try:
 
-        task_ref = db.collection('User').document(creatorId).collection('Tasks')
+        task_ref = db.collection('Users').document(creatorId).collection('Tasks')
 
         # Create the path to the Task
         for taskId in taskPathArray:
@@ -101,7 +101,7 @@ def delete_task_in_firestore(data, taskPathArray, db):
         task_id = data.get('ID')
         is_root = data.get('IsRoot')
 
-        task_ref = db.collection('User').document(creatorId).collection('Tasks')
+        task_ref = db.collection('Users').document(creatorId).collection('Tasks')
 
         # Create the path to the Task
         for taskId in taskPathArray:
@@ -112,7 +112,7 @@ def delete_task_in_firestore(data, taskPathArray, db):
 
         task_ref.delete()
 
-        user_ref = db.collection('User').document(creatorId)
+        user_ref = db.collection('Users').document(creatorId)
         
         if is_root:
             user_ref.update({f"TaskTreeRoots.{task_id}": firestore.DELETE_FIELD})

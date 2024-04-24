@@ -126,7 +126,7 @@ def signup():
         #msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
         #mail.send(msg)
 
-        existing_users = db.collection('User').where('Email', '==', email).get()
+        existing_users = db.collection('Users').where('Email', '==', email).get()
         if existing_users:
             print("Email already exists!")
             return None
@@ -157,7 +157,7 @@ def signup():
 
                 # Create user in Firestore
                 user_data = User(**user_data)
-                user_ref = db.collection('User').document(user_id).set(user_data.__dict__)
+                user_ref = db.collection('Users').document(user_id).set(user_data.__dict__)
 
                 create_user_folder(user_id)
 
@@ -206,7 +206,7 @@ def get_time():
 def get_task_by_user_and_task_id(user_id, task_id):
     try:
         # Navigating to the Task document within the User subcollection
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task = task_ref.get()
         if task.exists:
             return task.to_dict()
@@ -230,7 +230,7 @@ def get_user_task(user_id, task_id):
 # Assume a function in your model (TaskModel.py or similar)
 def add_task_to_firestore(user_id, task_data):
     # Add the task to Firestore under the user's tasks collection
-    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+    task_ref = db.collection('Users').document(user_id).collection('Tasks').document()
     task_data['due_date'] = datetime.strptime(task_data['due_date'],
                                               '%Y-%m-%d').date()  # not sure if this line works to get the due date
     task_ref.set(task_data)
@@ -260,7 +260,7 @@ def add_user():
         user_data = request.json
 
         # Generate a new document reference with a random unique ID
-        new_user_ref = db.collection('User').document()
+        new_user_ref = db.collection('Users').document()
 
         # Set the new user data
         new_user_ref.set(user_data)
@@ -276,7 +276,7 @@ def add_user():
 @app.route('/user/<user_id>/task/<task_id>', methods=['DELETE'])
 def delete_task(user_id, task_id):
     try:
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task_ref.delete()
         return jsonify({'message': 'Task deleted successfully'}), 200
     except Exception as e:
@@ -288,13 +288,13 @@ def delete_task(user_id, task_id):
 def delete_user(user_id):
     try:
         # First, delete all tasks in the 'Tasks' subcollection
-        # tasks_ref = db.collection('User').document(user_id).collection('Tasks')
+        # tasks_ref = db.collection('Users').document(user_id).collection('Tasks')
         # tasks = tasks_ref.stream()
         # for task in tasks:
         #     tasks_ref.document(task.id).delete()
 
         # Now, delete the user document
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
         user_ref.delete()
 
         return jsonify({'message': 'User and all associated tasks deleted successfully'}), 200
@@ -366,7 +366,7 @@ def generateTasks():
 def update_task(user_id, task_id):
     try:
         task_data = request.json
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task_ref.update(task_data)
         return jsonify({'message': 'Task updated successfully'}), 200
     except Exception as e:
@@ -377,7 +377,7 @@ def update_task(user_id, task_id):
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
     try:
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
         user = user_ref.get()
         if user.exists:
             return jsonify(user.to_dict()), 200
@@ -395,7 +395,7 @@ def update_user(user_id):
         user_updates = request.json
 
         # Get a reference to the existing user document
-        user_ref = db.collection('User').document(user_id)
+        user_ref = db.collection('Users').document(user_id)
 
         # Update the user document with the new data
         user_ref.update(user_updates)
@@ -430,9 +430,9 @@ def schedule_due_task_reminder(user_id, task_id, due_date):
 def send_due_task_email(user_id, task_id):
     try:
         # Retrieve user's email and task name from Firestore
-        task_ref = db.collection('User').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task_data = task_ref.get().to_dict()
-        user_email = db.collection('User').document(user_id).get().get('email')
+        user_email = db.collection('Users').document(user_id).get().get('email')
         task_name = task_data.get('name')
 
         # Send email to user
