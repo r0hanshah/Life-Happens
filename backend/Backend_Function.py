@@ -26,6 +26,7 @@ firebaseConfig={
   'databaseURL': "https://lifehappens-293da-default-rtdb.firebaseio.com/"
 }
 
+
 firebase = pyrebase.initialize_app(firebaseConfig)
 
 storage = firebase.storage()
