@@ -5,7 +5,7 @@ import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
-import { addTask, updateTask, TaskData } from "../../services/taskServices";
+import { addTask, updateTask, uploadFile, TaskData, deleteFile } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -17,7 +17,7 @@ class MainController {
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
 
-    // Private constructor to prevent instantiation from outside
+    // Private constructor to prevent uploadFileinstantiation from outside
     private constructor() {
       // Initialization code here
     }
@@ -250,9 +250,20 @@ class MainController {
       };
     }
 
-    public uploadFileToTask(task:TaskModel, fileName:string)
+    public async uploadFileToTask(task:TaskModel, file: {
+        name: string;
+        size: number | undefined;
+        type: string;
+        uri: string;
+    })
     {
-      
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      await uploadFile(task.creatorId, taskPathArray, task.id, file)
+    }
+
+    public async deleteFileFromTask(task:TaskModel, filename:string){
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      await deleteFile(task.creatorId, taskPathArray, task.id, filename)
     }
   }
 

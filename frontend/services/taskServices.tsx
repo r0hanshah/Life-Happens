@@ -1,6 +1,9 @@
 // taskServices.tsx
 
+import { DocumentPickerAsset } from "expo-document-picker"
 import TaskModel from "../models/TaskModel";
+import UserModel from "../models/UserModel";
+
 
 // No need to import fetch as it's a global function available in React Native
 
@@ -53,7 +56,7 @@ export const getTask = async (userId: string, taskId:string) => {
       const id = task['ID'] as string
       const creatorId = task['CreatorID'] as string
       const content = task['Content']
-      const contextFiles = task['ContextFiles']
+      const contextFiles = task['ContextFiles'] as string[]
       const contextText = task['ContextText'] as string
       const endDate = task['EndDate'] as string
       const extraMedia = task['ExtraMedia'] as string[]
@@ -65,9 +68,12 @@ export const getTask = async (userId: string, taskId:string) => {
       const title = task['Title'] as string
       const unobservedFiles = task['UnobservedFiles'] as string[]
       const users = task['Users'] as string[]
-
+     
       const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
 
+      loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(()=>{
+        loadFilesToUser(returnTask, "unobserved", unobservedFiles, id, ancestors, creatorId)
+      })
       return returnTask;
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
@@ -77,6 +83,40 @@ export const getTask = async (userId: string, taskId:string) => {
     throw error;
   }
 };
+
+const loadFilesToUser = async (task:TaskModel, fileArrayType:string, fileNameArray:string[], taskId:string, taskAncestors:string[], userId:string) => {
+  const documents:DocumentPickerAsset[] = []
+  const promises: Promise<DocumentPickerAsset | null>[] = [];
+
+  for(const file of fileNameArray)
+    {
+      promises.push(getFile(userId, taskAncestors, userId, file).catch(e => {
+        console.error('Error fetching file:', e);
+        return null; // Return null in case of an error
+    }))
+    }
+    
+    const resolvedFiles = await Promise.all(promises);
+
+    resolvedFiles.forEach(file => {
+      if (file !== null) {
+          documents.push(file);
+      }
+  });
+
+  if(fileArrayType == "context")
+  {
+    task.contextFiles = documents
+  }
+  else if(fileArrayType == "unobserved")
+  {
+    task.unobservedFiles = documents
+  }
+  else 
+  {
+    console.log("Invalid")  
+  }
+}
 
 
 // taskServices.tsx
@@ -239,3 +279,92 @@ export const updateUser = async (userId:string, userData:UserData) => {
     throw error;
   }
 };
+
+// Upload files
+
+export const uploadFile = async (user_id:string, task_path_array:string[], task_id: string, file: {
+  name: string;
+  size: number | undefined;
+  type: string;
+  uri: string;
+}) => {
+  try {
+    const response = await fetch(`${BASE_URL}/upload`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'file': file,
+        'task_path_array': task_path_array,
+        'task_id': task_id,
+        'user_id': user_id
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Problem updating user');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
+// Upload files
+
+export const deleteFile = async (user_id:string, task_path_array:string[], task_id: string, filename:string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/deletefile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'filename':filename,
+        'task_path_array': task_path_array,
+        'task_id': task_id,
+        'user_id': user_id
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Problem updating user');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
+const getFile = async (taskId:string, taskAncestors:string[], userId:string, filename:string) => {
+  const filePath = 'Users/'+userId+'/'+taskAncestors.join('/')+'/'+taskId+'/'+filename
+  try {
+    const response = await fetch(`${BASE_URL}/getfile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'file_path':filePath
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Problem getting file');
+    }
+    const file = await response.json()
+
+    const fileName = file.name.split('/').pop();
+
+    const doc:DocumentPickerAsset = {
+      uri: file.url, // Use the signed URL provided by the backend
+      name: fileName,
+      mimeType: file.type,
+    }
+
+    return doc
+  } catch (error) {
+    console.error('Error getting file:', error);
+    throw error;
+  }
+}

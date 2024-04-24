@@ -5,8 +5,9 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore, storage
-from task_funcs import add_task_to_firestore, edit_task_in_firestore
+from task_funcs import add_task_to_firestore, edit_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage
 
+import base64
 
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
@@ -126,13 +127,83 @@ def edit_task():
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/getfile', methods=['POST'])
+def get_file():
+    try:
+        if 'file_path' not in request.json:
+                return 'No file path provided in the request', 400
+        
+        data = get_files_from_storage(BUCKET, request.json['file_path'])
+
+        return jsonify(data), 200
+    except Exception as e:
+        print(f'Error getting file: {str(e)}')
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    file = request.files['file']
-    blob = BUCKET.blob(file.filename)
-    blob.upload_from_file(file)
-    return 'File uploaded successfully', 200
+    try:
+        # Check if 'file' exists in the request
+        if 'file' not in request.json:
+            return 'No file provided in the request', 400
+        
+        if 'task_path_array' not in request.json:
+            return 'No task path provided in the request', 400
+        
+        if 'task_id' not in request.json:
+            return 'No task id provided in the request', 400
+        
+        if 'user_id' not in request.json:
+            return 'No user id provided', 400
+
+        # Extract file data from the request
+        file_data = request.json['file']
+        task_path_array = request.json['task_path_array']
+        task_id = request.json['task_id']
+        user_id = request.json['user_id']
+
+        # Decode the base64 data URI
+        file_content = base64.b64decode(file_data['uri'].split(',')[1])
+
+        # Generate a unique filename
+        filename = file_data['name']
+
+        upload_file_in_storage(file_content, filename, task_path_array, task_id, user_id, BUCKET)
+
+        return 'File uploaded successfully', 200
+    except Exception as e:
+        print(f'Error uploading file: {str(e)}')
+        return f'Error uploading file: {str(e)}', 500
+
+@app.route('/deletefile', methods=['POST'])
+def delete_file():
+    try:
+        # Check if 'file' exists in the request
+        if 'filename' not in request.json:
+            return 'No file provided in the request', 400
+        
+        if 'task_path_array' not in request.json:
+            return 'No task path provided in the request', 400
+        
+        if 'task_id' not in request.json:
+            return 'No task id provided in the request', 400
+        
+        if 'user_id' not in request.json:
+            return 'No user id provided', 400
+
+        # Extract file data from the request
+        filename = request.json['filename']
+        task_path_array = request.json['task_path_array']
+        task_id = request.json['task_id']
+        user_id = request.json['user_id']
+
+        delete_file_in_storage(filename, task_path_array, task_id, user_id, BUCKET)
+
+        return 'File uploaded successfully', 200
+    except Exception as e:
+        print(f'Error deleting file: {str(e)}')
+        return f'Error uploading file: {str(e)}', 500
     
 ####################################################################
 

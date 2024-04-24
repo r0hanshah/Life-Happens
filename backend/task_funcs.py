@@ -2,6 +2,10 @@ from firebase_admin import firestore
 from firebase_admin import storage
 import json
 
+import tempfile
+import base64
+import os
+
 
 # Firestore functions 
 
@@ -80,23 +84,70 @@ def delete_task_in_firestore(taskId, creatorId, taskPathArray, db):
 # Firebase Storage functions
 
 
-# def upload_file_in_storage(task_path_array, file_path, bucket):
-#     try:
+def upload_file_in_storage(file_content, filename, task_path_array, task_id, user_id, bucket):
+    try:
+        print("Uploading file to task")
+        file_path = f'Users/{user_id}/'
 
-#         task_ref = db.collection('User').document(creatorId).collection('Tasks')
+        # Create the path to the Task
+        for taskId in task_path_array:
+            file_path += f'{taskId}/'
 
-#         # Create the path to the Task
-#         for taskId in taskPathArray:
-#             task_ref = task_ref.document(taskId).collection('Tasks')
+        file_path += f'{task_id}/{filename}'
 
-#         # Add current task id
-#         task_ref = task_ref.document(taskId)
+        # Save the decoded file content to a temporary file
+        # temp_file_path = f'./tmp/{user_id}_{filename}'
 
-#         task_ref.delete()
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(file_content)
+            temp_file_path = temp_file.name
 
-#         user_ref = db.collection('User').document(creatorId)
+        # with open(temp_file_path, 'wb') as temp_file:
+        #     temp_file.write(file_content)
 
-#         user_ref.update({f"TaskTreeRoots.{taskId}": firestore.DELETE_FIELD})
+        # Upload the file to Firebase Storage
+        blob = bucket.blob(file_path)
+        blob.upload_from_filename(temp_file_path)
 
-#     except Exception as e:
-#         print(f"Error creating document: {e}")
+        # Delete the temporary file
+        os.remove(temp_file_path)
+
+    except Exception as e:
+        print(f"Error creating document: {e}")
+
+def delete_file_in_storage(filename, task_path_array, task_id, user_id, bucket):
+    try:
+        print("Uploading file to task")
+        file_path = f'Users/{user_id}/'
+
+        # Create the path to the Task
+        for taskId in task_path_array:
+            file_path += f'{taskId}/'
+
+        file_path += f'{task_id}/{filename}'
+
+        # Delete the file to Firebase Storage
+        blob = bucket.blob(file_path)
+        blob.delete()
+
+        # Delete the temporary file
+
+    except Exception as e:
+        print(f"Error creating document: {e}")
+
+def get_files_from_storage(bucket, file_path):
+    try:
+        # List all files in the storage bucket
+        blob = bucket.blob(file_path)
+
+        file_info = {
+            'name': blob.name,
+            'size': blob.size,
+            'type': blob.content_type,
+            'url': blob.generate_signed_url(expiration=3600)  # Generate a signed URL for downloading the file
+        }
+
+        return file_info
+    
+    except Exception as e:
+        print(f"Error retrieving files from Firebase Storage: {str(e)}")

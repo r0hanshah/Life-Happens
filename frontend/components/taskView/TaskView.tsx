@@ -180,10 +180,18 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
 
       if (result && result.assets) {
+        const doc = result.assets.at(0)!
+        const file = {
+            name: doc.name,
+            size: doc.size,
+            type: doc.mimeType!,
+            uri: doc.uri,
+        }
         // Add the selected file to the files array
         setFiles([...files, result.assets.at(0)!]);
         task.unobservedFiles = [...files, result.assets.at(0)!]
         mainController.saveEditToTask(task)
+        mainController.uploadFileToTask(task, file)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -195,6 +203,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     task.unobservedFiles = newFiles
     mainController.saveEditToTask(task)
     setFiles(newFiles)
+    mainController.deleteFileFromTask(task, doc.name)
   }
 
   // For adding AI observed files
@@ -207,15 +216,19 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
       if (result && result.assets) {
 
-        const fileName = result.assets.at(0)!.name;
-
-
-        console.log(result.assets.at(0)!)
+        const doc = result.assets.at(0)!
+        const file = {
+            name: doc.name,
+            size: doc.size,
+            type: doc.mimeType!,
+            uri: doc.uri,
+        }
 
         // Add the selected file to the files array
         setObservedFiles([...observedFiles, result.assets.at(0)!]);
         task.contextFiles = [...observedFiles, result.assets.at(0)!]
         mainController.saveEditToTask(task)
+        mainController.uploadFileToTask(task, file)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -227,6 +240,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     task.contextFiles = newFiles
     mainController.saveEditToTask(task)
     setObservedFiles(newFiles)
+    mainController.deleteFileFromTask(task, doc.name)
   }
 
   // For Creating subtask
@@ -767,7 +781,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
                                     {files.map((item, index) => (
-                                    <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
                                         <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
@@ -817,7 +831,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
                                     {observedFiles.map((item, index) => (
-                                    <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
                                         <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
