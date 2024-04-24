@@ -3,6 +3,9 @@ import TaskModel from "../../models/TaskModel";
 
 import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
+import UserModel from "../../models/UserModel";
+
+import { addTask } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -12,6 +15,7 @@ class MainController {
     private tasksArray: PropertyListener<TaskModel[]> = new PropertyListener<TaskModel[]>([]);
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
+    private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
 
     // Private constructor to prevent instantiation from outside
     private constructor() {
@@ -27,6 +31,16 @@ class MainController {
     }
   
     // Other methods and properties can be added as needed
+    // User functions
+    public getUser(): PropertyListener<UserModel | null> {
+      return this.user;
+    }
+
+    // Method to increase the counter value
+    public setUser(user: UserModel | null): void {
+        this.user.setValue(user)
+    }
+
     // Getter for the counter property
     public getSelectedTask(): PropertyListener<TaskModel | null> {
         return this.selectedTask;

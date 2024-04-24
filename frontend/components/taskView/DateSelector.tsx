@@ -42,7 +42,7 @@ const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, m
       }
       updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
       updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
-    }, [task])
+    }, [task, task.endDate, task.startDate])
   
     const handleContainerClick = () => {
       setIsSquareVisible(!isSquareVisible);
@@ -93,6 +93,12 @@ const DateSelector = ({task, modStartDate, updateFunctions} : {task:TaskModel, m
       {
         const date = new Date(year, month-1, day)
         setSelectedDate(date)
+
+        if (modStartDate)
+        {
+          const diff = task.endDate.getTime() - task.startDate.getTime()
+          task.endDate = new Date(date.getTime() + diff)
+        }
 
         const dayOfWeek = daysOfWeek[date.getDay()];
         const monthName = months[date.getMonth()];
