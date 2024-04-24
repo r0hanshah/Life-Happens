@@ -5,11 +5,7 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
-
-
-
-
-
+from add_task import add_task_to_firestore
 
 
 
@@ -99,6 +95,20 @@ def get_task_by_user_and_task_id(user_id, task_id):
         return None
 
 # Route to get a specific task for a user
+@app.route('/addTask', methods=['POST'])
+def add_task():
+    try:
+        req_data = request.json
+        task_data = req_data.get('task')
+        task_path_array = req_data.get('task_path_array')
+
+        add_task_to_firestore(task_data, task_path_array, db)
+        
+        return jsonify({'message': 'Task added successfully'}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/user/<user_id>/task/<task_id>', methods=['GET'])
 def get_user_task(user_id, task_id):
     task = get_task_by_user_and_task_id(user_id, task_id)
@@ -106,33 +116,6 @@ def get_user_task(user_id, task_id):
         return jsonify(task), 200
     else:
         return jsonify({'error': 'Task not found'}), 404
-    
-
-
-
-
-# Assume a function in your model (TaskModel.py or similar)
-def add_task_to_firestore(user_id, task_data):
-    # Add the task to Firestore under the user's tasks collection
-    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
-    task_data['due_date'] = datetime.strptime(task_data['due_date'], '%Y-%m-%d').date() #not sure if this line works to get the due date
-    task_ref.set(task_data)
-
-    schedule_due_task_reminder(user_id, task_ref.id, task_data['due_date']) #calling the email notification scheduler for task
-
-    return task_ref.id  # Returns the newly created task's ID
-
-
-
-@app.route('/user/<user_id>/task', methods=['POST'])
-def add_task(user_id):
-    try:
-        task_data = request.json
-        new_task_id = add_task_to_firestore(user_id, task_data)
-        return jsonify({'message': 'Task added successfully', 'taskId': new_task_id}), 201
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify({'error': str(e)}), 500
     
 
 @app.route('/user', methods=['POST'])

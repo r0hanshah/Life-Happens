@@ -308,7 +308,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
             <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
             onPress={() => {
               if(controller.getSelectedTask().getValue() === null)
-                controller.createNewTask("TODO")
+                controller.createNewTask()
             }}
             >
               <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
