@@ -7,6 +7,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from add_task import add_task_to_firestore
 
+
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
     'storageBucket': 'lifehappens-293da.appspot.com'
@@ -116,7 +117,6 @@ def get_user_task(user_id, task_id):
         return jsonify(task), 200
     else:
         return jsonify({'error': 'Task not found'}), 404
-
 
 @app.route('/user', methods=['POST'])
 def add_user():

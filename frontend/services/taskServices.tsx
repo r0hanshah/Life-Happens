@@ -1,5 +1,7 @@
 // taskServices.tsx
 
+import TaskModel from "../models/TaskModel";
+
 // No need to import fetch as it's a global function available in React Native
 
 // types
@@ -16,19 +18,16 @@ type UserData = {
 };
 
 
-type TaskData = {
+export type TaskData = {
+  Color:string,
   Ancestors: string[],
   Children: string[],
-  Content: {
-      field1: string,
-      field2: string
-  },
+  Content: {},
   ContextFiles: string[],
+  UnobservedFiles: string[],
   ContextText: string,
   CreatorID: string,
-  DueDate: string,
   EndDate: string,
-  ExpectedTimeOfCompletion: number,
   ExtraMedia: string[],
   ID: string,
   InvitedUsers: string[],
@@ -37,7 +36,7 @@ type TaskData = {
   StartDate: string,
   Title: string,
   Users: string[],
-  isRoot: boolean
+  IsRoot: boolean
 };
 
 const BASE_URL = 'http://127.0.0.1:5000'; // Make sure to use the correct URL for your backend.
@@ -47,7 +46,8 @@ export const getTask = async (userId: string, taskId:string) => {
     const response = await fetch(`${BASE_URL}/user/${userId}/task/${taskId}`);
     const task = await response.json();
     if (response.ok) {
-        console.log('Task:', task);
+      console.log('Task:', task);
+      // const returnTask = new TaskModel(task.get('ID'))
       return task;
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
@@ -61,14 +61,21 @@ export const getTask = async (userId: string, taskId:string) => {
 
 // taskServices.tsx
 
-export const addTask = async (userId: string, taskData: TaskData) => {
+export const addTask = async (taskData: TaskData, taskPathArray:string[]) => {
   try {
-    const response = await fetch(`${BASE_URL}/user/${userId}/task`, {
+    console.log(JSON.stringify({
+      'task': JSON.stringify(taskData),
+      'task_path_array':taskPathArray
+    }))
+    const response = await fetch(`${BASE_URL}/addTask`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(taskData),
+      body: JSON.stringify({
+        'task': JSON.stringify(taskData),
+        'task_path_array':taskPathArray
+      }),
     });
     const result = await response.json();
     if (response.ok) {

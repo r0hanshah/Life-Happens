@@ -11,7 +11,7 @@ import ButtonTest from './components/buttonTest/ButtonTest'; // Import the Butto
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('ButtonTest');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Login');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');

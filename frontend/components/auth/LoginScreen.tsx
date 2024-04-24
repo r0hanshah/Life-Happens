@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import NavBar from "../landing/NavBar";
 
+import AuthController from '../../controllers/auth/authController';
 
 interface LoginScreenProps {
   navigateToSignUp: () => void;
@@ -14,6 +15,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const controller = new AuthController()
 
 
   const handleLogin = async () => {
@@ -75,7 +77,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
                    value={password} />
 
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} onPress={()=>{controller.handleLogin(email, password, navigateToMain)}}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signInWithGoogle}>

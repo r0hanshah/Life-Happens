@@ -35,7 +35,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut}) => {
                     <View style={{flexDirection:'row', width:'100%', alignItems:'flex-start'}}>
                         <View style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50, marginRight:10, marginBottom:30}}
                         >
-                            <Text style={{color:'white', fontSize:40}}>D</Text>
+                            <Text style={{color:'white', fontSize:40}}>{user.name.at(0)}</Text>
                         </View>
                     <View>
                         <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:40, marginBottom:5}}>{user.name}</Text>

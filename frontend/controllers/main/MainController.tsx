@@ -3,6 +3,9 @@ import TaskModel from "../../models/TaskModel";
 
 import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
+import UserModel from "../../models/UserModel";
+
+import { addTask, TaskData } from "../../services/taskServices";
 
 // This will control anything that happens inside Main view
 
@@ -12,6 +15,7 @@ class MainController {
     private tasksArray: PropertyListener<TaskModel[]> = new PropertyListener<TaskModel[]>([]);
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
+    private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
 
     // Private constructor to prevent instantiation from outside
     private constructor() {
@@ -27,6 +31,16 @@ class MainController {
     }
   
     // Other methods and properties can be added as needed
+    // User functions
+    public getUser(): PropertyListener<UserModel | null> {
+      return this.user;
+    }
+
+    // Method to increase the counter value
+    public setUser(user: UserModel | null): void {
+        this.user.setValue(user)
+    }
+
     // Getter for the counter property
     public getSelectedTask(): PropertyListener<TaskModel | null> {
         return this.selectedTask;
@@ -140,12 +154,18 @@ class MainController {
       return color;
     };
 
-    public createNewTask(creatorId:string):TaskModel
+    public createNewTask():TaskModel
     {
+      const user = this.user.getValue()
+      if (user == null) {throw Error("User is missing")}
       const id = uuid.v4().toString()
       const currentDate = new Date();
       const oneHourAhead = new Date(currentDate.getTime() + 3600000)
-      const newRootTask = new TaskModel(id, creatorId, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
+
+      const newRootTask = new TaskModel(id, user.id, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
+
+      this.storeTaskOnFirestore(newRootTask)
+
       this.setSelectedTask(newRootTask)
       this.setTasks([...this.tasksArray.getValue(), newRootTask])
       return newRootTask
@@ -158,6 +178,32 @@ class MainController {
 
     public setReRender(bool: boolean): void {
         this.reRender.setValue(bool)
+    }
+
+    private storeTaskOnFirestore(task:TaskModel)
+    {
+      const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      const taskData:TaskData = {
+        Color:task.color,
+        Ancestors: task.ancestors.map(task => task.id),
+        Children: task.children.map(task => task.id),
+        Content: task.content,
+        ContextFiles: task.contextFiles.map(doc => doc.name),
+        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
+        ContextText: task.contextText,
+        CreatorID: task.creatorId,
+        EndDate: task.endDate.toISOString(),
+        ExtraMedia: task.extraMedia,
+        ID: task.id,
+        InvitedUsers: task.invitedUsers,
+        IsMovable: task.isMovable,
+        Notes: task.notes,
+        StartDate: task.startDate.toISOString(),
+        Title: task.title,
+        Users: task.users.map(user => user.id),
+        IsRoot: task.isRoot
+      }
+      addTask(taskData, taskPathArray)
     }
   }
 

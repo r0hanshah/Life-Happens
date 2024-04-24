@@ -38,32 +38,7 @@ parent1.children.push(childOfParent1)
 const Main: React.FC<Tasks> = ({signOut}) => {
 
   const windowWidth = useWindowDimensions().width;
-  const tempUser = new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu", [
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-    [false,false,false,false,false,false,false],
-  ])
+  const tempUser = new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu")
 
   const controller = MainController.getInstance();
   var selectedTask = controller.getSelectedTask();
@@ -91,33 +66,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const loadRootTasks = () =>
   {
     // Load based off the month
-    if( currentMonthAndYear == "March 2024")
-    {
-      const taskArray =  [
-        parent1, 
-        parent,
-        new TaskModel("123", "dp", "123", [], [], "One More Test", "#00ff00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("124", "dp", "124", [], [], "2 Test", "#0000ff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("125", "dp", "125", [], [], "3 Test", "#ff7a00", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("126", "dp", "126", [], [], "4 Test", "#ff00e5", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("127", "dp", "127", [], [], "5 Test", "#a100bb", [], [], "2024-03-12T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("128", "dp", "128", [], [], "6 Test", "#ff0000", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("129", "dp", "129", [], [], "7 Test", "#ff4400", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("130", "dp", "130", [], [], "8 Test", "#ffffff", [], [], "2024-03-22T19:54:02+0000", "2024-03-08T20:54:02+0000", false, {}, "", [], true, "", []),
-        ]
-
-      controller.setTasks(taskArray)
-      setRootTasks(taskArray)
-    }
-    else
-    {
-      const taskArray = [
-        new TaskModel("131", "dp", "131", [], [], "9 Test", "#2ef5e9", [], [], "2024-04-22T19:54:02+0000", "2024-04-23T20:54:02+0000", false, {}, "", [], true, "", []),
-        new TaskModel("141", "dp", "141", [], [], "10 Test", "#fef5e0", [], [], "2024-04-27T19:54:02+0000", "2024-04-28T20:54:02+0000", false, {}, "", [], true, "", [])
-    ]
-      controller.setTasks(taskArray)
-      setRootTasks(taskArray)
-    }
+    //TODO: Filter out the tasks that match the month and year
   }
 
   // Animation
@@ -322,7 +271,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={tempUser} onPress={()=>{setProfileClicked(false)}} signOut={signOut}/>}
+                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut}/>}
 
             </Animated.View>
           
@@ -347,7 +296,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               controller.setSelectedTask(null)
             }}
             >
-              <Text style={{color:'white', fontSize:40}}>D</Text>
+              <Text style={{color:'white', fontSize:40}}>{controller.getUser().getValue()?.name.at(0)}</Text>
             </TouchableOpacity>
           </View>          
           
@@ -359,7 +308,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
             <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
             onPress={() => {
               if(controller.getSelectedTask().getValue() === null)
-                controller.createNewTask("TODO")
+                controller.createNewTask()
             }}
             >
               <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
