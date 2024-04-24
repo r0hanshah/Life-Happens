@@ -265,7 +265,7 @@ def schedule_due_task_reminder(user_id, task_id, due_date, start_date):
 
         # Schedule due date reminder
         scheduler = BackgroundScheduler()
-        scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date, args=[user_id, task_id])
+        scheduler.add_job(send_due_task_email, 'date', run_date=reminder_date2, args=[user_id, task_id])
         scheduler.start()
 
         print('Task reminder scheduled successfully.')
