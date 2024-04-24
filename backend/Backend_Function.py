@@ -14,6 +14,7 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
+
 firebaseConfig={
   'apiKey': "AIzaSyBgDOWWLjlJXgWRtN_hkBk4InUCr6QqHng",
   'authDomain': "lifehappens-293da.firebaseapp.com",
