@@ -16,7 +16,7 @@ const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLog
             <View style={styles.contentContainer}>
                 <View style={styles.topContainer}>
                     <Text style={styles.title}>Life Happens.</Text>
-                    <Text style={styles.h2}>Start getting your life organized today</Text>
+                    <Text style={styles.h3}>Start getting your life organized today</Text>
                 </View>
                 <View style={styles.middleContainer}>
                     <View style={styles.textContainer}>
@@ -33,13 +33,17 @@ const LandingScreen: React.FC<LandingProps> = ({ navigateToSignUp, navigateToLog
                             subtasks. David Vera set up and created the functions for the database and API that stores all user content.
                             Rohan Shah is the one that set up the development infrastructure and contributed to connecting
                             the database and frontend together. Lastly, Joseph Malegni implemented the rest of the frontend
-                            after the calendar page.
+                            after the main page.
                         </Text>
                     </View>
 
                     <View style={styles.textContainer}>
                         <Text style={styles.h1}>How to Use Life Happens:</Text>
-                        <Text style={styles.h2}>Lorem Ipsum Dolor.
+                        <Text style={styles.h2}>Click the Get Started button below to create an account, From there you will
+                            be taken to your Main page with a calendar. Here is where all your tasks and subtasks reside.
+                            To create new task, simply click the + button in the lower right corner of the page. Fill out
+                            the start and end dates, any additional notes or media, and finally enter the context prompt
+                            for the AI to process. Great! You have now successfully started your journey with Life Happens.
                         </Text>
                     </View>
                 </View>
@@ -85,11 +89,19 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
         marginTop: 8,
         color: '#FFFFFF',
+        flex: 1, // Add flex: 1 to ensure equal height
+        alignSelf: 'stretch', // Align the h1 elements to stretch vertically
+        textAlign: 'center',
     },
     h2: {
         fontSize: 18,
         fontWeight: 'normal',
-        marginTop: 8,
+        color: '#FFFFFF',
+        flex: 4,
+     },
+    h3: {
+        fontSize: 18,
+        fontWeight: 'normal',
         color: '#FFFFFF',
     },
     button: {
@@ -117,7 +129,7 @@ const styles = StyleSheet.create({
         flex: 3,
         flexDirection: 'row',
         justifyContent: 'space-around',
-        alignItems: 'center',
+        alignItems: 'stretch',
         marginHorizontal: 40, // Added margin to push content to the left
         padding: 20,
 
