@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../landing/NavBar";
 
@@ -58,7 +58,18 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigateToSignUp, navigateT
 
   return (
       <View style={styles.container}>
-        <NavBar navigateToLanding={navigateToLanding} navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} />
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 50,
+          width: 50,
+          backgroundColor: '#007AFF',
+          borderRadius: 50,
+        }}
+                          onPress={navigateToLanding}
+        >
+          <Image source={require('../../assets/chev_white.png')} style={{width:20, height:20, transform:[{rotate: '90deg'}]}}></Image>
+        </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
             style={styles.input}
