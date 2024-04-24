@@ -1,5 +1,6 @@
 import { DocumentPickerAsset } from "expo-document-picker"
 import uuid from 'react-native-uuid';
+import UserModel from "./UserModel";
 
 class TaskModel
 {

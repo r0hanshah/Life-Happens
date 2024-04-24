@@ -19,16 +19,12 @@ type UserData = {
 type TaskData = {
   Ancestors: string[],
   Children: string[],
-  Content: {
-      field1: string,
-      field2: string
-  },
+  Content: {},
   ContextFiles: string[],
+  UnobservedFiles: string[],
   ContextText: string,
   CreatorID: string,
-  DueDate: string,
   EndDate: string,
-  ExpectedTimeOfCompletion: number,
   ExtraMedia: string[],
   ID: string,
   InvitedUsers: string[],
@@ -37,7 +33,7 @@ type TaskData = {
   StartDate: string,
   Title: string,
   Users: string[],
-  isRoot: boolean
+  IsRoot: boolean
 };
 
 const BASE_URL = 'http://127.0.0.1:5000'; // Make sure to use the correct URL for your backend.

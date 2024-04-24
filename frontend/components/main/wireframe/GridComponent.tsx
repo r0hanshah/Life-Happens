@@ -114,12 +114,13 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
 
           // Draw horizontal lines
-          var columnOffset:number = lColumn + (lColumn == pColumn ? 1 : 0)
+          var columnOffset:number = lColumn + (lColumn == pColumn ? 0 : 0)
           while(lColumn < pColumn ? columnOffset < pColumn : columnOffset >= pColumn)
           {
-            lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
-
+            
             if(pColumn == columnOffset && pColumn <= lColumn || pColumn - 1 == columnOffset && pColumn > lColumn) { break }
+
+            lColumn < pColumn  ? columnOffset += 1 : columnOffset -= 1;
 
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}h${columnOffset}`))
             {

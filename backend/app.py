@@ -68,7 +68,7 @@ def login():
     try:
         user = auth.sign_in_with_email_and_password(email, password)
         print(user)
-        return jsonify({'message': 'Login successful'})
+        return jsonify({'user_id': user['localId']})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

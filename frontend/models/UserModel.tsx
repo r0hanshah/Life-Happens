@@ -1,6 +1,33 @@
 class UserModel
 {
-    constructor (id:string, name:string, profilePhotoURL:string, email:string, restPeriods:boolean[][] ) // TODO: Add other attributes
+    constructor (id:string, name:string, profilePhotoURL:string, email:string, restPeriods:boolean[][] = 
+        [
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+            [false,false,false,false,false,false,false],
+          ]
+     ) // TODO: Add other attributes
     {
         this.id = id
         this.name = name
