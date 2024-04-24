@@ -39,6 +39,7 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
       while(q.length > 0)
       {
         q[0].color = color
+        MainController.getInstance().saveEditToTask(q[0])
         for(const subTask of q[0].children)
         {
           q.push(subTask)

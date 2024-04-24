@@ -81,17 +81,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       setUrls([...urls, urlText]);
       task.extraMedia = [...urls, urlText]
       setUrlText('');
+      mainController.saveEditToTask(task)
     } else {
       alert('Invalid URL');
     }
   };
 
   const handleDeleteMedia = (urlToDelete:string) => {
+    const filteredUrls = urls.filter(url => url !== urlToDelete)
     setUrls(urls.filter(url => url !== urlToDelete))
+    task.extraMedia = filteredUrls
     if (urlsMetadata)
     {
         setUrlsMetadata(urlsMetadata!.filter(data => data.url !== urlToDelete))
     }
+    mainController.saveEditToTask(task)
   }
 
   const fetchMetadata = async (url:string) => {
@@ -145,6 +149,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setText(newText);
     task.notes = newText.valueOf().toString()
+    mainController.saveEditToTask(task)
   };
 
   const onSubmitEditing = () => {
@@ -158,6 +163,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeContext = (newText: React.SetStateAction<string>) => {
     setContext(newText);
     task.contextText = newText.valueOf().toString()
+    mainController.saveEditToTask(task)
   };
 
   const onSubmitContextEditing = () => {
@@ -174,9 +180,18 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
 
       if (result && result.assets) {
+        const doc = result.assets.at(0)!
+        const file = {
+            name: doc.name,
+            size: doc.size,
+            type: doc.mimeType!,
+            uri: doc.uri,
+        }
         // Add the selected file to the files array
         setFiles([...files, result.assets.at(0)!]);
         task.unobservedFiles = [...files, result.assets.at(0)!]
+        mainController.saveEditToTask(task)
+        mainController.uploadFileToTask(task, file)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -185,7 +200,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const handleRemoveFile = (doc:DocumentPicker.DocumentPickerAsset) => {
     const newFiles = files.filter(document => document.uri !== doc.uri)
+    task.unobservedFiles = newFiles
+    mainController.saveEditToTask(task)
     setFiles(newFiles)
+    mainController.deleteFileFromTask(task, doc.name)
   }
 
   // For adding AI observed files
@@ -197,9 +215,20 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
       const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
 
       if (result && result.assets) {
+
+        const doc = result.assets.at(0)!
+        const file = {
+            name: doc.name,
+            size: doc.size,
+            type: doc.mimeType!,
+            uri: doc.uri,
+        }
+
         // Add the selected file to the files array
         setObservedFiles([...observedFiles, result.assets.at(0)!]);
         task.contextFiles = [...observedFiles, result.assets.at(0)!]
+        mainController.saveEditToTask(task)
+        mainController.uploadFileToTask(task, file)
       }
     } catch (error) {
       console.log('Error selecting file:', error);
@@ -208,7 +237,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const handleRemoveContextFile = (doc:DocumentPicker.DocumentPickerAsset) => {
     const newFiles = observedFiles.filter(document => document.uri !== doc.uri)
+    task.contextFiles = newFiles
+    mainController.saveEditToTask(task)
     setObservedFiles(newFiles)
+    mainController.deleteFileFromTask(task, doc.name)
   }
 
   // For Creating subtask
@@ -226,6 +258,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const handleDeleteTask = () => {
     // If task is root, then remove it from root task list in main controller
     const mainController = MainController.getInstance()
+    mainController.deleteTaskOnFirestore(task)
     if(task.isRoot)
     {
         mainController.deleteRootTask(task);
@@ -238,7 +271,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
         parent.children = parent.children.filter(inTask => inTask.id !== task.id);
         mainController.setSelectedTask(null)
     }
-
     
   }
 
@@ -284,7 +316,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <View style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', alignItems:'center', width:'100%', height:50}}>
                                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
                                         <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                                        <Text style={{color:'white'}}>{task.title}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={{color:'white', width: 200, overflow:'hidden'}}>{task.title}</Text>
                                     </View>
                                     <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
                                     <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
@@ -295,7 +327,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                     </View>
                                     <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                                    <View style={[{height:320, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-318}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
+                                    <View style={[{height:420, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-418}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
                                 </View>
 
                                 {(selectedTask && selectedTask.id == task.id) && 
@@ -310,8 +342,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             <Text style={{color:'gray'}}>Start Date</Text>
                                         </View>
                                         <View style={{flexDirection:'row'}}>
-                                            <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                            <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                         </View>
                                         
                                         {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
@@ -327,8 +359,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         <Text style={{color:'gray'}}>End Date</Text>
                                         </View>
                                         <View style={{flexDirection:'row'}}>
-                                            <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                            <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                            <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                            <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                         </View>
                                         {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                                     </View>
@@ -364,7 +396,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             />
                                             <Text style={{color:'gray'}}>Is Movable?</Text>
                                             </View>
-                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                            <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable);mainController.saveEditToTask(task)}}>
                                                 <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -513,6 +545,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeTitle = (newText: React.SetStateAction<string>) => {
     setTitle(newText);
     task.title = newText.toString()
+    mainController.saveEditToTask(task)
   }
 
   // For changes in task
@@ -546,7 +579,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                     {/* Content */}
                     <View style={{width:'80%', alignItems: isLeft ? 'flex-start' : 'flex-end'}}>
-                        <Text style={{color: 'white'}}>Created by: Daniel Parra</Text> {/* Get creator name */}
+                        <Text style={{color: 'white'}}>Created by: {mainController.getUser().getValue()?.name}</Text> {/* Get creator name */}
                         <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}}>
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
@@ -608,8 +641,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                    <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                    <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                 </View>
                                 
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
@@ -625,8 +658,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
-                                    <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></DateSelector>
-                                    <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]}></TimeSelector>
+                                    <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></DateSelector>
+                                    <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={true}></TimeSelector>
                                 </View>
                                 {/* <Text style={{color:'gray', marginHorizontal: 10}}>Monday, April 27, 2024 | 4:00 PM EST</Text> */}
                             </View>
@@ -662,7 +695,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     />
                                     <Text style={{color:'gray'}}>Is Movable?</Text>
                                     </View>
-                                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
+                                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable);mainController.saveEditToTask(task)}}>
                                         <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -748,7 +781,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
                                     {files.map((item, index) => (
-                                    <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
                                         <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
@@ -798,7 +831,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
                                     {observedFiles.map((item, index) => (
-                                    <View style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
                                         <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
                                         <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
                                         <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
