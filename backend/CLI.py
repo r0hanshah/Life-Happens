@@ -286,9 +286,7 @@ def sign_up():
 
     if user_id:
         try:
-            weekly_ai_times = input(
-                "Enter your weekly AI times allowed (format: 'Monday:StartTime:::EndTime, Tuesday:StartTime:::EndTime, ...'): ")
-            weekly_ai_times_dict = weekly_ai_times
+            weekly_ai_times_dict = 2
 
             # Create user data
             user_data = {

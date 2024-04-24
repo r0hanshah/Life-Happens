@@ -8,7 +8,6 @@ from firebase_admin import firestore
 from add_task import add_task_to_firestore
 
 
-
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
     'storageBucket': 'lifehappens-293da.appspot.com'
@@ -30,8 +29,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
 mail = Mail(app)
 
 
-
-#user passwords are all 123456
+# user passwords are all 123456
 # Signup route
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -44,7 +42,7 @@ def signup():
         msg = Message('Welcome to Life Happens!', recipients=[email])
         msg.body = 'Thank you for signing up! We hope you enjoy using our app.'
         mail.send(msg)
-        
+
         print(user)
 
         # find way to print out user id, then store ids in doc
@@ -53,6 +51,7 @@ def signup():
         print(str(e))
         print(request.data.decode())
         return jsonify({'error': str(e)}), 400
+
 
 # Login route
 @app.route('/login', methods=['POST'])
@@ -68,7 +67,8 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-# Dummy data route  
+
+# Dummy data route
 @app.route('/data')
 def get_time():
     # Returning dummy data
@@ -78,7 +78,6 @@ def get_time():
         "Date": 'x',
         "programming": "python"
     }
-
 
 
 def get_task_by_user_and_task_id(user_id, task_id):
@@ -94,6 +93,7 @@ def get_task_by_user_and_task_id(user_id, task_id):
         print(f"An error occurred: {e}")
         return None
 
+
 # Route to get a specific task for a user
 @app.route('/addTask', methods=['POST'])
 def add_task():
@@ -103,11 +103,12 @@ def add_task():
         task_path_array = req_data.get('task_path_array')
 
         add_task_to_firestore(task_data, task_path_array, db)
-        
+
         return jsonify({'message': 'Task added successfully'}), 201
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/user/<user_id>/task/<task_id>', methods=['GET'])
 def get_user_task(user_id, task_id):
@@ -116,17 +117,16 @@ def get_user_task(user_id, task_id):
         return jsonify(task), 200
     else:
         return jsonify({'error': 'Task not found'}), 404
-    
 
 @app.route('/user', methods=['POST'])
 def add_user():
     try:
         # Parse request data
         user_data = request.json
-        
+
         # Generate a new document reference with a random unique ID
         new_user_ref = db.collection('User').document()
-        
+
         # Set the new user data
         new_user_ref.set(user_data)
 
@@ -148,6 +148,7 @@ def delete_task(user_id, task_id):
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/user/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
     try:
@@ -167,7 +168,6 @@ def delete_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 
-
 # AI backend
 @app.route('/generate', methods=['POST'])
 def generateTasks():
@@ -180,8 +180,8 @@ def generateTasks():
     pre_existing_subtasks = data.get('subtasks')
     file_paths = data.get('files')
 
-    return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks, file_paths)
-
+    return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks,
+                                        file_paths)
 
 
 @app.route('/user/<user_id>/task/<task_id>', methods=['PUT'])
@@ -194,7 +194,7 @@ def update_task(user_id, task_id):
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
-    
+
 
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
@@ -215,10 +215,10 @@ def update_user(user_id):
     try:
         # Parse request data
         user_updates = request.json
-        
+
         # Get a reference to the existing user document
         user_ref = db.collection('User').document(user_id)
-        
+
         # Update the user document with the new data
         user_ref.update(user_updates)
 
@@ -227,11 +227,11 @@ def update_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 
-
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 
-#this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
+
+# this will run every time a task is created and schedule the email notifications for 24 hrs before the due date
 def schedule_due_task_reminder(user_id, task_id, due_date):
     try:
         # Calculate reminder date (24 hours before due date)
@@ -246,7 +246,8 @@ def schedule_due_task_reminder(user_id, task_id, due_date):
     except Exception as e:
         print(f"An error occurred while scheduling task reminder: {e}")
 
-#this function is called automatically by the scheduler
+
+# this function is called automatically by the scheduler
 def send_due_task_email(user_id, task_id):
     try:
         # Retrieve user's email and task name from Firestore
@@ -263,6 +264,7 @@ def send_due_task_email(user_id, task_id):
         print('Task reminder email sent successfully.')
     except Exception as e:
         print(f"An error occurred while sending task reminder email: {e}")
+
 
 # Run Flask app
 if __name__ == '__main__':
