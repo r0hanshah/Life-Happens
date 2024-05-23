@@ -574,26 +574,36 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center', zIndex:5}}>
                         <ColorSelector task={task} isLeft={isLeft} updateFunctions={[]}/>
-                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color, zIndex:-1}}></View>}
                     </View>
 
                     {/* Content */}
                     <View style={{width:'80%', alignItems: isLeft ? 'flex-start' : 'flex-end'}}>
                         <Text style={{color: 'white'}}>Created by: {mainController.getUser().getValue()?.name}</Text> {/* Get creator name */}
-                        <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}}>
+                        <View style={[{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
-
                                 <TextInput 
-                                style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right', textAlignVertical:'bottom', minWidth:'50%', height: Math.max(50, (title.split('\n').length + Math.max(0, Math.ceil(title.replace(/\s+/g, '').length / 9)) - 1) * 50)}}
+                                style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right', textAlignVertical:'bottom', minWidth:'70%', height: Math.max(50, (title.split('\n').length + Math.max(0, Math.ceil(title.replace(/\s+/g, '').length / 13)) - 1) * 50)}}
                                 scrollEnabled={false}
                                 onChangeText={onChangeTitle}
                                 value={title}
                                 multiline={true}
                                 placeholder='Task Title...'
                                 />
+                            </View>
+                            
+                            <View style={{flexDirection:'column'}}>
+                                {/*TODO: Generate this part of the task view*/}
+                                <View style={{flexDirection: 'row', paddingVertical: 10, alignItems:'center'}}>
+                                                                
+                                    <CircularProgressBar percentage={completion}></CircularProgressBar>
 
-                                <View style={{flexDirection: 'row', marginHorizontal: 20, height: 50, backgroundColor:'black', borderRadius: 30, borderColor: 'white', borderWidth: 2, alignItems:'center'}}>
+                                    <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
+
+                                </View>
+
+                                <View style={{flexDirection: 'row', height: 50, width:100, backgroundColor:'black', borderRadius: 30, borderColor: 'white', borderWidth: 2, alignItems:'center', justifyContent:'center'}}>
                                     
                                     <TouchableOpacity onPress={()=>{controller.setInvitedUsers(true)}}>
                                         <Image
@@ -612,19 +622,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     </TouchableOpacity>
                                     
                                 </View>
-
-
                             </View>
                             
-
-                            {/*TODO: Generate this part of the task view*/}
-                            <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
-                                
-                                <CircularProgressBar percentage={completion}></CircularProgressBar>
-
-                                <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
-
-                            </View>
                         </View>
                         {/* Display users/ancestor tasks */}
                         {!viewUsers && renderAncestors()}

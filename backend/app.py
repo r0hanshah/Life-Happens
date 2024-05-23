@@ -127,15 +127,15 @@ def add_task():
 
         add_task_to_firestore(task_data, task_path_array, db)
 
-# Assume a function in your model (TaskModel.py or similar)
-def add_task_to_firestore(user_id, task_data):
-    # Add the task to Firestore under the user's tasks collection
-    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
-    task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
-    task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
-    task_ref.set(task_data)
+        # Assume a function in your model (TaskModel.py or similar)
+        def add_task_to_firestore(user_id, task_data):
+            # Add the task to Firestore under the user's tasks collection
+            task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+            task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+            task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
+            task_ref.set(task_data)
 
-    schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
+        schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
         return jsonify({'message': 'Task added successfully'}), 201
     except Exception as e:
         print(f"An error occurred: {e}")
