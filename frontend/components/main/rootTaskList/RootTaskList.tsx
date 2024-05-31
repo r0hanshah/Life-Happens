@@ -2,16 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, useWindowDimensions } from 'react-native';
 import TaskModel from '../../../models/TaskModel';
 import ListItem from './ListItem';
+import moment from 'moment';
 
 interface RootTaskListProps
 {
     rootTasksMap: {[key:string]:TaskModel[]}
+    inMoment: moment.Moment;
 }
 
-const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) => 
+const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) => 
 {
 
     const windowWidth = useWindowDimensions().width;
+    const firstDayOfMonth = inMoment.clone().startOf('month');
+    const startDay = firstDayOfMonth.clone().startOf('week');
+    const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
 
     const renderLists = (rootTasksMap: {[key:string]:TaskModel[]}) => {
 
@@ -22,16 +27,24 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap }) =>
         var count = 0
         for(const task of rootTasksMap["1"])
         {
-            leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
-            count += 1;
+            const momentEndDate = moment(task.endDate)
+            if (momentEndDate.isBetween(startDay,endDay))
+            {
+                leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
+                count += 1;
+            }
         }
 
         // Right Bound Tasks
         count = 0
         for(const task of rootTasksMap["0"])
         {
-            rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
-            count += 1;
+            const momentEndDate = moment(task.endDate)
+            if (momentEndDate.isBefore(endDay) && momentEndDate.isAfter(firstDayOfMonth))
+            {
+                rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
+                count += 1;
+            }
         }
 
         const lists = [

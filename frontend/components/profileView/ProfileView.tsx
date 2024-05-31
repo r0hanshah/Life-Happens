@@ -14,9 +14,10 @@ interface ProfileViewProps {
   user: UserModel;
   onPress: () => void;
   signOut: () => void;
+  deletAccount: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut}) => {
+const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletAccount}) => {
 
     let [fontsLoaded] = useFonts({
         Inter_900Black
@@ -55,9 +56,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut}) => {
                         <Text style={{color:"red", fontSize:15, marginVertical:10}}>Sign Out</Text>
                         </TouchableOpacity>
                         
-
+                        <TouchableOpacity onPress={deletAccount}>
                         <Text style={{color:"red", fontSize:15, marginVertical:10}}>Delete Account</Text>
-                        
+                        </TouchableOpacity>
                         
                     </View>
                     

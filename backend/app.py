@@ -5,6 +5,7 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore, storage
+from firebase_admin import auth as TEMP_AUTH
 from task_funcs import add_task_to_firestore, edit_task_in_firestore,delete_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage, get_task_in_firestore
 
 import base64
@@ -317,6 +318,7 @@ def delete_user(user_id):
         # tasks = tasks_ref.stream()
         # for task in tasks:
         #     tasks_ref.document(task.id).delete()
+        TEMP_AUTH.delete_user(user_id)
 
         # Now, delete the user document
         user_ref = db.collection('Users').document(user_id)
