@@ -4,7 +4,6 @@ import os
 import docx
 import csv
 import pandas as pd
-
 import openpyxl
 
 def extract_text_from_pdf_byte_content(content):
@@ -31,7 +30,7 @@ def extract_text_from_pdf_byte_content(content):
         
         return text_content
     except Exception as e:
-            return f"Error: {e}"
+        return f"Error: {e}"
 
 def extract_text_from_excel(content):
     """
@@ -73,7 +72,6 @@ def extract_file_type(file_path):
     _, file_extension = os.path.splitext(file_path)
     return file_extension[1:].lower()
 
-
 def read_docx(file_path):
     doc = docx.Document(file_path)
     return "\n".join([para.text for para in doc.paragraphs])
@@ -102,20 +100,28 @@ def read_csv(file_path):
     df = pd.read_csv(file_path)
     return df.to_csv(index=False)
 
+def read_pdf(file_path):
+    with open(file_path, 'rb') as file:
+        return extract_text_from_pdf_byte_content(file.read())
+
 def read_file(file_path):
-    if file_path.endswith('.docx'):
+    file_extension = os.path.splitext(file_path)[1].lower()
+    if file_extension == '.docx':
         return read_docx(file_path)
-    elif file_path.endswith('.txt'):
+    elif file_extension == '.txt':
         return read_txt(file_path)
-    elif file_path.endswith('.py'):
+    elif file_extension == '.py':
         return read_python_file(file_path)
-    elif file_path.endswith('.java'):
+    elif file_extension == '.java':
         return read_java_file(file_path)
-    elif file_path.endswith('.cpp'):
+    elif file_extension == '.cpp':
         return read_cpp_file(file_path)
-    elif file_path.endswith('.hpp'):
+    elif file_extension == '.hpp':
         return read_hpp_file(file_path)
-    elif file_path.endswith('.csv'):
+    elif file_extension == '.csv':
         return read_csv(file_path)
+    elif file_extension == '.pdf':
+        return read_pdf(file_path)
     else:
+        print(f"Unsupported file type: {file_path}")
         raise ValueError("Unsupported file type")

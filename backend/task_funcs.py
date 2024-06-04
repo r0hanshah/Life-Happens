@@ -191,14 +191,16 @@ def delete_file_in_storage(filename, task_path_array, task_id, user_id, bucket):
     
 #     except Exception as e:
 #         print(f"Error retrieving files from Firebase Storage: {str(e)}")
-
 def get_files_from_storage(bucket, file_path):
     try:
         blob = bucket.blob(file_path)
         file_content = blob.download_as_bytes()  # Download file as bytes
 
+        # Determine the file type from the file_path
+        file_extension = os.path.splitext(file_path)[1].lower()
+        
         # Save file content temporarily to read it based on type
-        temp_file_path = '/tmp/tempfile'
+        temp_file_path = '/tmp/tempfile' + file_extension
 
         with open(temp_file_path, 'wb') as temp_file:
             temp_file.write(file_content)
