@@ -1,6 +1,9 @@
 import PyPDF2
 import io
 import os
+import docx
+import csv
+import pandas as pd
 
 import openpyxl
 
@@ -69,3 +72,50 @@ def extract_file_type(file_path):
     """
     _, file_extension = os.path.splitext(file_path)
     return file_extension[1:].lower()
+
+
+def read_docx(file_path):
+    doc = docx.Document(file_path)
+    return "\n".join([para.text for para in doc.paragraphs])
+
+def read_txt(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def read_python_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def read_java_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def read_cpp_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def read_hpp_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def read_csv(file_path):
+    df = pd.read_csv(file_path)
+    return df.to_csv(index=False)
+
+def read_file(file_path):
+    if file_path.endswith('.docx'):
+        return read_docx(file_path)
+    elif file_path.endswith('.txt'):
+        return read_txt(file_path)
+    elif file_path.endswith('.py'):
+        return read_python_file(file_path)
+    elif file_path.endswith('.java'):
+        return read_java_file(file_path)
+    elif file_path.endswith('.cpp'):
+        return read_cpp_file(file_path)
+    elif file_path.endswith('.hpp'):
+        return read_hpp_file(file_path)
+    elif file_path.endswith('.csv'):
+        return read_csv(file_path)
+    else:
+        raise ValueError("Unsupported file type")
