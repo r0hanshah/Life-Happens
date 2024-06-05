@@ -789,6 +789,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             icon = require('../../assets/csvicon.png');
                                         } else if (item.name.endsWith('.docx')){
                                             icon = require('../../assets/docxicon.png');
+                                        }else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
                                         }
                                         
                                         else {
@@ -856,7 +863,14 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             icon = require('../../assets/csvicon.png');
                                         } else if (item.name.endsWith('.docx')){
                                             icon = require('../../assets/docxicon.png');
-                                        } 
+                                        } else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
+                                        }
                                         else {
                                             icon = require('../../assets/document_icon.png');
                                         }
