@@ -5,6 +5,7 @@ import json
 import tempfile
 import base64
 import os
+from file_extract_tools import read_file
 
 
 # Firestore functions 
@@ -174,19 +175,39 @@ def delete_file_in_storage(filename, task_path_array, task_id, user_id, bucket):
     except Exception as e:
         print(f"Error creating document: {e}")
 
+# def get_files_from_storage(bucket, file_path):
+#     try:
+#         # List all files in the storage bucket
+#         blob = bucket.blob(file_path)
+
+#         file_info = {
+#             'name': blob.name,
+#             'size': blob.size,
+#             'type': blob.content_type,
+#             'url': blob.generate_signed_url(expiration=3600)  # Generate a signed URL for downloading the file
+#         }
+
+#         return file_info
+    
+#     except Exception as e:
+#         print(f"Error retrieving files from Firebase Storage: {str(e)}")
 def get_files_from_storage(bucket, file_path):
     try:
-        # List all files in the storage bucket
         blob = bucket.blob(file_path)
+        file_content = blob.download_as_bytes()  # Download file as bytes
 
-        file_info = {
-            'name': blob.name,
-            'size': blob.size,
-            'type': blob.content_type,
-            'url': blob.generate_signed_url(expiration=3600)  # Generate a signed URL for downloading the file
-        }
+        # Determine the file type from the file_path
+        file_extension = os.path.splitext(file_path)[1].lower()
+        
+        # Save file content temporarily to read it based on type
+        temp_file_path = '/tmp/tempfile' + file_extension
 
-        return file_info
-    
+        with open(temp_file_path, 'wb') as temp_file:
+            temp_file.write(file_content)
+
+        # Read the file using the appropriate reader
+        data = read_file(temp_file_path)
+        return data
     except Exception as e:
-        print(f"Error retrieving files from Firebase Storage: {str(e)}")
+        print(f"Error reading file from storage: {str(e)}")
+        return {'error': str(e)}

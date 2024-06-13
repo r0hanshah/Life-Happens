@@ -5,6 +5,7 @@ from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore, storage
+from firebase_admin import auth as TEMP_AUTH
 from task_funcs import add_task_to_firestore, edit_task_in_firestore,delete_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage, get_task_in_firestore
 
 import base64
@@ -127,15 +128,15 @@ def add_task():
 
         add_task_to_firestore(task_data, task_path_array, db)
 
-# Assume a function in your model (TaskModel.py or similar)
-def add_task_to_firestore(user_id, task_data):
-    # Add the task to Firestore under the user's tasks collection
-    task_ref = db.collection('User').document(user_id).collection('Tasks').document()
-    task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
-    task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
-    task_ref.set(task_data)
+        # Assume a function in your model (TaskModel.py or similar)
+        def add_task_to_firestore(user_id, task_data):
+            # Add the task to Firestore under the user's tasks collection
+            task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+            task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+            task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
+            task_ref.set(task_data)
 
-    schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
+        schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
         return jsonify({'message': 'Task added successfully'}), 201
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -317,6 +318,7 @@ def delete_user(user_id):
         # tasks = tasks_ref.stream()
         # for task in tasks:
         #     tasks_ref.document(task.id).delete()
+        TEMP_AUTH.delete_user(user_id)
 
         # Now, delete the user document
         user_ref = db.collection('Users').document(user_id)

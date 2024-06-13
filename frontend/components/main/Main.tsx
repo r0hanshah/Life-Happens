@@ -12,10 +12,15 @@ import MainController from '../../controllers/main/MainController';
 import PropertyListener from '../../controllers/Listener';
 import UserModel from '../../models/UserModel';
 
+import { BlurView } from 'expo-blur';
+import DeleteAccount from './deleteAccount/DeleteAccount';
+
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
     signOut: ()=>void;
 }
+
+const DEBUG = false
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
@@ -43,6 +48,8 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const controller = MainController.getInstance();
   var selectedTask = controller.getSelectedTask();
 
+  const [blurVisible, setBlurVisible] = useState(false);
+
   const [reRender, setReRender] = useState<boolean>(false)
 
   const [task, setTask] = useState<TaskModel | null>(null);
@@ -54,7 +61,13 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   // Load in tasks on appear
   useEffect(() => {
     console.log('Number of tasks', controller.getTasks().getValue().length)
-    loadRootTasks()
+    if (DEBUG) {
+      controller.setUser(tempUser)
+      setRootTasks([])
+    }
+    else{
+      loadRootTasks()
+    }
   }, [controller])
 
   // Load in tasks
@@ -268,9 +281,38 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut}/>}
+                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}}/>}
 
             </Animated.View>
+
+            {blurVisible && (
+              <View style={{
+                position: 'absolute',
+                zIndex: 999,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                justifyContent:'center',
+                alignItems:'center'
+                }}>
+
+                <BlurView
+                  intensity={50}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                  tint="dark"
+                />
+                <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
+
+              </View>
+              
+            )}
           
         <ScrollView style={{width:"100%"}}>
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
@@ -313,7 +355,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
           </View>
           
           <View style={{maxWidth: "auto", alignItems:"center", paddingBottom:80}}>
-            <RootTaskList rootTasksMap={rootTaskMap}/>
+            <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
           </View>
         </ScrollView>
       </View>

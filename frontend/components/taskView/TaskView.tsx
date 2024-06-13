@@ -574,26 +574,36 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                     {/* Circle with wire extending from it */}
                     <View style={{width: '15%', alignItems:'center', zIndex:5}}>
                         <ColorSelector task={task} isLeft={isLeft} updateFunctions={[]}/>
-                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color}}></View>}
+                        {(task.children.length > 0 || newTasks.length > 0)  && <View style={{width:2, height: task.children.length > 0 ? '72.65%' : '70%', backgroundColor: task.color, zIndex:-1}}></View>}
                     </View>
 
                     {/* Content */}
                     <View style={{width:'80%', alignItems: isLeft ? 'flex-start' : 'flex-end'}}>
                         <Text style={{color: 'white'}}>Created by: {mainController.getUser().getValue()?.name}</Text> {/* Get creator name */}
-                        <View style={{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}}>
+                        <View style={[{width: "100%", flexDirection: isLeft ? 'row': 'row-reverse', alignItems: 'flex-end', justifyContent:'space-between'}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
 
                             <View style={{flexDirection: isLeft ? 'row': 'row-reverse', width:'70%', alignItems:'flex-end'}}>
-
                                 <TextInput 
-                                style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right', textAlignVertical:'bottom', minWidth:'50%', height: Math.max(50, (title.split('\n').length + Math.max(0, Math.ceil(title.replace(/\s+/g, '').length / 9)) - 1) * 50)}}
+                                style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40, textAlign: isLeft ? 'left' : 'right', textAlignVertical:'bottom', minWidth:'70%', height: Math.max(50, (title.split('\n').length + Math.max(0, Math.ceil(title.replace(/\s+/g, '').length / 13)) - 1) * 50)}}
                                 scrollEnabled={false}
                                 onChangeText={onChangeTitle}
                                 value={title}
                                 multiline={true}
                                 placeholder='Task Title...'
                                 />
+                            </View>
+                            
+                            <View style={{flexDirection:'column'}}>
+                                {/*TODO: Generate this part of the task view*/}
+                                <View style={{flexDirection: 'row', paddingVertical: 10, alignItems:'center'}}>
+                                                                
+                                    <CircularProgressBar percentage={completion}></CircularProgressBar>
 
-                                <View style={{flexDirection: 'row', marginHorizontal: 20, height: 50, backgroundColor:'black', borderRadius: 30, borderColor: 'white', borderWidth: 2, alignItems:'center'}}>
+                                    <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
+
+                                </View>
+
+                                <View style={{flexDirection: 'row', height: 50, width:100, backgroundColor:'black', borderRadius: 30, borderColor: 'white', borderWidth: 2, alignItems:'center', justifyContent:'center'}}>
                                     
                                     <TouchableOpacity onPress={()=>{controller.setInvitedUsers(true)}}>
                                         <Image
@@ -612,19 +622,8 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     </TouchableOpacity>
                                     
                                 </View>
-
-
                             </View>
                             
-
-                            {/*TODO: Generate this part of the task view*/}
-                            <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
-                                
-                                <CircularProgressBar percentage={completion}></CircularProgressBar>
-
-                                <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
-
-                            </View>
                         </View>
                         {/* Display users/ancestor tasks */}
                         {!viewUsers && renderAncestors()}
@@ -774,21 +773,45 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             </View>
                         </View>
 
-                        {/*Unobserved files */}
+                        {/* Unobserved files */}
                         <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
                             <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Unobserved Files</Text>
                             <View style={{flexDirection:'row', alignItems:'flex-start', flexWrap: 'wrap'}}>
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
-                                    {files.map((item, index) => (
-                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
-                                        <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
-                                        <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
-                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
-                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
-                                        </TouchableOpacity>
-                                    </View>
-                                    ))}
+                                    {files.map((item, index) => {
+                                        let icon;
+                                        if (item.name.endsWith('.pdf')) {
+                                            icon = require('../../assets/pdficon.png');
+                                        } else if (item.name.endsWith('.py')) {
+                                            icon = require('../../assets/pythonicon.png');
+                                        } else if (item.name.endsWith('.csv')) {
+                                            icon = require('../../assets/csvicon.png');
+                                        } else if (item.name.endsWith('.docx')){
+                                            icon = require('../../assets/docxicon.png');
+                                        }else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
+                                        }
+                                        
+                                        else {
+                                            icon = require('../../assets/document_icon.png');
+                                        }
+
+                                        return (
+                                        <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                            <Image source={icon} style={{width:120, height:120}}></Image>
+                                            <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                            <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
+                                                <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                            </TouchableOpacity>
+                                        </View>
+                                        );
+                                    })}
                                 </View>
 
                                 {/* Add button */}
@@ -820,7 +843,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             />
                         </View>
 
-                        {/*Observed files */}
+                        {/* Observed files */}
                         <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
                             <View style={{flexDirection:'row', justifyContent:'space-between'}}>
                                 <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Observed Files</Text>
@@ -830,15 +853,38 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             <View style={{flexDirection:'row', alignItems:'flex-start', flexWrap: 'wrap'}}>
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
-                                    {observedFiles.map((item, index) => (
-                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
-                                        <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
-                                        <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
-                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
-                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
-                                        </TouchableOpacity>
-                                    </View>
-                                    ))}
+                                    {observedFiles.map((item, index) => {
+                                        let icon;
+                                        if (item.name.endsWith('.pdf')) {
+                                            icon = require('../../assets/pdficon.png');
+                                        } else if (item.name.endsWith('.py')) {
+                                            icon = require('../../assets/pythonicon.png');
+                                        } else if (item.name.endsWith('.csv')) {
+                                            icon = require('../../assets/csvicon.png');
+                                        } else if (item.name.endsWith('.docx')){
+                                            icon = require('../../assets/docxicon.png');
+                                        } else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
+                                        }
+                                        else {
+                                            icon = require('../../assets/document_icon.png');
+                                        }
+
+                                        return (
+                                        <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                            <Image source={icon} style={{width:120, height:120}}></Image>
+                                            <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                            <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
+                                                <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                            </TouchableOpacity>
+                                        </View>
+                                        );
+                                    })}
                                 </View>
 
                                 {/* Add button */}

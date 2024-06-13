@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
-  "proxy" : "http://127.0.0.1:5000",
+  "proxy": "http://127.0.0.1:5000",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -27,7 +27,8 @@
     "react-native": "0.73.2",
     "react-native-svg": "14.1.0",
     "react-native-uuid": "^2.0.2",
-    "react-native-web": "~0.19.6"
+    "react-native-web": "~0.19.6",
+    "expo-blur": "~12.9.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
