@@ -16,6 +16,10 @@ class MainController {
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
+    private displayMode:PropertyListener<number> = new PropertyListener<number>(0);
+    // 0 : in calendar display
+    // 1 : in week display
+    // 2 : in day display
 
     // Private constructor to prevent uploadFileinstantiation from outside
     private constructor() {
@@ -28,6 +32,14 @@ class MainController {
         MainController.instance = new MainController();
       }
       return MainController.instance;
+    }
+
+    public getDisplay(): PropertyListener<number> {
+      return this.displayMode
+    }
+
+    public setDisplay(display:number){
+      this.displayMode.setValue(display)
     }
   
     // Other methods and properties can be added as needed

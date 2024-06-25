@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Text, useWindowDimensions, TouchableOpacity, Modal, Button } from 'react-native';
 import DayNode from './DayNode';
 import moment from 'moment';
 import TaskModel from '../../../models/TaskModel';
 import MainController from '../../../controllers/main/MainController';
+import WeekDisplay from './WeekDisplay';
 
 interface CalendarProps {
   offset: number;
@@ -17,6 +18,9 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
   const windowHeight = useWindowDimensions().height;
 
   const [currentMonth, setCurrentMonth] = useState(inMoment);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [weekDays, setWeekDays] = useState<React.JSX.Element[]>([]);
 
   // Produce map of yyyymmdd (string) : [TaskModel[]]
 
@@ -38,7 +42,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     const currentDate = moment(new Date())
 
     const difference = endDay.diff(startDay, 'days')
-    const calendarDays = [];
+    const calendarDays:React.JSX.Element[] = [];
     let currentDay = startDay.clone();
 
     var offset:number = 0;
@@ -53,11 +57,17 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     }
 
     const calendarDisplay = []
-    for(var i = 0; i < calendarDays.length; i+=7)
+    for(let i = 0; i < calendarDays.length; i+=7)
     {
         calendarDisplay.push(
-            <View key={`row${i/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9), paddingTop: windowHeight / 6 * 0.25}]}>
+            <View key={`row${i/7}`} style={[styles.row, { height: 95, paddingTop: 40}]}>
                 {calendarDays.slice(i,i+7)}
+                <TouchableOpacity onPress={() => {
+                  setWeekDays(calendarDays.slice(i,i+7))
+                  MainController.getInstance().setDisplay(1)
+                  }}>
+                  <View style={{position: 'absolute', width:10, height:10, borderRadius: 10, backgroundColor:'#717171', right:-20, marginVertical:15}}></View>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -65,10 +75,10 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     return calendarDisplay;
   };
 
-
   return (
     <View style={[styles.grid, { width: windowWidth * 0.84}]}>
-      {renderCalendar()}
+      {MainController.getInstance().getDisplay().getValue() == 1 ? <WeekDisplay dayNodes={weekDays}/> :  renderCalendar() }
+
       <View style={[styles.row, { height: 40}]}>
         <Text style={{color:'#717171'}}>Su</Text>
         <Text style={{color:'#717171'}}>M</Text>
@@ -85,7 +95,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
 const styles = StyleSheet.create({
   grid: {
     flex: 1,
-    position: 'absolute',
+    // position: 'absolute',
   },
   row: {
     flexDirection: 'row',

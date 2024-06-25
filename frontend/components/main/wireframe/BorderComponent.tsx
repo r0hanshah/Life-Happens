@@ -7,13 +7,14 @@ interface BorderComponentProps {
   colorQueue: Array<[string, number, string, boolean, boolean?]>;
   orientation: 'horizontal' | 'vertical'; // Specify the valid values for orientation
   lastRow: boolean;
+  numberOfRows: number
 }
 
 const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientation, lastRow }) => {
   const borderStyle = orientation === 'horizontal' ? styles.horizontalBorder : styles.verticalBorder;
 
   const windowWidth = useWindowDimensions().width;
-  const windowHeight = useWindowDimensions().height;
+  const windowHeight = 630;
 
   const renderBorders = () => {
     return colorQueue.map((value, index) => {
@@ -41,7 +42,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               {
                 minHeight: 0,
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 0,
-                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
+                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 +56.9)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
                 paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 : 0,
                marginTop: orientation === 'vertical' && placedInlastRow ? ((windowHeight / 6) * 0.9 + 50)*1.51: 0
               },

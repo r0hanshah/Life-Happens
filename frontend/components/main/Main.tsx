@@ -20,7 +20,7 @@ interface Tasks {
     signOut: ()=>void;
 }
 
-const DEBUG = false
+const DEBUG = true
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
@@ -56,7 +56,24 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const [slideAnimation] = useState(new Animated.Value(0));
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
-  const [profileClicked, setProfileClicked] = useState(false)
+  const [profileClicked, setProfileClicked] = useState(false);
+
+  const [displayType, setDisplayType] = useState(0);
+
+  // Update display type
+  useEffect(()=>{
+    const displayListener = controller.getDisplay();
+
+    const listener = (display: number) => {
+      setDisplayType(display);
+    };
+
+    displayListener.addListener(listener)
+
+    return () => {
+      displayListener.removeListener(listener);
+    };
+  }, [controller])
 
   // Load in tasks on appear
   useEffect(() => {
@@ -314,9 +331,20 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               
             )}
           
-        <ScrollView style={{width:"100%"}}>
-          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
+        <ScrollView style={{width:"100%", paddingBottom:80}}>
+          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
             <View style={styles.hstack}>
+
+              {displayType != 0 ? 
+              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+                controller.setDisplay(0)
+                }}>
+                <Image source={require('../../assets/calendar_icon.png')} style={{
+                  width:30, height:30, opacity: 0.5
+                }}/>
+              </TouchableOpacity>
+              : <View style={{display:'none'}}/>}
+
               <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).subtract(1, 'months')); console.log(currentMonth)}}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableOpacity>
@@ -339,24 +367,32 @@ const Main: React.FC<Tasks> = ({signOut}) => {
             </TouchableOpacity>
           </View>          
           
-          <View style={[styles.container, {height: windowHeight * 0.95}]}>
+          {/* Calendar */}
+          <View style={[styles.container, {marginTop:20}]}>
             <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
           </View>
-          <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
-            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
-            <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
-            onPress={() => {
-              if(controller.getSelectedTask().getValue() === null)
-                controller.createNewTask()
-            }}
-            >
-              <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
-            </TouchableOpacity>
+
+          {/* Root task list */}
+          <View>
+            <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+
+              <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
+              onPress={() => {
+                if(controller.getSelectedTask().getValue() === null)
+                  controller.createNewTask()
+              }}
+              >
+                <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={{maxWidth: "auto", alignItems:"center"}}>
+              <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
+            </View>
           </View>
           
-          <View style={{maxWidth: "auto", alignItems:"center", paddingBottom:80}}>
-            <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
-          </View>
+          
         </ScrollView>
       </View>
       );
