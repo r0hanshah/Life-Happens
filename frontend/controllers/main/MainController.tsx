@@ -6,6 +6,7 @@ import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
 import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask } from "../../services/taskServices";
+import moment from "moment";
 
 // This will control anything that happens inside Main view
 
@@ -17,6 +18,7 @@ class MainController {
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
     private displayMode:PropertyListener<number> = new PropertyListener<number>(0);
+    private movingMoment:PropertyListener<moment.Moment> = new PropertyListener<moment.Moment>(moment());
     // 0 : in calendar display
     // 1 : in week display
     // 2 : in day display
@@ -32,6 +34,14 @@ class MainController {
         MainController.instance = new MainController();
       }
       return MainController.instance;
+    }
+
+    public getMoment(): PropertyListener<moment.Moment> {
+      return this.movingMoment
+    }
+
+    public setMoment(moment: moment.Moment) {
+      this.movingMoment.setValue(moment)
     }
 
     public getDisplay(): PropertyListener<number> {

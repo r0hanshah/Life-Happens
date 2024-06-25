@@ -18,7 +18,6 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
   const windowHeight = useWindowDimensions().height;
 
   const [currentMonth, setCurrentMonth] = useState(inMoment);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const [weekDays, setWeekDays] = useState<React.JSX.Element[]>([]);
 
@@ -27,11 +26,28 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
   useEffect(() => {
     // Fetch or set the initial month based on your requirements
     // For example, you can set it to the current month
-    console.log("updating from calendar")
     setCurrentMonth(moment(inMoment));
     const mainController = MainController.getInstance()
     const reRenderState = mainController.getReRender().getValue()
     mainController.setReRender(reRenderState ? false : true)
+
+    //Update weeks
+    console.log("Week Moment", inMoment)
+    const indexingMoment=inMoment.clone()
+    const weekDays:React.JSX.Element[] = [];
+    const currentDate = moment(new Date())
+
+    for(let i =0; i < 7; i++)
+    {
+      indexingMoment.subtract(1,'day')
+
+      weekDays.push(
+          <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0}/>
+      );
+      
+    }
+
+    setWeekDays(weekDays.toReversed())
   }, [inMoment]);
 
   const renderCalendar = () => {
@@ -65,6 +81,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
                 <TouchableOpacity onPress={() => {
                   setWeekDays(calendarDays.slice(i,i+7))
                   MainController.getInstance().setDisplay(1)
+                  MainController.getInstance().setMoment(startDay.clone().add(i+7, 'days'))
                   }}>
                   <View style={{position: 'absolute', width:10, height:10, borderRadius: 10, backgroundColor:'#717171', right:-20, marginVertical:15}}></View>
                 </TouchableOpacity>

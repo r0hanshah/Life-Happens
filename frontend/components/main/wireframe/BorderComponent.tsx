@@ -42,7 +42,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               {
                 minHeight: 0,
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.85)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 0,
-                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6) * 0.9 +56.9)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
+                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6)*1.05 + 41)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 0,
                 paddingTop: orientation === 'horizontal' ? lastRow ? (windowHeight / 6) * 0.9 + 50.5 : (windowHeight / 6) * 0.9 + 1.5 : 0,
                marginTop: orientation === 'vertical' && placedInlastRow ? ((windowHeight / 6) * 0.9 + 50)*1.51: 0
               },

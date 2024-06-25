@@ -49,6 +49,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   var selectedTask = controller.getSelectedTask();
 
   const [blurVisible, setBlurVisible] = useState(false);
+  const [editAccount, setEditAccount] = useState(false);
 
   const [reRender, setReRender] = useState<boolean>(false)
 
@@ -163,7 +164,30 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
   const [currentMonth, setCurrentMonth] = useState(moment());
 
-  var currentMonthAndYear = currentMonth.format('MMMM YYYY');
+  useEffect(()=>{
+    const momentListener = controller.getMoment();
+
+    const listener = (moment: moment.Moment) => {
+      setCurrentMonth(moment);
+    };
+
+    momentListener.addListener(listener)
+
+    return () => {
+      momentListener.removeListener(listener);
+    };
+  },[controller])
+
+  const [weekNumber, setWeekNumber] = useState(1);
+  
+  useEffect(()=>{
+    const firstDayOfDisplay = currentMonth.clone().startOf('month').startOf('week');
+    const lastDayOfCurrentWeek = currentMonth.clone().endOf('week')
+    const diff = lastDayOfCurrentWeek.diff(firstDayOfDisplay, 'days') + 1
+
+    setWeekNumber(diff/7)
+
+  },[currentMonth])
 
   let [fontsLoaded] = useFonts({
       Inter_900Black
@@ -298,11 +322,40 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}}/>}
+                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}} editAccount={()=>{setEditAccount(true)}}/>}
 
             </Animated.View>
 
             {blurVisible && (
+              <View style={{
+                position: 'absolute',
+                zIndex: 999,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                justifyContent:'center',
+                alignItems:'center'
+                }}>
+
+                <BlurView
+                  intensity={50}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                  tint="dark"
+                />
+                <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
+
+              </View>
+              
+            )}
+
+            {editAccount && (
               <View style={{
                 position: 'absolute',
                 zIndex: 999,
@@ -345,14 +398,28 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               </TouchableOpacity>
               : <View style={{display:'none'}}/>}
 
-              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).subtract(1, 'months')); console.log(currentMonth)}}>
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' :'months'));
+                console.log(currentMonth)
+                }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableOpacity>
               
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format('MMMM YYYY')}</Text>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format( displayType == 1 ? 'MMM YYYY' : 'MMMM YYYY')}{displayType == 1 ? ' - Week ' + weekNumber : ''}</Text>
 
-              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).add(1, 'months')); console.log(currentMonth)}}>
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(displayType == 1 ? currentMonth.clone().endOf('week') : currentMonth).add(1, displayType == 1 ? 'weeks' : 'months'))
+                console.log(currentMonth)
+                }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, alignItems:'center', justifyContent:'center', marginLeft:20}} onPress={
+                ()=>{
+                  controller.setMoment(displayType==1? moment(new Date()).endOf('week') : moment(new Date()))
+                }
+              }>
+                <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20}}>Today</Text>
               </TouchableOpacity>
             </View>
             

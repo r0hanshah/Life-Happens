@@ -308,11 +308,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, lastRow ?  1.070 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, lastRow ?  1.070  + offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, lastRow ? 1.070 - offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, lastRow ? 1.070 + offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow]])
             }
           }
 
@@ -357,11 +357,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
             rowOffset += 1
             if(colorQueuesMap.hasOwnProperty(`${rowOffset}v${columnOffset}`))
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, lastRow ?  1.070 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`].add([hexcode, lastRow ?  1.070  + offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow])
             }
             else
             {
-              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, lastRow ? 1.070 - offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow]])
+              colorQueuesMap[`${rowOffset}v${columnOffset}`] = new Set([[hexcode, lastRow ? 1.070 + offset * 0.02 : rowOffset == ROWS-1 ? 1 + (1.19 + 0.389* parseInt(rootIndex) + 0.03*(2-offset)) : 1, rootId, leftBound, lastRow]])
             }
           }
         }

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "expo-image-picker": "^15.0.5",
     "firebase": "^10.8.0"
   }
 }

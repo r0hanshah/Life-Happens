@@ -15,9 +15,10 @@ interface ProfileViewProps {
   onPress: () => void;
   signOut: () => void;
   deletAccount: () => void;
+  editAccount: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletAccount}) => {
+const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletAccount, editAccount}) => {
 
     let [fontsLoaded] = useFonts({
         Inter_900Black
@@ -34,8 +35,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
             <View style ={{flexDirection:'row', width:'100%', paddingBottom: 20}}>
                 <ScrollView style={{ height: useWindowDimensions().height, padding:39}}>
                     <View style={{flexDirection:'row', width:'100%', alignItems:'flex-start'}}>
-                        <View style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50, marginRight:10, marginBottom:30}}
+                        <View style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50, marginRight:20, marginBottom:30}}
                         >
+                            <TouchableOpacity style={{backgroundColor:'#717171', borderColor:'#151515', borderRadius:30, borderWidth:4,position:'absolute', width:40, height:40, padding:10, right:-10, bottom:-10, justifyContent:'center', alignItems:'center'}}
+                            onPress={editAccount}
+                            >
+                                <Image source={require('../../assets/pencil.png')} style={{height:20, width:20}}/>
+                            </TouchableOpacity>
                             <Text style={{color:'white', fontSize:40}}>{user.name.at(0)}</Text>
                         </View>
                     <View>
