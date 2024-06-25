@@ -14,6 +14,7 @@ import UserModel from '../../models/UserModel';
 
 import { BlurView } from 'expo-blur';
 import DeleteAccount from './deleteAccount/DeleteAccount';
+import EditAccount from './editAccount/EditAccount';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
@@ -378,7 +379,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
                   }}
                   tint="dark"
                 />
-                <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
+                <EditAccount cancel={()=>{setEditAccount(false)}} user={controller.getUser().getValue()!} saveChanges={signOut}/>
 
               </View>
               

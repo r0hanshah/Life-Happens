@@ -70,6 +70,19 @@ class AIFunctions:
         # Find and load the observed documents in firebase firestore
         print(file_paths)
 
+        if(len(file_paths) == 0):
+            prompt = ChatPromptTemplate.from_template("""The user needs to complete their task from """+start_date_iso_string+" to "+end_date_iso_string+"."+"""Help the user make 3 new sub tasks to finish their task based on the information available:
+
+            Task: {input}"""+"\nUser Provided Context:"+context_text + "\nPre-Existing Subtasks:\n" + self.__stringify_subtasks(pre_existing_subtasks))
+
+            parser = JsonKeyOutputFunctionsParser(key_name="task")
+
+            chain = prompt | self.llm.bind(functions=openai_functions) | parser
+
+            response = chain.invoke({"input": "I need to build an AI that can scan documents and summarize them."})
+
+            return response
+
         docs = []
 
         for file_path in file_paths:
