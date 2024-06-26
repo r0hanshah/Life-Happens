@@ -22,6 +22,7 @@ class MainController {
     // 0 : in calendar display
     // 1 : in week display
     // 2 : in day display
+    private toggledPopupKey:PropertyListener<string> = new PropertyListener<string>('');
 
     // Private constructor to prevent uploadFileinstantiation from outside
     private constructor() {
@@ -34,6 +35,14 @@ class MainController {
         MainController.instance = new MainController();
       }
       return MainController.instance;
+    }
+
+    public getToggledPopupKey():PropertyListener<string> {
+      return this.toggledPopupKey
+    }
+
+    public setToggledPopupKey(key:string){
+      this.toggledPopupKey.setValue(key)
     }
 
     public getMoment(): PropertyListener<moment.Moment> {
@@ -95,6 +104,7 @@ class MainController {
     public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
       this.setLoadingGenerateTasks(true)
       try {
+        const taskName = task.title
         const context = task.contextText
         const start = task.startDate.toISOString()
         const end = task.endDate.toISOString()
@@ -113,6 +123,7 @@ class MainController {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            "taskName": taskName,
             "contextText": context,
             "start":start,
             "end": end,

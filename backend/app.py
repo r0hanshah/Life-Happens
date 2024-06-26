@@ -336,13 +336,14 @@ def generateTasks():
     print(request.json)
     # return []
     data = request.json
+    task_name = data.get('taskName')
     context = data.get('contextText')
     start_date_iso_string = data.get('start')
     end_date_iso_string = data.get('end')
     pre_existing_subtasks = data.get('subtasks')
     file_paths = data.get('files')
 
-    return AIFunctions().generate_tasks(context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks,
+    return AIFunctions().generate_tasks(task_name, context, start_date_iso_string, end_date_iso_string, pre_existing_subtasks,
                                         file_paths)
 
 

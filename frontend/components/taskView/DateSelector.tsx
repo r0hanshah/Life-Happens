@@ -23,6 +23,23 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
     
     const [formattedDate, setFormattedDate] = useState(`${dayOfWeek}, ${monthName} ${dayOfMonth}, ${year}`);
 
+    const mainController = MainController.getInstance();
+
+    useEffect(()=>{
+      const popupListener = mainController.getToggledPopupKey();
+  
+      const listener = (key:string) => {
+        setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id + 'd' + modStartDate)
+      };
+  
+      popupListener.addListener(listener)
+  
+      return () => {
+          popupListener.removeListener(listener);
+      }
+  
+    },[mainController])
+
     useEffect(()=>{
       setSelectedMonth(modStartDate ? task.startDate.getMonth() : task.endDate.getMonth());
       setSelectedYear(modStartDate ? task.startDate.getFullYear() : task.endDate.getFullYear());
@@ -45,7 +62,8 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
     }, [task, task.endDate, task.startDate])
   
     const handleContainerClick = () => {
-      setIsSquareVisible(!isSquareVisible);
+      mainController.setToggledPopupKey(mainController.getToggledPopupKey().getValue() == task.id+'d'+modStartDate ? '' : task.id + 'd' + modStartDate)
+      setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id + 'd' + modStartDate);
     };
   
     const handlePrevMonth = () => {

@@ -10,12 +10,32 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [hours, setHours] = useState<string>(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
     const [hoursInt, setHoursInt] = useState<number>(parseInt(hours))
-    const [minutes, setMinutes] = useState<string>(modStartDate ? task.startDate.getMinutes().toString() : task.endDate.getMinutes().toString());
+
+    const [minutes, setMinutes] = useState<string>(modStartDate ? task.startDate.getMinutes().toString().length <= 1 ? ('00'+task.startDate.getMinutes().toString()).slice(-2) : task.startDate.getMinutes().toString()  : task.endDate.getMinutes().toString().length <= 1 ? ('00'+task.endDate.getMinutes().toString()).slice(-2) : task.endDate.getMinutes().toString());
+    
     const [minInts, setMinInts] = useState<number>(parseInt(minutes))
     const [isPM, setIsPM] = useState<boolean>((modStartDate ? task.startDate.getHours() > 12 : task.endDate.getHours() > 12));
 
+    const mainController = MainController.getInstance();
+
+    useEffect(()=>{
+      const popupListener = mainController.getToggledPopupKey();
+  
+      const listener = (key:string) => {
+        setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id + 't' + modStartDate)
+      };
+  
+      popupListener.addListener(listener)
+  
+      return () => {
+          popupListener.removeListener(listener);
+      }
+  
+    },[mainController])
+
     const handleContainerClick = () => {
-      setIsSquareVisible(!isSquareVisible);
+      mainController.setToggledPopupKey(mainController.getToggledPopupKey().getValue() == task.id+'t'+modStartDate ? '' : task.id + 't' + modStartDate)
+      setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id + 't' + modStartDate);
     };
 
     const togglePeriod = () => {
@@ -25,7 +45,7 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
     useEffect(()=>{
       setHours(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
       setHoursInt(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()) :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()))
-      setMinutes(modStartDate ? task.startDate.getMinutes().toString() : task.endDate.getMinutes().toString());
+      setMinutes(modStartDate ? task.startDate.getMinutes().toString().length <= 1 ? ('00'+task.startDate.getMinutes().toString()).slice(-2) : task.startDate.getMinutes().toString()  : task.endDate.getMinutes().toString().length <= 1 ? ('00'+task.endDate.getMinutes().toString()).slice(-2) : task.endDate.getMinutes().toString());
       setMinInts(modStartDate ? task.startDate.getMinutes() : task.endDate.getMinutes())
       setIsPM((modStartDate ? task.startDate.getHours() > 12 : task.endDate.getHours() > 12));
       updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
@@ -74,6 +94,10 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
         const { hour, minute } = validationResult;
         setHoursInt(hour);
         setMinInts(minute);
+
+        setHours(hour.toString());
+        setMinutes(minutes.toString().length <= 1 ? ('00'+minutes.toString()).slice(-2) : minutes.toString());
+
         (modStartDate ? task.startDate : task.endDate).setHours(hour + (isPM ? 12 : 0));
         (modStartDate ? task.startDate : task.endDate).setMinutes(minute);
         for(const parent of task.ancestors)
@@ -90,6 +114,7 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
           MainController.getInstance().saveEditToTask(task)
         }
         
+        mainController.setToggledPopupKey('')
         setIsSquareVisible(false);
       }
     };
@@ -98,7 +123,7 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
       <View style={styles.container}>
         <TouchableOpacity onPress={handleContainerClick}>
           <View style={[styles.pickerContainer, {alignItems:'flex-end'}]}>
-              <Text style={{color:'gray'}}>{hoursInt}:{minInts} {isPM ? 'PM' : 'AM'}</Text> 
+              <Text style={{color:'gray'}}>{hours}:{minutes} {isPM ? 'PM' : 'AM'}</Text> 
           </View>
         </TouchableOpacity>
         {isSquareVisible && 
@@ -116,7 +141,9 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
               style={styles.input}
               value={minutes}
               keyboardType='numeric'
-              onChangeText={(text) => {setMinutes(text)}}
+              onChangeText={(text) => {
+                setMinutes(text)
+              }}
               maxLength={2}
             />
             <TouchableOpacity onPress={togglePeriod}>
