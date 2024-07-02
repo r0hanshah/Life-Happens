@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
-import DayNode from './DayNode';
-import moment from 'moment';
-import TaskModel from '../../../models/TaskModel';
-import MainController from '../../../controllers/main/MainController';
 
 interface WeekProps {
     dayNodes: React.JSX.Element[];

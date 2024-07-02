@@ -39,12 +39,11 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
 
     for(let i =0; i < 7; i++)
     {
-      indexingMoment.subtract(1,'day')
-
       weekDays.push(
           <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0}/>
       );
-      
+
+      indexingMoment.subtract(1,'day')
     }
 
     setWeekDays(weekDays.toReversed())
