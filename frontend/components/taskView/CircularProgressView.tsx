@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Svg, Circle, LinearGradient, Stop } from 'react-native-svg';
+import TaskModel from '../../models/TaskModel';
 
-const CircularProgressBar = ({ percentage }: {percentage:number })  => {
+const CircularProgressBar = ({ percentage, task }: {percentage:number, task:TaskModel })  => {
     // Calculate the radius, circumference, and stroke width
     const radius = 15;
     const strokeWidth = 2;
     const circumference = 2 * Math.PI * radius;
     
     // Calculate the progress value
-    const progress = circumference - (percentage) * circumference;
+    const [progress, setProgress] = useState(circumference - (percentage) * circumference)
+
+    useEffect(()=>{
+      setProgress(circumference - (task.getPercentCompleteness()) * circumference)
+      console.log("Progress changed!")
+    },[percentage])
     
     return (
       <View style={styles.container}>

@@ -282,6 +282,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     validateDelete()
   }, [deleteInput])
 
+  // Re render task view here
+  const [rerender, setRerender] = useState(false)
+
+  useEffect(()=>{
+    console.log("Rerendering")
+  },[rerender])
+
   const scrollViewRef = useRef<ScrollView>(null);
 
   const scrollToBottom = () => {
@@ -302,7 +309,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
 
                     {task.children.map((task, index) => (
-                        <TouchableOpacity key={index} style={{ height: selectedTask && selectedTask.id == task.id ? 250 : 50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginTop: 10, zIndex:-index}} onPress={()=>{
+                        <TouchableOpacity key={index} style={{ width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginVertical: 10, zIndex:-index}} onPress={()=>{
                             if (selectedTask && selectedTask.id == task.id)
                             {
                                 MainController.getInstance().setSelectedTask(selectedTask)
@@ -321,7 +328,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
                                     <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
 
-                                            <CircularProgressBar percentage={task.getPercentCompleteness()}></CircularProgressBar>
+                                            <CircularProgressBar percentage={task.getPercentCompleteness()} task={task}/>
 
                                             <Text style={{color: 'gray'}}>{(task.getPercentCompleteness()*100).toFixed(1)}%</Text>
 
@@ -387,6 +394,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         <Text style={{color:'gray'}}>{durationFromNow}</Text>
                                     </View>
                                     { task.children.length == 0 &&
+                                    <View>
                                         <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
                                             <View style={{flexDirection:'row'}}>
                                             <Image
@@ -400,6 +408,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                                 <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                             </TouchableOpacity>
                                         </View>
+
+                                        <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginVertical:20}} onPress={()=>{
+                                            task.completeness = 1
+                                            console.log("clicked", rerender)
+                                            setRerender(rerender? false : true)
+                                        }}>
+                                            <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10}}
+                                                source={require('../../assets/check_mark_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                        </TouchableOpacity>
+
+                                    </View>
                                     }
                                     
                                 </View>
@@ -597,7 +620,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/*TODO: Generate this part of the task view*/}
                                 <View style={{flexDirection: 'row', paddingVertical: 10, alignItems:'center'}}>
                                                                 
-                                    <CircularProgressBar percentage={completion}></CircularProgressBar>
+                                    <CircularProgressBar percentage={task.getPercentCompleteness()} task={task}/>
 
                                     <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
 
