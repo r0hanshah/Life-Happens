@@ -300,6 +300,8 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       }
     }, [profileClicked]);
 
+    const scrollY = useRef(new Animated.Value(0)).current;
+
     return (
       <View style={{flex: 1, width:'100%'}}>
         
@@ -385,7 +387,13 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               
             )}
           
-        <ScrollView style={{width:"100%", paddingBottom:80}}>
+        <Animated.ScrollView style={{width:"100%", paddingBottom:80}}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+        >
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
             <View style={styles.hstack}>
 
@@ -437,7 +445,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
           
           {/* Calendar */}
           <View style={[styles.container, {marginTop:20}]}>
-            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
+            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth} scrollY={scrollY}/>
           </View>
 
           {/* Root task list */}
@@ -461,7 +469,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
           </View>
           
           
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
       );
 }

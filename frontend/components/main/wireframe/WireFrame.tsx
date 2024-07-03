@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import GridComponent from './GridComponent';
 import ParentNodeGridComponent from './ParentCircleGrid';
 import CalendarDisplay from '../calendar/CalendarDisplay';
@@ -12,9 +12,10 @@ interface WireFrameProps {
     leafNodesMap: {[key:string]:TaskModel[]};
     sidedRootTasksMap: {[key:string]:TaskModel[]};
     inMoment: moment.Moment;
+    scrollY:Animated.Value
 }
 
-const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment }) => {
+const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment, scrollY }) => {
     // Produce ids for leaf nodes and their parents
     const [leafIds, setLeafIds] = useState<{ [key: number]: string[] }>({});
     const [parentNodeIds, setParentNodeIds] = useState<{ [key: number]: string[] }>({})
@@ -189,7 +190,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
             <GridComponent offset={1} subtaskDispIds={leafIds.hasOwnProperty(1) ? leafIds[1]: []} inMoment={inMoment}/>
             <GridComponent offset={2} subtaskDispIds={leafIds.hasOwnProperty(2) ? leafIds[2]: []} inMoment={inMoment}/>
 
-            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment}/>
+            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment} scrollY={scrollY}/>
 
             <ParentNodeGridComponent offset={0} parentNodeIds={parentNodeIds.hasOwnProperty(0) ? parentNodeIds[0]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(0) ? parentTaskByWireFrame[0] : [] } inMoment={inMoment}/>
             <ParentNodeGridComponent offset={1} parentNodeIds={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(1) ? parentTaskByWireFrame[1] : [] } inMoment={inMoment}/>

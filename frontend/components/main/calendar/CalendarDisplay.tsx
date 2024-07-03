@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, useWindowDimensions, TouchableOpacity, Modal, Button } from 'react-native';
+import { View, StyleSheet, Text, useWindowDimensions, TouchableOpacity, Modal, Button, Animated } from 'react-native';
 import DayNode from './DayNode';
 import moment from 'moment';
 import TaskModel from '../../../models/TaskModel';
@@ -10,9 +10,10 @@ interface CalendarProps {
   offset: number;
   leafNodesMap: { [key:number] : TaskModel[]}; // row,column,color
   inMoment: moment.Moment;
+  scrollY: Animated.Value
 }
 
-const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMoment }) => {
+const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMoment, scrollY }) => {
 
   const windowWidth = useWindowDimensions().width;
   const windowHeight = useWindowDimensions().height;
@@ -40,7 +41,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     for(let i =0; i < 7; i++)
     {
       weekDays.push(
-          <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0}/>
+          <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0} scrollY={scrollY}/>
       );
 
       indexingMoment.subtract(1,'day')
@@ -64,7 +65,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     while (currentDay.isBefore(endDay)) 
     {
         calendarDays.push(
-            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()} lastRowExtension={difference - offset < 7 ? 128 : 0}/>
+            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()} lastRowExtension={difference - offset < 7 ? 128 : 0} scrollY={scrollY}/>
         );
 
         currentDay.add(1, 'day');
@@ -80,7 +81,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
                 <TouchableOpacity onPress={() => {
                   setWeekDays(calendarDays.slice(i,i+7))
                   MainController.getInstance().setDisplay(1)
-                  MainController.getInstance().setMoment(startDay.clone().add(i+7, 'days'))
+                  MainController.getInstance().setMoment(startDay.clone().add(i+7-1, 'days'))
                   }}>
                   <View style={{position: 'absolute', width:10, height:10, borderRadius: 10, backgroundColor:'#717171', right:-20, marginVertical:15}}></View>
                 </TouchableOpacity>

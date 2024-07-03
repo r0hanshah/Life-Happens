@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight } from 'react-native';
+import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Animated } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 import TaskModel from '../../../models/TaskModel';
 
@@ -12,9 +12,10 @@ interface DayNodeProps {
   currentDay: boolean; 
   inMonth: boolean;
   lastRowExtension: number;
+  scrollY: Animated.Value
 }
 
-const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth, lastRowExtension }) => {
+const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth, lastRowExtension, scrollY }) => {
 
   const controller = MainController.getInstance();
 
@@ -26,6 +27,19 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   });
 
   const [displayType, setDisplayType] = useState(0);
+
+  const [scrollValue, setScrollValue] = useState(0);
+
+  useEffect(() => {
+      const listenerId = scrollY.addListener(({ value }) => {
+      setScrollValue(value);
+      });
+
+      // Clean up the listener on component unmount
+      return () => {
+      scrollY.removeListener(listenerId);
+      };
+  }, [scrollY]);
 
   // Update display type
   useEffect(()=>{
@@ -58,7 +72,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   {
     flexDirection: "column",
     backgroundColor: currentDay ? '#00488A' : '#383838',
-    height: 575,
+    height: 875,
     width: windowWidth/7 * 0.75,
     borderRadius: 20,
     justifyContent: 'flex-start',
@@ -93,6 +107,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     {
         return (
           <View style={weekContainerStyle}>
+            
             <View style={{flexDirection: "row", maxWidth:'100%'}}>
               <Text style={{
                   color: '#fff',
@@ -102,6 +117,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   alignContent: "flex-start",
                   width: 35
                 }}>{dayNumber}</Text>
+              <Text>Scroll Value: {scrollValue}</Text>
             </View>
           </View>
         )
