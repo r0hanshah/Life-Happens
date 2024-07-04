@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Animated } from 'react-native';
+import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Animated, Touchable, TouchableOpacity } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 import TaskModel from '../../../models/TaskModel';
 
@@ -107,7 +107,21 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     {
         return (
           <View style={weekContainerStyle}>
-            
+            {(scrollValue > 200) ? 
+            <View style={{position:'absolute', top: scrollValue-210, backgroundColor:'#151515', height: 80,
+              width: windowWidth/7 * 0.75, paddingTop:40}}>
+                <TouchableOpacity style={{height:40, width:'100%', bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row"}}>
+                  <Text style={{
+                    color: '#fff',
+                    paddingLeft: 15,
+                    paddingTop:15,
+                    fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
+                    alignContent: "flex-start",
+                    width: 35
+                  }}>{dayNumber}</Text>
+                </TouchableOpacity>
+            </View> 
+            : <></>}
             <View style={{flexDirection: "row", maxWidth:'100%'}}>
               <Text style={{
                   color: '#fff',
@@ -116,8 +130,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
                   alignContent: "flex-start",
                   width: 35
-                }}>{dayNumber}</Text>
-              <Text>Scroll Value: {scrollValue}</Text>
+                }}>{(scrollValue > 200) ? '' : dayNumber}</Text>
             </View>
           </View>
         )
