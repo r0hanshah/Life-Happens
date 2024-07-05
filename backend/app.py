@@ -1,5 +1,5 @@
 import firebase_admin
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, make_response
 from flask_mail import Mail, Message
 from firebase_auth import auth
 from flask_cors import CORS
@@ -7,8 +7,12 @@ from firebase_admin import credentials
 from firebase_admin import firestore, storage
 from firebase_admin import auth as TEMP_AUTH
 from task_funcs import add_task_to_firestore, edit_task_in_firestore,delete_task_in_firestore, upload_file_in_storage, delete_file_in_storage, get_files_from_storage, get_task_in_firestore
-
 import base64
+# below for persistent login
+import jwt
+from datetime import datetime, timedelta, timezone
+from functools import wraps
+from flask import request, jsonify
 
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
@@ -17,6 +21,9 @@ firebase_admin.initialize_app(CRED, {
 
 db = firestore.client()
 from ai_funcs import AIFunctions
+
+SECRET_KEY = 'your_secret_key'
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -29,6 +36,13 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
 mail = Mail(app)
+
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
 
 BUCKET = storage.bucket()
 
@@ -73,7 +87,25 @@ def signup():
         print(request.data.decode())
         return jsonify({'error': str(e)}), 400
 
-
+# Login route for persistent login
+# @app.route('/login', methods=['POST'])
+# def login():
+#     data = request.json
+#     email = data.get('email')
+#     password = data.get('password')
+#     try:
+#         user = auth.sign_in_with_email_and_password(email, password)
+#         user_id = user['localId']
+        
+#         # Generate JWT
+#         token = jwt.encode({
+#             'user_id': user_id,
+#             'exp': datetime.utcnow() + timedelta(days=7)
+#         }, SECRET_KEY, algorithm='HS256')
+        
+#         return jsonify({'user_id': user_id, 'token': token})
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
 # Login route
 @app.route('/login', methods=['POST'])
 def login():
@@ -87,6 +119,66 @@ def login():
         return jsonify({'user_id': user['localId']})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+@app.route('/verify-token', methods=['POST'])
+def verify_user_token():
+    data = request.json
+    token = data.get('token')
+    user_id = verify_token(token)
+    if user_id:
+        user_ref = db.collection('Users').document(user_id)
+        user = user_ref.get()
+        if user.exists:
+            return jsonify({'user_id': user_id, 'user': user.to_dict()})
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    else:
+        return jsonify({'error': 'Invalid or expired token'}), 401
+
+def generate_token(user_id):
+    expiration = datetime.now(timezone.utc) + timedelta(days=7)
+    token = jwt.encode({'user_id': user_id, 'exp': expiration}, SECRET_KEY, algorithm='HS256')
+    return token
+
+def verify_token(token):
+    try:
+        data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        print(f"Token decoded: {data}")
+        return data['user_id']
+    except jwt.ExpiredSignatureError:
+        print("Token expired")
+        return None
+    except jwt.InvalidTokenError:
+        print("Invalid token")
+        return None    
+
+    
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        
+        try:
+            data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            current_user = data['user_id']
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired!'}), 403
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Token is invalid!'}), 403
+        
+        return f(current_user, *args, **kwargs)
+    
+    return decorated
+
+@app.route('/protected', methods=['GET'])
+@token_required
+def protected_route(current_user):
+    return jsonify({'message': 'This is a protected route', 'user': current_user})
+### persistent login above
 
 
 # Dummy data route
@@ -114,33 +206,70 @@ def get_task_by_user_and_task_id(user_id, task_id):
         print(f"An error occurred: {e}")
         return None
 
+@app.route('/addTask', methods=['POST'])
+def add_task():
+    try:
+        req_data = request.json
+        user_id = req_data.get('user_id')
+        task_data = req_data.get('task')
+        task_path_array = req_data.get('task_path_array')
+
+        if not user_id or not task_data:
+            return jsonify({'error': 'Invalid data'}), 400
+
+        task_id = add_task_to_firestore(user_id, task_data, task_path_array, db)
+        schedule_due_task_reminder(user_id, task_id, task_data['EndDate'], task_data['StartDate'])
+        
+        return jsonify({'message': 'Task added successfully', 'task_id': task_id}), 201
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+# def add_task_to_firestore(user_id, task_data):
+#     try:
+#         task_ref = db.collection('Users').document(user_id).collection('Tasks').document()
+        
+#         # Convert ISO formatted date strings to datetime objects
+#         task_data['EndDate'] = datetime.fromisoformat(task_data['EndDate'].replace('Z', '+00:00'))
+#         task_data['StartDate'] = datetime.fromisoformat(task_data['StartDate'].replace('Z', '+00:00'))
+        
+#         task_ref.set(task_data)
+#         return task_ref.id
+#     except Exception as e:
+#         print(f"An error occurred while adding task to Firestore: {e}")
+#         raise
+
+def schedule_due_task_reminder(user_id, task_id, end_date, start_date):
+    # Placeholder for the email notification scheduler function
+    pass
 
 # Route to get a specific task for a user
 
 ####################################################################
 
-@app.route('/addTask', methods=['POST'])
-def add_task():
-    try:
-        req_data = request.json
-        task_data = req_data.get('task')
-        task_path_array = req_data.get('task_path_array')
+# @app.route('/addTask', methods=['POST'])
+# def add_task():
+#     try:
+#         req_data = request.json
+#         task_data = req_data.get('task')
+#         task_path_array = req_data.get('task_path_array')
 
-        add_task_to_firestore(task_data, task_path_array, db)
+#         add_task_to_firestore(task_data, task_path_array, db)
 
-        # Assume a function in your model (TaskModel.py or similar)
-        def add_task_to_firestore(user_id, task_data):
-            # Add the task to Firestore under the user's tasks collection
-            task_ref = db.collection('User').document(user_id).collection('Tasks').document()
-            task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
-            task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
-            task_ref.set(task_data)
+#         # Assume a function in your model (TaskModel.py or similar)
+#         def add_task_to_firestore(user_id, task_data):
+#             # Add the task to Firestore under the user's tasks collection
+#             task_ref = db.collection('User').document(user_id).collection('Tasks').document()
+#             task_data['EndDate'] = datetime.strptime(task_data['EndDate'], '%Y-%m-%d').date() #not sure if this line works to get the due date
+#             task_data['StartDate'] = datetime.strptime(task_data['StartDate'], '%Y-%m-%d').date()
+#             task_ref.set(task_data)
 
-        schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
-        return jsonify({'message': 'Task added successfully'}), 201
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify({'error': str(e)}), 500
+#         schedule_due_task_reminder(user_id, task_ref.id, task_data['EndDate'], task_data['StartDate']) #calling the email notification scheduler for task
+#         return jsonify({'message': 'Task added successfully'}), 201
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#         return jsonify({'error': str(e)}), 500
 
 @app.route('/editTask', methods=['PUT'])
 def edit_task():
@@ -149,12 +278,18 @@ def edit_task():
         task_data = req_data.get('task')
         task_path_array = req_data.get('task_path_array')
 
+        if not task_data:
+            return jsonify({'error': 'Missing task data'}), 400
+        # if not task_path_array:
+        #     return jsonify({'error': 'Missing task path array'}), 400
+
         edit_task_in_firestore(task_data, task_path_array, db)
 
-        return jsonify({'message': 'Task edited successfully'}), 201
+        return jsonify({'message': 'Task edited successfully'}), 200
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/fetchTask', methods=['POST'])
 def fetch_task():
@@ -450,6 +585,49 @@ def send_start_task_email(user_id, task_id):
         print('Task reminder email sent successfully.')
     except Exception as e:
         print(f"An error occurred while sending task reminder email: {e}")
+
+@app.route('/invite', methods=['POST'])
+def invite_user():
+    try:
+        data = request.json
+        email = data.get('email')
+        task_id = data.get('taskId')
+        inviter_id = data.get('inviterId')
+
+        print(f"Received invite request for email: {email}, task_id: {task_id}, inviter_id: {inviter_id}")
+
+        # Check if the user exists in the Firebase authentication
+        try:
+            user_record = TEMP_AUTH.get_user_by_email(email)
+            user_id = user_record.uid
+            print(f"User found with id: {user_id}")
+            
+            # Add user to the task
+            task_ref = db.collection('Users').document(inviter_id).collection('Tasks').document(task_id)
+            task = task_ref.get()
+            if task.exists:
+                task_data = task.to_dict()
+                invited_users = task_data.get('InvitedUsers', [])
+                if user_id not in invited_users:
+                    invited_users.append(user_id)
+                    task_ref.update({'InvitedUsers': invited_users})
+                return jsonify({'message': 'User invited to the task'}), 200
+            else:
+                return jsonify({'error': 'Task not found'}), 404
+        except firebase_admin.auth.UserNotFoundError:
+            print(f"User with email {email} does not exist in Firebase authentication")
+            # Send invitation email to unregistered user
+            try:
+                msg = Message('Invitation to Join Life Happens', recipients=[email])
+                msg.body = f'You have been invited to join Life Happens. Please sign up to collaborate on tasks: [Signup URL]'
+                mail.send(msg)
+                return jsonify({'message': 'Invitation sent to unregistered user'}), 200
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                return jsonify({'error': 'Failed to send invitation email'}), 500
+    except Exception as e:
+        print(f"Error in inviting user: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # Run Flask app

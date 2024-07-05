@@ -230,23 +230,28 @@ const loadFilesToUser = async (task:TaskModel, fileArrayType:string, fileNameArr
 
 // taskServices.tsx
 
-export const addTask = async (taskData: TaskData, taskPathArray:string[]) => {
+export const addTask = async (taskData: TaskData, taskPathArray: string[], userId: string) => {
   try {
-    console.log(JSON.stringify({
-      'task': JSON.stringify(taskData),
-      'task_path_array':taskPathArray
-    }))
+    const payload = {
+      user_id: userId,
+      task: taskData,
+      task_path_array: taskPathArray
+    };
+
+    console.log('Payload being sent:', JSON.stringify(payload));
+    console.log('Task Path Array:', taskPathArray);  // Log the user_id to ensure it's not undefined or null
+
     const response = await fetch(`${BASE_URL}/addTask`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        'task': JSON.stringify(taskData),
-        'task_path_array':taskPathArray
-      }),
+      body: JSON.stringify(payload),
     });
+
     const result = await response.json();
+    console.log('Response received:', result);
+
     if (response.ok) {
       console.log('Task added:', result);
       return result;
@@ -258,6 +263,9 @@ export const addTask = async (taskData: TaskData, taskPathArray:string[]) => {
     throw error;
   }
 };
+
+
+
 
 // taskServices.tsx
 

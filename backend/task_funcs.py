@@ -6,68 +6,79 @@ import tempfile
 import base64
 import os
 from file_extract_tools import read_file
+from datetime import datetime, timedelta, timezone
 
 
 # Firestore functions 
-
-def add_task_to_firestore(data, taskPathArray, db):
+def add_task_to_firestore(user_id, task_data, taskPathArray, db):
     try:
-        print(data)
-        data = json.loads(data)
-        creatorID = data.get('CreatorID')
-        ID = data.get('ID')
-
+        # Generate a new document reference with a unique ID if not provided
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document()
+        task_id = task_ref.id
+        
+        task_data['ID'] = task_id
+        task_data['ExtraMedia'] = {'ID': task_id}  # Set ExtraMedia ID to task ID
+        
+        # Convert ISO formatted date strings to datetime objects
+        task_data['EndDate'] = datetime.fromisoformat(task_data['EndDate'].replace('Z', '+00:00'))
+        task_data['StartDate'] = datetime.fromisoformat(task_data['StartDate'].replace('Z', '+00:00'))
+        
         tempCount = 0
-        task_ref = db.collection('Users').document(creatorID).collection('Tasks')
+        parent_task_ref = db.collection('Users').document(user_id).collection('Tasks')
 
-        # Create the path to the Task
+        # Create the path to the Task and update children references if needed
         for taskId in taskPathArray:
-            task_ref = task_ref.document(taskId)
+            parent_task_ref = parent_task_ref.document(taskId)
 
             tempCount += 1
-            if(tempCount == len(taskPathArray)):
-                task_ref.update({'Children': firestore.ArrayUnion([ID])})
+            if tempCount == len(taskPathArray):
+                parent_task_ref.update({'Children': firestore.ArrayUnion([task_id])})
 
-            task_ref = task_ref.collection('Tasks')
-            
+            parent_task_ref = parent_task_ref.collection('Tasks')
 
-        # Add current task id
-        task_ref = task_ref.document(ID)
+        # Add current task ID
+        task_ref = parent_task_ref.document(task_id)
+        task_ref.set(task_data)
 
-        task_ref.set(data)
+        if len(taskPathArray) == 0:
+            user_ref = db.collection('Users').document(user_id)
+            user_ref.update({f"TaskTreeRoots.{task_id}": task_data.get('StartDate')})
 
-        if (len(taskPathArray) == 0):
-            user_ref = db.collection('Users').document(creatorID)
-
-            user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
-
+        return task_id
     except Exception as e:
-        print(f"Error creating document: {e}")
+        print(f"An error occurred while adding task to Firestore: {e}")
+        raise
 
 def edit_task_in_firestore(data, taskPathArray, db):
     try:
-        print(data)
-        data = json.loads(data)
+        if isinstance(data, str):
+            data = json.loads(data)
+        print("Data received for edit:", data)
         creatorID = data.get('CreatorID')
         ID = data.get('ID')
 
-        task_ref = db.collection('Users').document(creatorID).collection('Tasks')
+        # Navigate to the correct task document
+        task_ref = db.collection('Users').document(creatorID).collection('Tasks').document(ID)
+        
+        # Check if the document exists
+        task_doc = task_ref.get()
+        if not task_doc.exists:
+            print(f"Document with ID {ID} does not exist in path Users/{creatorID}/Tasks.")
+            raise Exception(f"Document with ID {ID} does not exist.")
 
-        # Create the path to the Task
-        for taskId in taskPathArray:
-            task_ref = task_ref.document(taskId).collection('Tasks')
-
-        # Add current task id
-        task_ref = task_ref.document(ID)
-
+        # Update the task
         task_ref.update(data)
 
+        # Update the user's TaskTreeRoots with the new StartDate
         user_ref = db.collection('Users').document(creatorID)
-
         user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
 
+        print(f"Task {ID} updated successfully for user {creatorID}.")
     except Exception as e:
-        print(f"Error creating document: {e}")
+        print(f"Error editing document: {e}")
+        raise
+
+
 
 def get_task_in_firestore(task_Id, creatorId, taskPathArray, db):
     try:
