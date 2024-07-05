@@ -107,10 +107,10 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     {
         return (
           <View style={weekContainerStyle}>
-            {(scrollValue > 200) ? 
-            <View style={{position:'absolute', top: scrollValue-210, backgroundColor:'#151515', height: 80,
-              width: windowWidth/7 * 0.75, paddingTop:40}}>
-                <TouchableOpacity style={{height:40, width:'100%', bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row"}}>
+            {(scrollValue > 200 && scrollValue < 1000) ? 
+            <View style={{position:'absolute', top: scrollValue-250, backgroundColor:'#151515', height: 120,
+              width: windowWidth/7 * 0.75, paddingTop:80}}>
+                <View style={{height:40, width:'100%', bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row"}}>
                   <Text style={{
                     color: '#fff',
                     paddingLeft: 15,
@@ -119,7 +119,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                     alignContent: "flex-start",
                     width: 35
                   }}>{dayNumber}</Text>
-                </TouchableOpacity>
+                </View>
             </View> 
             : <></>}
             <View style={{flexDirection: "row", maxWidth:'100%'}}>
@@ -132,6 +132,12 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   width: 35
                 }}>{(scrollValue > 200) ? '' : dayNumber}</Text>
             </View>
+            {leafTasks.map((task)=>{
+              console.log("Task here:",task.title)
+              return(
+                <View style={{backgroundColor:'red', height:50, width:50}}/>
+              )
+            })}
           </View>
         )
     }

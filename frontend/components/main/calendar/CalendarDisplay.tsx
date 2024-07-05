@@ -94,7 +94,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
 
   return (
     <View style={[styles.grid, { width: windowWidth * 0.84}]}>
-      {MainController.getInstance().getDisplay().getValue() == 1 ? <WeekDisplay dayNodes={weekDays}/> :  renderCalendar() }
+      {MainController.getInstance().getDisplay().getValue() == 1 ? <WeekDisplay dayNodes={weekDays} scrollY={scrollY}/> :  renderCalendar() }
 
       <View style={[styles.row, { height: 40}]}>
         <Text style={{color:'#717171'}}>Su</Text>

@@ -49,7 +49,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
                         <Text style={{color:'gray', fontSize:20}}>{user.email}</Text>
                     </View>
                     </View>
-                    <View style={{padding: 30}}>
+                    <View style={{padding: 25}}>
                         <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginBottom:30}}>Rest Periods</Text>
                         <TimeBlocker user={user}/>
 
