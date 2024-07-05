@@ -601,7 +601,7 @@ def invite_user():
             user_record = TEMP_AUTH.get_user_by_email(email)
             user_id = user_record.uid
             print(f"User found with id: {user_id}")
-            
+
             # Add user to the task
             task_ref = db.collection('Users').document(inviter_id).collection('Tasks').document(task_id)
             task = task_ref.get()
@@ -611,6 +611,17 @@ def invite_user():
                 if user_id not in invited_users:
                     invited_users.append(user_id)
                     task_ref.update({'InvitedUsers': invited_users})
+
+                    # Add task path to SharedTaskTrees array of the invited user
+                    task_path = f'Users/{inviter_id}/Tasks/{task_id}'
+                    user_ref = db.collection('Users').document(user_id)
+                    user_doc = user_ref.get()
+                    if user_doc.exists:
+                        user_data = user_doc.to_dict()
+                        shared_task_trees = user_data.get('SharedTaskTrees', [])
+                        if task_path not in shared_task_trees:
+                            shared_task_trees.append(task_path)
+                            user_ref.update({'SharedTaskTrees': shared_task_trees})
                 return jsonify({'message': 'User invited to the task'}), 200
             else:
                 return jsonify({'error': 'Task not found'}), 404

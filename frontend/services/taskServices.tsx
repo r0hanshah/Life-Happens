@@ -96,7 +96,7 @@ export const getTask = async (userId: string, taskId:string) => {
   }
 };
 
-export const fetchTask = async (userId: string, taskId:string, ancestorArray:string[], parent:TaskModel | null):Promise<[TaskModel, string[], string[]]> => {
+export const fetchTask = async (userId: string, taskId: string, ancestorArray: string[], parent: TaskModel | null): Promise<[TaskModel, string[], string[]]> => {
   console.log(taskId)
   console.log(ancestorArray)
   try {
@@ -111,7 +111,9 @@ export const fetchTask = async (userId: string, taskId:string, ancestorArray:str
         'task_path_array': ancestorArray
       }),
     });
+
     const task = await response.json();
+
     if (response.ok) {
       console.log('Fetched Task:', task);
       const ancestors = task['Ancestors'] as string[]
@@ -133,25 +135,47 @@ export const fetchTask = async (userId: string, taskId:string, ancestorArray:str
       const unobservedFiles = task['UnobservedFiles'] as string[]
       const users = task['Users'] as string[]
       const completeness = task['Completeness'] as number
-     
-      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+
+      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length - 1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
       returnTask.completeness = completeness
 
-      loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(()=>{
+      loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(() => {
         loadFilesToUser(returnTask, "unobserved", unobservedFiles, id, ancestors, creatorId)
       })
 
-      if (parent != null){
+      if (parent != null) {
         parent.children.push(returnTask)
         returnTask.ancestors = [parent, ...parent.ancestors]
       }
 
-      return [returnTask, children, [returnTask.id, ...returnTask.ancestors.map(task=>task.id)]];
+      return [returnTask, children, [returnTask.id, ...returnTask.ancestors.map(task => task.id)]];
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
     }
   } catch (error) {
     console.error('Failed to fetch task:', error);
+
+    // Fetch from shared paths if personal task fetch fails
+    try {
+      const userDoc = await firestore.collection('Users').doc(userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        const sharedTaskPaths = userData?.SharedTaskTrees || [];
+        for (const path of sharedTaskPaths) {
+          const pathComponents = path.split('/');
+          const sharedUserId = pathComponents[1]; // Extract user ID from path
+          const sharedTaskId = pathComponents[pathComponents.length - 1]; // Extract task ID from path
+          const taskPathArray = pathComponents.slice(3, pathComponents.length - 1); // Extract task path array
+
+          if (sharedTaskId === taskId) {
+            return await fetchTask(sharedUserId, taskId, taskPathArray, parent);
+          }
+        }
+      }
+    } catch (sharedError) {
+      console.error('Failed to fetch shared task:', sharedError);
+    }
+
     throw error;
   }
 };
