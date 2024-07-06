@@ -15,6 +15,8 @@ import TimeSelector from './TimeSelector';
 
 import CreateSubTaskView from './CreateSubTaskView';
 import ColorSelector from './ColorSelector';
+import InviteUser from './InviteUser';
+
 
 interface TaskViewProps {
   task: TaskModel;
@@ -33,6 +35,16 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   let [fontsLoaded] = useFonts({
     Inter_900Black
   });
+
+    // Get current user from mainController
+  const currentUser = mainController.getUser().getValue();
+  const inviterId = currentUser ? currentUser.id : null; // Adjust this based on how the user ID is stored
+  
+    // Ensure inviterId is available
+    if (!inviterId) {
+      console.error("Inviter ID is not available");
+      return null;
+    }
 
   useEffect(()=>{
     const taskListener = mainController.getLoadingGenerateTasks();
@@ -700,6 +712,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
                             }
                             
+                        </View>
+                        {/* Invite User */}
+                        <InviteUser taskId={task.id} inviterId={inviterId} />
+
+                        {/* Notes */}
+                        <View style={[{ width: '100%', marginTop: 20 }, isLeft ? { paddingRight: 30 } : { paddingLeft: 35 }]}>
+                             <Text style={{ color: 'white', fontFamily: fontsLoaded ? 'Inter_900Black' : 'Arial', fontSize: 20 }}>Notes</Text>
+                            <TextInput
+                                style={{ width: "100%", color: 'white', backgroundColor: 'rgba(50, 50, 50, 1)', borderRadius: 5, minHeight: 300, marginTop: 10, padding: 10, justifyContent: 'flex-start' }}
+                                onChangeText={onChangeText}
+                                value={text}
+                                multiline={true}
+                                placeholder="Enter text here..."
+                                onSubmitEditing={onSubmitEditing}
+                            />
                         </View>
 
 
