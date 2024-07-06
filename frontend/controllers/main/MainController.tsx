@@ -227,6 +227,7 @@ class MainController {
     public storeTaskOnFirestore(task:TaskModel)
     {
       const taskPathArray = task.ancestors.map(task => task.id).reverse()
+      console.log('Task Path Array:', taskPathArray); // Log the taskPathArray to ensure it's correct
       const taskData:TaskData = {
         Color:task.color,
         Ancestors: task.ancestors.map(task => task.id),
@@ -248,7 +249,13 @@ class MainController {
         IsRoot: task.isRoot,
         Completeness: task.completeness
       }
-      addTask(taskData, taskPathArray)
+      const user = this.getUser().getValue();
+      if (user == null) {
+        throw new Error("User is missing");
+      }
+      const userId = user.id;
+    
+      addTask(taskData, taskPathArray, userId)
     }
 
     public deleteTaskOnFirestore(task:TaskModel)

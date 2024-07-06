@@ -15,6 +15,8 @@ import TimeSelector from './TimeSelector';
 
 import CreateSubTaskView from './CreateSubTaskView';
 import ColorSelector from './ColorSelector';
+import InviteUser from './InviteUser';
+
 
 interface TaskViewProps {
   task: TaskModel;
@@ -33,6 +35,16 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   let [fontsLoaded] = useFonts({
     Inter_900Black
   });
+
+    // Get current user from mainController
+  const currentUser = mainController.getUser().getValue();
+  const inviterId = currentUser ? currentUser.id : null; // Adjust this based on how the user ID is stored
+  
+    // Ensure inviterId is available
+    if (!inviterId) {
+      console.error("Inviter ID is not available");
+      return null;
+    }
 
   useEffect(()=>{
     const taskListener = mainController.getLoadingGenerateTasks();
@@ -724,6 +736,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             }
                             
                         </View>
+                        {/* Invite User */}
+                        <InviteUser taskId={task.id} inviterId={inviterId} />
+
+                        {/* Notes */}
+                        <View style={[{ width: '100%', marginTop: 20 }, isLeft ? { paddingRight: 30 } : { paddingLeft: 35 }]}>
+                             <Text style={{ color: 'white', fontFamily: fontsLoaded ? 'Inter_900Black' : 'Arial', fontSize: 20 }}>Notes</Text>
+                            <TextInput
+                                style={{ width: "100%", color: 'white', backgroundColor: 'rgba(50, 50, 50, 1)', borderRadius: 5, minHeight: 300, marginTop: 10, padding: 10, justifyContent: 'flex-start' }}
+                                onChangeText={onChangeText}
+                                value={text}
+                                multiline={true}
+                                placeholder="Enter text here..."
+                                onSubmitEditing={onSubmitEditing}
+                            />
+                        </View>
 
 
                         {/* Notes */}
@@ -796,21 +823,45 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             </View>
                         </View>
 
-                        {/*Unobserved files */}
+                        {/* Unobserved files */}
                         <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
                             <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Unobserved Files</Text>
                             <View style={{flexDirection:'row', alignItems:'flex-start', flexWrap: 'wrap'}}>
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
-                                    {files.map((item, index) => (
-                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
-                                        <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
-                                        <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
-                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
-                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
-                                        </TouchableOpacity>
-                                    </View>
-                                    ))}
+                                    {files.map((item, index) => {
+                                        let icon;
+                                        if (item.name.endsWith('.pdf')) {
+                                            icon = require('../../assets/pdficon.png');
+                                        } else if (item.name.endsWith('.py')) {
+                                            icon = require('../../assets/pythonicon.png');
+                                        } else if (item.name.endsWith('.csv')) {
+                                            icon = require('../../assets/csvicon.png');
+                                        } else if (item.name.endsWith('.docx')){
+                                            icon = require('../../assets/docxicon.png');
+                                        }else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
+                                        }
+                                        
+                                        else {
+                                            icon = require('../../assets/document_icon.png');
+                                        }
+
+                                        return (
+                                        <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                            <Image source={icon} style={{width:120, height:120}}></Image>
+                                            <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                            <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveFile(item)}}>
+                                                <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                            </TouchableOpacity>
+                                        </View>
+                                        );
+                                    })}
                                 </View>
 
                                 {/* Add button */}
@@ -842,7 +893,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             />
                         </View>
 
-                        {/*Observed files */}
+                        {/* Observed files */}
                         <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
                             <View style={{flexDirection:'row', justifyContent:'space-between'}}>
                                 <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Observed Files</Text>
@@ -852,15 +903,38 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             <View style={{flexDirection:'row', alignItems:'flex-start', flexWrap: 'wrap'}}>
                                 {/* List of loaded files */}
                                 <View style={{flexDirection:'row'}}>
-                                    {observedFiles.map((item, index) => (
-                                    <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
-                                        <Image source={require('../../assets/document_icon.png')} style={{width:120, height:120}}></Image>
-                                        <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
-                                        <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
-                                            <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
-                                        </TouchableOpacity>
-                                    </View>
-                                    ))}
+                                    {observedFiles.map((item, index) => {
+                                        let icon;
+                                        if (item.name.endsWith('.pdf')) {
+                                            icon = require('../../assets/pdficon.png');
+                                        } else if (item.name.endsWith('.py')) {
+                                            icon = require('../../assets/pythonicon.png');
+                                        } else if (item.name.endsWith('.csv')) {
+                                            icon = require('../../assets/csvicon.png');
+                                        } else if (item.name.endsWith('.docx')){
+                                            icon = require('../../assets/docxicon.png');
+                                        } else if (item.name.endsWith('.java')){
+                                            icon = require('../../assets/javaicon.png');
+                                        }
+                                        else if (item.name.endsWith('.cpp' || '.h' || '.hpp')){
+
+                                            icon = require('../../assets/cppicon.png');
+
+                                        }
+                                        else {
+                                            icon = require('../../assets/document_icon.png');
+                                        }
+
+                                        return (
+                                        <View key={index} style={{width:150, height:150, borderRadius:10, backgroundColor:"rgba(50, 50, 50, 1)", justifyContent:'center', alignItems:'center', margin:5}}>
+                                            <Image source={icon} style={{width:120, height:120}}></Image>
+                                            <Text style={{color:'white', textAlign:'center', fontSize:10}}>{item.name}</Text>
+                                            <TouchableOpacity style={{position:'absolute', backgroundColor:"rgba(50, 50, 50, 1)", height:30, width:30, borderRadius:20, borderWidth:5, borderColor:'#151515', justifyContent:'center', alignItems:'center', top:-5, right:-10}} onPress={()=>{handleRemoveContextFile(item)}}>
+                                                <Image source={require('../../assets/x_mark_white.png')}  style={{width: 10, height: 10, marginHorizontal: 10}}></Image>
+                                            </TouchableOpacity>
+                                        </View>
+                                        );
+                                    })}
                                 </View>
 
                                 {/* Add button */}
