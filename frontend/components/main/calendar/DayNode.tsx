@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Animated, Touchable, TouchableOpacity } from 'react-native';
 import { useFonts, Inter_500Medium } from '@expo-google-fonts/inter';
 import TaskModel from '../../../models/TaskModel';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import MainController from '../../../controllers/main/MainController';
+import moment from 'moment';
 
 interface DayNodeProps {
   dayNumber: number;
@@ -30,6 +32,9 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
   const [scrollValue, setScrollValue] = useState(0);
 
+  const [reRender, setReRender] = useState<boolean>(false)
+
+
   useEffect(() => {
       const listenerId = scrollY.addListener(({ value }) => {
       setScrollValue(value);
@@ -53,6 +58,20 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
     return () => {
       displayListener.removeListener(listener);
+    };
+  }, [controller])
+
+  useEffect(()=>{
+    const renderListener = controller.getReRender();
+
+    const listener = (bool: boolean) => {
+      setReRender(bool);
+    };
+
+    renderListener.addListener(listener)
+
+    return () => {
+      renderListener.removeListener(listener);
     };
   }, [controller])
 
@@ -91,15 +110,90 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                <View style={{width: 13, height: 13, borderRadius: 13, backgroundColor: task.color}}/>
           </TouchableHighlight>
         )
-        if(circles.length > 4) {break}
+        if(circles.length >= Math.ceil((windowWidth/7 - 100)/34)) {break}
       }
 
+      const diff = leafTasks.length - circles.length
+
       return (
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', alignItems:'center'}}>
           {circles}
+          {diff > 0 && 
+          <View style={{width:25, height:25, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor:'rgba(0,0,0,0.2)', marginLeft:5}}>
+            <Text style={{color:'white'}}>+{diff}</Text>
+          </View>
+          }
         </View>
       )
   }
+
+  const renderTaskCirclesForWeek = () => {
+    const circles = []
+
+    for(const task of leafTasks)
+    {
+      circles.push(
+        <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width:'100%'}} onPress={() => controller.setSelectedTask(task)}>
+          <View style={{position:'absolute', top:3, left:-5}}>
+            <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
+            <View style={{backgroundColor:task.color, width:2, height:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, position:'absolute'}}/>
+            <View style={{backgroundColor:task.color, width:550, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:2, position:'absolute'}}/>
+            <View style={{backgroundColor:task.color, left:550, width:2, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:148, position:'absolute'}}/>
+          </View>
+          <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.527+10, minWidth:'100%'}}>
+            <LinearGradient
+                colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)']}              
+                style={{ flex: 1}}/>
+            <View style={{position:'absolute', paddingLeft:15, top:-5}}>
+              <Text style={{color:'white'}}>{task.title}</Text>
+              {getMinutesDifference(task.startDate, task.endDate) >= 60 ? 
+              <Text style={{color:'#919191', fontSize:10}}>{formatTime(task.startDate)} - {formatTime(task.endDate)}</Text> : <></>}
+              {getMinutesDifference(task.startDate, task.endDate) >= 120 ? 
+              <Text style={{color:'#919191', fontSize:10}}>{getMinutesDifference(task.startDate, task.endDate)} minutes</Text> : <></>}
+            </View>
+            
+          </View>
+          
+          <View style={{position:'absolute', left:5,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
+            <LinearGradient
+              colors={[task.color, 'rgba(0, 0, 0, 0)']}              
+              style={{ flex: 1}}/>
+          </View>
+
+          <View style={{position:'absolute', backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
+          
+        </TouchableOpacity>
+      )
+    }
+
+    return circles
+  }
+
+  const calculateMinutesSinceMidnight = (date:Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    // Convert hours to 12-hour format
+    hours = hours % 24;
+
+    // Calculate total minutes since 12:00 AM
+    const totalMinutes = hours * 60 + minutes;
+
+    return totalMinutes;
+  };
+
+  const getMinutesDifference = (d1:Date, d2:Date) => {
+    const date1Moment = moment(d1);
+    const date2Moment = moment(d2);
+    const differenceInMinutes = date2Moment.diff(date1Moment, 'minutes');
+    return differenceInMinutes;
+  };
+
+  const formatTime = (date:Date) => {
+    const hours = (date.getHours()%12).toString();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
 
   const renderDayNode = () =>
   {
@@ -132,12 +226,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   width: 35
                 }}>{(scrollValue > 200) ? '' : dayNumber}</Text>
             </View>
-            {leafTasks.map((task)=>{
-              console.log("Task here:",task.title)
-              return(
-                <View style={{backgroundColor:'red', height:50, width:50}}/>
-              )
-            })}
+            {renderTaskCirclesForWeek()}
           </View>
         )
     }

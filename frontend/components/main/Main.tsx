@@ -21,7 +21,7 @@ interface Tasks {
     signOut: ()=>void;
 }
 
-const DEBUG = true
+const DEBUG = false
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
@@ -457,6 +457,12 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               onPress={() => {
                 if(controller.getSelectedTask().getValue() === null)
                   controller.createNewTask()
+                  console.log("Made new task")
+                  if(controller.getDisplay().getValue() != 0)
+                    console.log("Calling to rerending since in week view")
+                    console.log(controller.getReRender().getValue())
+                    controller.setReRender(controller.getReRender().getValue()? false : true)
+                    console.log(controller.getReRender().getValue())
               }}
               >
                 <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>

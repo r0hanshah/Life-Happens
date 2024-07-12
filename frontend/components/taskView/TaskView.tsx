@@ -662,6 +662,12 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </View>
                         {/* Display users/ancestor tasks */}
                         {!viewUsers && renderAncestors()}
+                        {viewUsers && 
+                        <View>
+                            {/* Invite User */}
+                            <InviteUser taskId={task.id} inviterId={inviterId} />  
+                        </View>
+                        }
                         
                         {/* View displaying dates */}
                         <View style={[{width:'100%', zIndex:4}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
@@ -736,8 +742,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             }
                             
                         </View>
-                        {/* Invite User */}
-                        <InviteUser taskId={task.id} inviterId={inviterId} />
 
                         {/* Notes */}
                         <View style={[{ width: '100%', marginTop: 20 }, isLeft ? { paddingRight: 30 } : { paddingLeft: 35 }]}>

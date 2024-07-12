@@ -5,6 +5,7 @@ import { deleteUser } from '../../../services/taskServices';
 import MainController from '../../../controllers/main/MainController';
 import UserModel from '../../../models/UserModel';
 import * as DocumentPicker from 'expo-document-picker';
+import { updateUser } from '../../../services/taskServices';
 
 
 interface EditAccountProps {
@@ -68,7 +69,7 @@ const EditAccount: React.FC<EditAccountProps> = ({cancel, saveChanges, user}) =>
             <TextInput
             style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignVertical:'bottom', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
             scrollEnabled={false}
-            onChangeText={()=>{}}
+            onChangeText={setName}
             value={name}
             multiline={true}
             placeholder='Full Name...'
@@ -79,7 +80,7 @@ const EditAccount: React.FC<EditAccountProps> = ({cancel, saveChanges, user}) =>
             <TextInput
             style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignVertical:'bottom', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
             scrollEnabled={false}
-            onChangeText={()=>{}}
+            onChangeText={setEmail}
             value={email}
             multiline={true}
             placeholder='user@example.com'
@@ -96,7 +97,20 @@ const EditAccount: React.FC<EditAccountProps> = ({cancel, saveChanges, user}) =>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{
                     // handle saving changes to user's profile
-                    saveChanges()
+                    // saveChanges()
+                    user.name = name
+                    user.email = email
+                    updateUser(user.id, {
+                      AllowAIMoveTasks: false,
+                      ID: user.id,
+                      Name: user.name,
+                      ParentsOfLeafNodesByTask: {},
+                      ProfilePicture: "",
+                      Settings: {},
+                      SharedTaskTrees: [],
+                      TaskTreeRoots: [],
+                      WeeklyAITimesAllowed: 3})
+                    cancel()
                 }} style={{
                     padding:10,
                     paddingHorizontal:20,

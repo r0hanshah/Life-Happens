@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, useWindowDimensions, Animated, ViewStyle, TextStyle } from 'react-native';
+import MainController from '../../../controllers/main/MainController';
+import moment from 'moment';
 
 interface WeekProps {
     dayNodes: React.JSX.Element[];
@@ -11,6 +13,7 @@ interface WeekProps {
 const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
     const [scrollValue, setScrollValue] = useState(0);
     const currentDate = new Date()
+    const controller = MainController.getInstance()
 
     useEffect(() => {
         const listenerId = scrollY.addListener(({ value }) => {
@@ -22,6 +25,22 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
         scrollY.removeListener(listenerId);
         };
     }, [scrollY]);
+
+    const [reRender, setReRender] = useState<boolean>(false)
+
+  useEffect(()=>{
+    const renderListener = controller.getReRender();
+
+    const listener = (bool: boolean) => {
+      setReRender(bool);
+    };
+
+    renderListener.addListener(listener)
+
+    return () => {
+      renderListener.removeListener(listener);
+    };
+  }, [controller])
 
     const formatTime = (date:Date) => {
         const hours = (date.getHours()%12).toString();
@@ -41,6 +60,15 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
 
         return totalMinutes;
     };
+
+    const getDateDifference = (d1:Date, d2:Date) => {
+        const date1Moment = moment(d1);
+        const date2Moment = moment(d2);
+        const differenceInDays = date2Moment.diff(date1Moment, 'days');
+        return differenceInDays;
+      };
+    
+    const dateDifference = getDateDifference(currentDate, controller.getMoment().getValue().toDate())
 
     const hourStyle:TextStyle=
     {
@@ -62,11 +90,13 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
             {(scrollValue > 200 && scrollValue < 1000) ? <View style={{position:'absolute', top: scrollValue-210, backgroundColor:'#151515', height: 80,
               width: 100, paddingTop:40, zIndex:999, left:-91}}></View> : <></>}
 
-            <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:calculateMinutesSinceMidnight(currentDate)*0.52 + 60}}>
+            {(dateDifference <= 0 && dateDifference > -7) ? 
+            <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:calculateMinutesSinceMidnight(currentDate)*0.527 + 60}}>
                 <Text style={{color:'#D35454', marginRight:5}}>{formatTime(currentDate)}</Text>
                 <View style={{height:5, width:5, backgroundColor:'#D35454', borderRadius:5}}/>
                 <View style={{width:53, height:1, backgroundColor:'#D35454'}}/>
-            </View>
+            </View> : <></>}
+            
             
             <View style={{position:'absolute', flexDirection:'column', left:-40, marginTop:60, alignItems:'flex-end'}}>
                 <Text style={hourStyle}>1 AM</Text>
