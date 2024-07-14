@@ -326,11 +326,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           // Draw first column line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
-            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.38 + 0.051*((offset) + (((index)-4)%3+1)), rootId, leftBound])
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.23 + 0.05*((offset) + (((index)-4)%3+1)), rootId, leftBound])
           }
           else
           {
-            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.38 + 0.051* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.23 + 0.05* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
           }
 
           // Draw horizontal lines

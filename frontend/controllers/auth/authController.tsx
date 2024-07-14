@@ -12,7 +12,7 @@ class AuthController {
       // Initialization code here
     }
 
-    async handleLogin(email:string, password:string, completion:()=>void) {
+    async handleLogin(email:string, password:string, completion:()=>void, handleBadLogin:()=>void) {
         try {
           const response = await fetch('http://127.0.0.1:5000/login', {
             method: 'POST',
@@ -26,6 +26,7 @@ class AuthController {
           });
     
           if (!response.ok) {
+            handleBadLogin();
             throw new Error('Login failed');
           }
     

@@ -105,12 +105,12 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
       for(const task of leafTasks)
       {
+        if(circles.length >= Math.ceil((windowWidth/7 - 100)/34)) {break}
         circles.push(
           <TouchableHighlight style={{width: 13, height: 13, borderRadius: 13,  marginLeft: 8}}  key={`leafTask${task.id}`} onPress={() => controller.setSelectedTask(task)}>
                <View style={{width: 13, height: 13, borderRadius: 13, backgroundColor: task.color}}/>
           </TouchableHighlight>
         )
-        if(circles.length >= Math.ceil((windowWidth/7 - 100)/34)) {break}
       }
 
       const diff = leafTasks.length - circles.length
@@ -125,6 +125,21 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           }
         </View>
       )
+  }
+
+  const renderWiresForDay = () => {
+    const lines =[]
+    for(const task of leafTasks)
+    {
+      if (lines.length >= 0 && lines.length < 3)
+      lines.push(
+      <>
+        <View style={{position:'absolute', width:2, backgroundColor:task.color, height:5*leafTasks[0].offset * 4 + 10 + lastRowExtension, top: 40, alignSelf:'flex-start', left:50 + (20)* (lines.length)}}/>
+        <View style={{position:'absolute', width:(windowWidth/7 - 50) - 40 * (lines.length+1 )+ (20)* (lines.length), backgroundColor:task.color, height:2, top: 40 + 5*leafTasks[0].offset * 4 + 10 + lastRowExtension, alignSelf:'flex-start', left:50 + (20)* (lines.length)}}/>
+      </>
+      )
+    }
+    return lines
   }
 
   const renderTaskCirclesForWeek = () => {
@@ -250,6 +265,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
               }}>{dayNumber}</Text>
               {/* Render task circles */}
               {renderTaskCircles()}
+              {/* {renderWiresForDay()} */}
             </View>
             <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
               <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 5 ? leafTasks[5].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
@@ -259,15 +275,15 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           </View>
           <View style={{flexDirection: "row", justifyContent: "flex-start", width: "100%"}}>
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3, marginLeft: windowWidth * 0.04}}/>
-            <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.043 + leafTasks[0].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 0 ? leafTasks[0].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.057 + leafTasks[0].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 0 ? leafTasks[0].color : "rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
   
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-            <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.043 + leafTasks[1].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 1 ? leafTasks[1].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.057 + leafTasks[1].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 1 ? leafTasks[1].color : "rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
   
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-            <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.043 + leafTasks[2].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.057 + leafTasks[2].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
           </View>
         </View>
