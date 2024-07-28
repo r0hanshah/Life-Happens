@@ -75,7 +75,8 @@ def signup():
             'Settings':[],
             'SharedTaskTrees':[],
             'TaskTreeRoots':[],
-            'WeeklyAITimesAllowed':[]
+            'WeeklyAITimesAllowed':[],
+            'RestPeriods':[]
         }
 
         db.collection('Users').document(user_id).set(data)
@@ -460,6 +461,20 @@ def delete_user(user_id):
         user_ref.delete()
 
         return jsonify({'message': 'User and all associated tasks deleted successfully'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/user/<user_id>/save_rest_periods', methods=['POST'])
+def save_rest_periods(user_id):
+    try:
+        data = request.json
+        rest_periods = data.get('rest_periods')
+
+        user_ref = db.collection('Users').document(user_id)
+        user_ref.update({f"RestPeriods": rest_periods})
+        return jsonify({'message', 'Rest periods saved successfully.'})
+    
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
