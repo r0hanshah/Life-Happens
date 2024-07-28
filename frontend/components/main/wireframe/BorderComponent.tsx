@@ -18,10 +18,17 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
 
   const renderBorders = () => {
     return colorQueue.map((value, index) => {
-      const backgroundColor = value[0], amountFill = value[1] , rootTaskId = value[2], leftBound = value[3], placedInlastRow= value[4] ? value[4] : false
+      let backgroundColor = value[0], amountFill = value[1] , rootTaskId = value[2], leftBound = value[3], placedInlastRow= value[4] ? value[4] : false
       const borderStyle = orientation === 'horizontal' ? styles.horizontalBorder : styles.verticalBorder;
       const containerStyle = orientation === 'horizontal' ? (leftBound? styles.HLContainer : styles.HRContainer) : styles.VContainer
       const zIndex = -(index + 1); // Set zIndex to stack borders
+
+      console.log(amountFill)
+
+      const existsInLastRowOnly = amountFill < 0
+      amountFill = Math.abs(amountFill)
+
+      console.log("Exists in last only:",existsInLastRowOnly, lastRow, orientation)
 
       return (
         <View key={`cont${index}`} style={[containerStyle, {
@@ -31,7 +38,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
         }, placedInlastRow && orientation === 'vertical' ? {alignItems:'flex-end'} : orientation === 'vertical' ? {alignItems: 'center', flexDirection:'column'} : {}]}>
           {/* Empty space for when drawing vertical lines */}
           <View style={[{
-            height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 2,
+            height: orientation==='vertical'? lastRow ? ((windowHeight / 6) * 0.9 + 50)*(1-amountFill < 0 ? 0 : 1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : 2,
             display: orientation==='vertical'? 'flex' : 'none'
           }]} />
           {/* The actual wire being drawn */}
@@ -43,9 +50,10 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
                 position: orientation==='horizontal' ? 'absolute' : 'relative',
                 backgroundColor: backgroundColor,
                 width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 2,
-                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6)* 0.9 + 50)*amountFill : ((windowHeight / 6) * 0.9)*amountFill : 2,
-                top: orientation ==='vertical'?0:2
+                height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6)* 0.9)*amountFill + 50 : ((windowHeight / 6) * 0.9)*amountFill : 2,
+                top: orientation ==='vertical'? lastRow && amountFill <= 1 ? -48*(1-amountFill): 0: 2
               },
+              existsInLastRowOnly ? {top: 144.5} : {}
             ]}
           />
         </View>

@@ -350,7 +350,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
 
                                 {(selectedTask && selectedTask.id == task.id) && 
-                                <View style={[{width:'100%', zIndex:4, paddingHorizontal:25}]}>
+                                <View style={[{width:'100%', zIndex:4, paddingHorizontal:25, paddingBottom:20}]}>
                                     <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
                                         <View style={{flexDirection:'row'}}>
                                             <Image
@@ -421,7 +421,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                             </TouchableOpacity>
                                         </View>
 
-                                        <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginVertical:20}} onPress={()=>{
+                                        <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginTop:20}} onPress={()=>{
                                             task.completeness = 1
                                             console.log("clicked", rerender)
                                             setRerender(rerender? false : true)

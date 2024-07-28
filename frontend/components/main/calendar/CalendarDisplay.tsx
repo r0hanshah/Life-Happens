@@ -83,7 +83,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     while (currentDay.isBefore(endDay)) 
     {
         calendarDays.push(
-            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()} lastRowExtension={difference - offset < 7 ? 128 : 0} scrollY={scrollY}/>
+            <DayNode key={currentDay.toString()} dayNumber={parseInt(currentDay.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == currentDay.year() && currentDate.month() == currentDay.month() && currentDate.date() == currentDay.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ currentDay.month() == currentMonth.month()} lastRowExtension={difference - offset < 7 ? 48 : 0} scrollY={scrollY}/>
         );
 
         currentDay.add(1, 'day');

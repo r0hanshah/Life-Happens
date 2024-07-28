@@ -21,7 +21,7 @@ interface Tasks {
     signOut: ()=>void;
 }
 
-const DEBUG = false
+const DEBUG = true
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 

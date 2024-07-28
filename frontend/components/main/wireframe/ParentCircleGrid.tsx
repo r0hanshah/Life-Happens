@@ -97,7 +97,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
       }
   
       components.push(
-        <View key={`row${row}`} style={[styles.row, { position:'absolute', top: ((windowHeight / 6) * 0.9 )*(row)-(rows > 5 ? 222  : 175), width:'100%'}]}>
+        <View key={`row${row}`} style={[styles.row, { position:'absolute', top: ((windowHeight / 6) * 0.9 )*(row)-(rows > 5 ? 222  : 175) + (row == rows-1 ? 50 : 0), width:'100%'}]}>
           {rowComponents}
         </View>
       );
