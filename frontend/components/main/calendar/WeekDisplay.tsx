@@ -64,8 +64,14 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
     const getDateDifference = (d1:Date, d2:Date) => {
         const date1Moment = moment(d1);
         const date2Moment = moment(d2);
-        const differenceInDays = date2Moment.diff(date1Moment, 'days');
-        return differenceInDays;
+
+  
+        date2Moment.add(1, 'days'); // Add one day to d2
+        
+        
+        const differenceInMinutes = date2Moment.diff(date1Moment, 'minutes');
+
+        return differenceInMinutes;
       };
     
     const dateDifference = getDateDifference(currentDate, controller.getMoment().getValue().toDate())
@@ -90,12 +96,13 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
             {(scrollValue > 200 && scrollValue < 1000) ? <View style={{position:'absolute', top: scrollValue-210, backgroundColor:'#151515', height: 80,
               width: 100, paddingTop:40, zIndex:999, left:-91}}></View> : <></>}
 
-            {(dateDifference <= 0 && dateDifference > -7) ? 
+            {(dateDifference >= 0 && dateDifference <= 10080) ? 
             <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:calculateMinutesSinceMidnight(currentDate)*0.527 + 60}}>
                 <Text style={{color:'#D35454', marginRight:5}}>{formatTime(currentDate)}</Text>
                 <View style={{height:5, width:5, backgroundColor:'#D35454', borderRadius:5}}/>
                 <View style={{width:53, height:1, backgroundColor:'#D35454'}}/>
-            </View> : <></>}
+            </View> : <></>
+            }
             
             
             <View style={{position:'absolute', flexDirection:'column', left:-40, marginTop:60, alignItems:'flex-end'}}>

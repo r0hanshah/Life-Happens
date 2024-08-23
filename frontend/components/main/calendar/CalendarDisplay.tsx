@@ -66,7 +66,7 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     }
 
     setWeekDays(weekDays.toReversed())
-  }, [inMoment, mainController]);
+  }, [mainController]);
 
   const renderCalendar = () => {
     const firstDayOfMonth = currentMonth.clone().startOf('month');

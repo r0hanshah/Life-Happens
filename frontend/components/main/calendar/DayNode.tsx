@@ -101,6 +101,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
   const renderTaskCircles = () => 
   {
+      console.log("Task passed into this daynode:", dayNumber, leafTasks.length)
       const circles = []
 
       for(const task of leafTasks)
@@ -144,6 +145,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
   const renderTaskCirclesForWeek = () => {
     const circles = []
+    console.log("Task passed into this week daynode:", dayNumber, leafTasks.length)
 
     for(const task of leafTasks)
     {

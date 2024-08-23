@@ -756,20 +756,6 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             />
                         </View>
 
-
-                        {/* Notes */}
-                        <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
-                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Notes</Text>
-                            <TextInput
-                                style={{width:"100%", color:'white', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:5, minHeight: 300, marginTop:10, padding:10, justifyContent:'flex-start'}}
-                                onChangeText={onChangeText}
-                                value={text}
-                                multiline={true}
-                                placeholder="Enter text here..."
-                                onSubmitEditing={onSubmitEditing}
-                            />
-                        </View>
-
                         {/* Extra Media */}
                         <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
                             <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Extra Media</Text>
