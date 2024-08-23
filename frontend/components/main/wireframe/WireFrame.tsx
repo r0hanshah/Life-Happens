@@ -175,6 +175,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                 count += 1
             }
         }
+        console.log("Leaf node map passed into Calendar display: ", leafTaskByIndex)
         return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex, parentTaskByWireFrame]
     }
 

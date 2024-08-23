@@ -101,7 +101,6 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
   const renderTaskCircles = () => 
   {
-      console.log("Task passed into this daynode:", dayNumber, leafTasks.length)
       const circles = []
 
       for(const task of leafTasks)
@@ -145,17 +144,16 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
   const renderTaskCirclesForWeek = () => {
     const circles = []
-    console.log("Task passed into this week daynode:", dayNumber, leafTasks.length)
-
+    
     for(const task of leafTasks)
     {
       circles.push(
         <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width:'100%'}} onPress={() => controller.setSelectedTask(task)}>
           <View style={{position:'absolute', top:3, left:-5}}>
             <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
-            <View style={{backgroundColor:task.color, width:2, height:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, position:'absolute'}}/>
+            {/* <View style={{backgroundColor:task.color, width:2, height:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, position:'absolute'}}/>
             <View style={{backgroundColor:task.color, width:550, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:2, position:'absolute'}}/>
-            <View style={{backgroundColor:task.color, left:550, width:2, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:148, position:'absolute'}}/>
+            <View style={{backgroundColor:task.color, left:550, width:2, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:148, position:'absolute'}}/> */}
           </View>
           <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.527+10, minWidth:'100%'}}>
             <LinearGradient

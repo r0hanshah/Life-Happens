@@ -46,9 +46,10 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     // Fetch or set the initial month based on your requirements
     // For example, you can set it to the current month
     setCurrentMonth(moment(inMoment));
-    const reRenderState = mainController.getReRender().getValue()
-    mainController.setReRender(reRenderState ? false : true)
-
+    // const reRenderState = mainController.getReRender().getValue()
+    // mainController.setReRender(reRenderState ? false : true)
+    console.log(inMoment)
+    console.log(leafNodesMap)
     console.log("HERE")
 
     //Update weeks
@@ -56,17 +57,21 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     const weekDays:React.JSX.Element[] = [];
     const currentDate = moment(new Date())
 
+    const firstDayOfMonthSet = inMoment.clone().startOf('month').startOf('week');
+    var offset = indexingMoment.diff(firstDayOfMonthSet, 'days')
+
     for(let i =0; i < 7; i++)
     {
       weekDays.push(
-          <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(indexingMoment.date()) ? leafNodesMap[indexingMoment.date()] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0} scrollY={scrollY}/>
+          <DayNode key={indexingMoment.toString()} dayNumber={parseInt(indexingMoment.format('D'),)} dayOfWeek={0} currentDay={currentDate.year() == indexingMoment.year() && currentDate.month() == inMoment.month() && currentDate.date() == indexingMoment.date()} leafTasks={leafNodesMap.hasOwnProperty(offset) ? leafNodesMap[offset] : []} inMonth={ indexingMoment.month() == currentMonth.month()} lastRowExtension={0} scrollY={scrollY}/>
       );
       
       indexingMoment.subtract(1,'day')
+      offset -= 1;
     }
 
     setWeekDays(weekDays.toReversed())
-  }, [mainController]);
+}, [mainController, leafNodesMap, inMoment]);
 
   const renderCalendar = () => {
     const firstDayOfMonth = currentMonth.clone().startOf('month');
