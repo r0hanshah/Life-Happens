@@ -60,6 +60,7 @@ class TaskModel
     completeness:number = 0
     //UI Aids
     offset:number
+    rootIndex:number = 0
 
     isLeftBound():boolean {
         if (this.ancestors.length > 0)

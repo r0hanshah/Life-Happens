@@ -33,7 +33,32 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   const [scrollValue, setScrollValue] = useState(0);
 
   const [reRender, setReRender] = useState<boolean>(false)
+  const [secondReender, setSecondRerender] = useState<boolean>(false)
 
+  const [selectedTask, setSelectedTask] = useState<TaskModel>()
+
+  const [displayGroups, setDisplayGroups] = useState<TaskModel[][]>([])
+  const [idsOfInterest, setIdsOfInterest] = useState<string[]>([])
+
+  useEffect(()=>{
+    console.log("changed display groups")
+  }, [secondReender])
+
+  // Update based on edits made to a task
+  useEffect(()=>{
+    const taskListener = controller.getSelectedTask();
+
+    const listener = (task: TaskModel | null) => {
+      setSelectedTask(task ? task : undefined);
+      console.log("change registered")
+    };
+
+    taskListener.addListener(listener)
+
+    return () => {
+      taskListener.removeListener(listener);
+    };
+  }, [controller])
 
   useEffect(() => {
       const listenerId = scrollY.addListener(({ value }) => {
@@ -74,6 +99,37 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       renderListener.removeListener(listener);
     };
   }, [controller])
+
+  useEffect(()=>{
+    let newDisplayGroups:TaskModel[][] = []
+
+    leafTasks.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+    // Create groups of overlap for each of the tasks in a day
+    for(const task of leafTasks)
+    {
+      if(newDisplayGroups.length == 0)
+      {
+        newDisplayGroups.push([task])
+      }
+      else
+      {
+        const lastTaskRegistered = newDisplayGroups[newDisplayGroups.length-1][ newDisplayGroups[newDisplayGroups.length-1].length-1]
+        if(lastTaskRegistered.startDate.getTime() <= task.startDate.getTime() && task.startDate.getTime() <= lastTaskRegistered.endDate.getTime())
+        {
+          newDisplayGroups[newDisplayGroups.length-1].push(task);
+        }
+        else
+        {
+          newDisplayGroups.push([task])
+        }
+      }
+    }
+
+    
+
+    setDisplayGroups(newDisplayGroups);
+  }, [leafTasks])
 
   const containerStyle:ViewStyle=
   {
@@ -142,46 +198,103 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     return lines
   }
 
+  const swap = (arr: any[], index1: number, index2: number) => {
+    const temp = arr[index1];
+    arr[index1] = arr[index2];
+    arr[index2] = temp;
+    return arr;
+  };
+
+  const setDateToEndOfDay = (date: Date): Date => {
+    const newDate = new Date(date)
+    newDate.setHours(23, 59, 59, 999); // Set time to 11:59:59.999 PM
+    return newDate;
+  };
+
   const renderTaskCirclesForWeek = () => {
     const circles = []
-    
-    for(const task of leafTasks)
-    {
-      circles.push(
-        <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width:'100%'}} onPress={() => controller.setSelectedTask(task)}>
-          <View style={{position:'absolute', top:3, left:-5}}>
-            <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
-            {/* <View style={{backgroundColor:task.color, width:2, height:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, position:'absolute'}}/>
-            <View style={{backgroundColor:task.color, width:550, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:2, position:'absolute'}}/>
-            <View style={{backgroundColor:task.color, left:550, width:2, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:148, position:'absolute'}}/> */}
-          </View>
-          <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.527+10, minWidth:'100%'}}>
-            <LinearGradient
-                colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)']}              
-                style={{ flex: 1}}/>
-            <View style={{position:'absolute', paddingLeft:15, top:-5}}>
-              <Text style={{color:'white'}}>{task.title}</Text>
-              {getMinutesDifference(task.startDate, task.endDate) >= 60 ? 
-              <Text style={{color:'#919191', fontSize:10}}>{formatTime(task.startDate)} - {formatTime(task.endDate)}</Text> : <></>}
-              {getMinutesDifference(task.startDate, task.endDate) >= 120 ? 
-              <Text style={{color:'#919191', fontSize:10}}>{getMinutesDifference(task.startDate, task.endDate)} minutes</Text> : <></>}
-            </View>
-            
-          </View>
-          
-          <View style={{position:'absolute', left:5,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
-            <LinearGradient
-              colors={[task.color, 'rgba(0, 0, 0, 0)']}              
-              style={{ flex: 1}}/>
-          </View>
+    const currentDate = new Date()
 
-          <View style={{position:'absolute', backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
+    // Each group should have a double click functionality to where the task clicked is expanded and shows more details. Once expanded it can be clicked to display leaf task on the side.
+    let displays =[]
+    for(let j = 0; j < displayGroups.length; j++)
+    {
+      let displayGroup = displayGroups[j]
+      for(let i = 0; i < displayGroup.length; i++)
+      {
+        let task = displayGroup[i]
+        let weekDay = task.startDate.getDay()
+        if(i == 0)
+        {
+          displays.push(
+            <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}} onPress={() => {
+                controller.setSelectedTask(task);
+                setSelectedTask(task);
+              }}>
+
+              <View style={{position:'absolute', top:3, left:-5}}>
+                <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
+                <View style={{backgroundColor:task.color, width:2, height:(-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.527+150, position:'absolute'}}/>
+                <View style={{backgroundColor:task.color, width: task.isLeftBound() ? weekDay * 50 : (7 - weekDay) * (windowWidth/7 * 0.75 + 18 + (6-weekDay)*10) , top:(-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.527+150, height:2, position:'absolute'}}/>
+                <View style={[{backgroundColor:task.color, width:2, top:(-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.527+150, height: 153 + task.rootIndex*60, position:'absolute'}, task.isLeftBound() ? {  } : {left: (7 - weekDay) * (windowWidth/7 * 0.75 + 18 + (6-weekDay)*10)}]}/>
+              </View>
+
+              <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.527+10, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}}>
+                <LinearGradient
+                    colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)']}              
+                    style={{ flex: 1}}/>
+                <View style={{position:'absolute', paddingLeft:15, top:-5}}>
+                  <Text style={{color:'white'}}>{task.title}</Text>
+                  {getMinutesDifference(task.startDate, task.endDate) >= 60 ? 
+                  <Text style={{color:'#919191', fontSize:10}}>{formatTime(task.startDate)} - {formatTime(task.endDate)}</Text> : <></>}
+                  {getMinutesDifference(task.startDate, task.endDate) >= 120 ? 
+                  <Text style={{color:'#919191', fontSize:10}}>{getMinutesDifference(task.startDate, task.endDate)} minutes</Text> : <></>}
+                </View>
+                
+              </View>
+              
+              <View style={{position:'absolute', left:5,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
+                <LinearGradient
+                  colors={[task.color, 'rgba(0, 0, 0, 0)']}              
+                  style={{ flex: 1}}/>
+              </View>
+
+              <View style={{position:'absolute', backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
+              
+            </TouchableOpacity>
+          )
+        }
+        else
+        {
+          displays.push(
+            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width:10}} onPress={() => {
+                displayGroups[j] = swap(displayGroups[j], 0, i)
+                setDisplayGroups(displayGroups)
+                setSecondRerender(!secondReender)
+                idsOfInterest[j] = task.id
+              }}>
+                <View style={{position:'absolute', top:3, right:-5}}>
+                  <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
+                  {/* <View style={{backgroundColor:task.color, width:2, height:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, position:'absolute'}}/>
+                  <View style={{backgroundColor:task.color, width:550, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:2, position:'absolute'}}/>
+                  <View style={{backgroundColor:task.color, left:550, width:2, top:(670-getMinutesDifference(task.startDate, task.endDate))*0.527+10, height:148, position:'absolute'}}/> */}
+                </View>
+
+                <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
+                  <LinearGradient
+                    colors={[task.color, 'rgba(0, 0, 0, 0)']}              
+                    style={{ flex: 1}}/>
+                </View>
+
+                <View style={{position:'absolute', right:-5, backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
+            </TouchableOpacity>
+          )
           
-        </TouchableOpacity>
-      )
+        }
+      }
     }
 
-    return circles
+    return displays
   }
 
   const calculateMinutesSinceMidnight = (date:Date) => {
@@ -218,8 +331,11 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           <View style={weekContainerStyle}>
             {(scrollValue > 200 && scrollValue < 1000) ? 
             <View style={{position:'absolute', top: scrollValue-250, backgroundColor:'#151515', height: 120,
-              width: windowWidth/7 * 0.75, paddingTop:80}}>
-                <View style={{height:40, width:'100%', bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row"}}>
+              width: windowWidth/7 * 0.75, paddingTop:80, zIndex: 999}}>
+                <View style={{height:40, width: windowWidth/7 * 0.75 + 10, left:-5, bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row", 
+                  borderLeftWidth:5, borderLeftColor: '#151515',
+                  borderRightWidth:5, borderRightColor:'#151515'
+                  }}>
                   <Text style={{
                     color: '#fff',
                     paddingLeft: 15,

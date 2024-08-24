@@ -156,6 +156,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                             break
                         }
                     }
+                    leafNode.rootIndex = rootIndex
                     
 
                     // Create Leaf Id and parent node id

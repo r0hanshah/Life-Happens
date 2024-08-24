@@ -31,8 +31,10 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
             if (momentEndDate.isBetween(startDay,endDay))
             {
                 leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
+                task.rootIndex = count;
                 count += 1;
             }
+
         }
 
         // Right Bound Tasks
@@ -43,6 +45,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
             if (momentEndDate.isBefore(endDay) && momentEndDate.isAfter(firstDayOfMonth))
             {
                 rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
+                task.rootIndex = count;
                 count += 1;
             }
         }

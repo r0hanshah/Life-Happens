@@ -287,6 +287,8 @@ class MainController {
 
     public saveEditToTask(task:TaskModel)
     {
+      console.log("updating task...")
+      this.setReRender(this.getReRender().getValue() ? false : true)
       this.debounce(this.saveChangesToTask, 1000)(task)
     }
 
@@ -314,6 +316,7 @@ class MainController {
         IsRoot: task.isRoot,
         Completeness: task.completeness
       }
+
       updateTask(taskData, taskPathArray)
     }
 
