@@ -109,13 +109,14 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
    
       if (typeof day === 'number')
       {
-        const date = new Date(year, month-1, day)
+        const date = new Date(year, month-1, day, task.startDate.getHours(), task.startDate.getMinutes()+1)
         setSelectedDate(date)
 
         if (modStartDate)
         {
           const diff = task.endDate.getTime() - task.startDate.getTime()
           task.endDate = new Date(date.getTime() + diff)
+          console.log("This is the new endate: ", task.endDate)
         }
 
         const dayOfWeek = daysOfWeek[date.getDay()];
@@ -137,7 +138,6 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
 
         // Refresh main view
         const mainController = MainController.getInstance();
-        mainController.setReRender(mainController.getReRender().getValue() ? false : true)
 
         if(updateServer)
         {
