@@ -61,6 +61,20 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
         return totalMinutes;
     };
 
+    const renderHourlyLines = () => {
+      let lines = []
+      for(let i = 0; i < 24; i ++)
+      {
+        lines.push(
+          <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:(i*60)*0.547 + 50}}>
+              <Text style={{color:'#D35454'}}>{i}</Text>
+              <View style={{width:20, height:1, backgroundColor:'#D35454'}}/>
+          </View>
+        )
+      }
+      return lines
+    }
+
     const getDateDifference = (d1:Date, d2:Date) => {
         const date1Moment = moment(d1);
         const date2Moment = moment(d2);
@@ -80,10 +94,11 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
     {
         color:'#717171', 
         textAlign:'right', 
-        marginBottom:15,
+        marginBottom:23,
         backgroundColor:'#151515',
         paddingRight:15,
-        width:'auto'
+        width:'auto',
+        height: 10
     }
 
     const nonKeyHourStyle:TextStyle=
@@ -97,15 +112,18 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
               width: 100, paddingTop:40, zIndex:999, left:-91}}></View> : <></>}
 
             {(dateDifference >= 0 && dateDifference <= 10080) ? 
-            <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:calculateMinutesSinceMidnight(currentDate)*0.527 + 60}}>
+            <View style={{position:'absolute', flexDirection:'row', alignItems:'center', left:-80, top:calculateMinutesSinceMidnight(currentDate)*0.547 + 50}}>
                 <Text style={{color:'#D35454', marginRight:5}}>{formatTime(currentDate)}</Text>
                 <View style={{height:5, width:5, backgroundColor:'#D35454', borderRadius:5}}/>
                 <View style={{width:53, height:1, backgroundColor:'#D35454'}}/>
-            </View> : <></>
+            </View> :
+            // Display lines based off the hour
+            <></>
+            // renderHourlyLines()
             }
             
             
-            <View style={{position:'absolute', flexDirection:'column', left:-40, marginTop:60, alignItems:'flex-end'}}>
+            <View style={{position:'absolute', flexDirection:'column', left:-40, marginTop:80, alignItems:'flex-end'}}>
                 <Text style={hourStyle}>1 AM</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>2</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>3</Text>
@@ -117,7 +135,7 @@ const WeekDisplay: React.FC<WeekProps> = ({dayNodes, scrollY}) => {
                 <Text style={[hourStyle, nonKeyHourStyle]}>9</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>10</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>11</Text>
-                <Text style={[hourStyle, nonKeyHourStyle]}>12</Text>
+                <Text style={[hourStyle]}>12 PM</Text>
                 <Text style={hourStyle}>1 PM</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>2</Text>
                 <Text style={[hourStyle, nonKeyHourStyle]}>3</Text>

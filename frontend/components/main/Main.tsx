@@ -428,6 +428,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               <TouchableOpacity style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, alignItems:'center', justifyContent:'center', marginLeft:20}} onPress={
                 ()=>{
                   controller.setMoment(displayType==1? moment(new Date()).endOf('week') : moment(new Date()))
+                  controller.setReRender(controller.getReRender().getValue() ? false: true)
                 }
               }>
                 <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20}}>Today</Text>

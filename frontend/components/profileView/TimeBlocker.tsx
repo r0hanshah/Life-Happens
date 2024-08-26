@@ -157,7 +157,7 @@ const TimeBlocker: React.FC<TimeBlockerInterface> = ({user}) => {
           <TouchableOpacity onPress={() => {
             handleRowClick(rowIndex)
           }}>
-            <Text style={{color:'gray', width:50, marginLeft:5}}>{((rowIndex+1)%12) == 0 ? 12 : ((rowIndex+1)%12)} {((rowIndex)%12) == 0 ? (rowIndex )/12 == 1 ? 'PM' : 'AM' : rowIndex == 23 ? 'AM' :''}</Text>
+            <Text style={{color:'gray', width:50, marginLeft:5}}>{((rowIndex+1)%12) == 0 ? 12 : ((rowIndex+1)%12)} {((rowIndex)%12) == 0 ? (rowIndex )/12 == 1 ? 'PM' : 'AM' : rowIndex == 23 ? 'AM' : rowIndex == 11 ? 'PM' :''}</Text>
           </TouchableOpacity>
           
         </View>

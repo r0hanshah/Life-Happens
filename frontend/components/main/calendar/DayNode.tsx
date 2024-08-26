@@ -233,7 +233,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
         let weekDay = task.startDate.getDay()
 
         //Length of wires
-        let heightFromStartDate = (-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.527+150
+        let heightFromStartDate = (-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.547 +132
         let heightFromEndOfCalendar = 153 + task.rootIndex*60
 
         if(i == 0)
@@ -241,7 +241,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           let widthFromDay = task.isLeftBound() ? weekDay * (windowWidth/7 * 0.86) : (7 - weekDay) * (windowWidth/7 * 0.86)
 
           displays.push(
-            <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}} onPress={() => {
+            <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}} onPress={() => {
                 controller.setSelectedTask(task);
                 setSelectedTask(task);
               }}>
@@ -254,7 +254,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                 <View style={[{backgroundColor:task.color, width:30, top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? {right:widthFromDay-30 } : {left: widthFromDay - 30}]}/>
               </View>
 
-              <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.527+10, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}}>
+              <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.547, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}}>
                 <LinearGradient
                     colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)']}              
                     style={{ flex: 1}}/>
@@ -268,7 +268,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                 
               </View>
               
-              <View style={{position:'absolute', left:5,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
+              <View style={{position:'absolute', left:5,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547 +10}}>
                 <LinearGradient
                   colors={[task.color, 'rgba(0, 0, 0, 0)']}              
                   style={{ flex: 1}}/>
@@ -285,7 +285,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           let distanceFromCircle = 6 + 10*(i-1)
 
           displays.push(
-            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.527+60, width:10, zIndex:-i}} onPress={() => {
+            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width:10, zIndex:-i}} onPress={() => {
                 displayGroups[j] = swap(displayGroups[j], 0, i)
                 setDisplayGroups(displayGroups)
                 setSecondRerender(!secondReender)
@@ -303,7 +303,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   <View style={[{backgroundColor:task.color, width:10 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-10} : {left: widthFromDay + distanceFromCircle-10}]}/>
                 </View>
 
-                <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.527+10}}>
+                <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547 +10}}>
                   <LinearGradient
                     colors={[task.color, 'rgba(0, 0, 0, 0)']}              
                     style={{ flex: 1}}/>
