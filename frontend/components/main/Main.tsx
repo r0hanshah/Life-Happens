@@ -407,9 +407,11 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               </TouchableOpacity>
               : <View style={{display:'none'}}/>}
 
+              {/* Month displayed here */}
+
               <TouchableOpacity onPress={()=>{
                 controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' :'months'));
-                console.log(currentMonth)
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
                 }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableOpacity>
@@ -418,7 +420,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
               <TouchableOpacity onPress={()=>{
                 controller.setMoment(moment(displayType == 1 ? currentMonth.clone().endOf('week') : currentMonth).add(1, displayType == 1 ? 'weeks' : 'months'))
-                console.log(currentMonth)
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
                 }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
               </TouchableOpacity>
@@ -457,9 +459,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               onPress={() => {
                 if(controller.getSelectedTask().getValue() === null)
                   controller.createNewTask()
-                  console.log("Made new task")
                   if(controller.getDisplay().getValue() != 0)
-                    console.log("Calling to rerending since in week view")
                     console.log(controller.getReRender().getValue())
                     controller.setReRender(controller.getReRender().getValue()? false : true)
                     console.log(controller.getReRender().getValue())
