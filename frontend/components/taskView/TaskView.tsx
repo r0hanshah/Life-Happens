@@ -16,6 +16,7 @@ import TimeSelector from './TimeSelector';
 import CreateSubTaskView from './CreateSubTaskView';
 import ColorSelector from './ColorSelector';
 import InviteUser from './InviteUser';
+import Canvas from './treeView/Canvas';
 
 
 interface TaskViewProps {
@@ -31,6 +32,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const [viewUsers, setViewUsers] = useState(false)
   const [isMovable, setIsMovable] = useState(task.isMovable)
   const [generating, setGenerating] = useState(false)
+
+  const [viewTree, setViewTree] = useState(false);
+
+  let windowHeight = useWindowDimensions().height;
+  let windowWidth = useWindowDimensions().width;
 
   let [fontsLoaded] = useFonts({
     Inter_900Black
@@ -595,7 +601,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
 
   return(
-    <View style={{overflow:'hidden', minHeight:'100%'}}>
+    <View style={{minHeight:'100%'}}>
         <View style={isLeft ? styles.gradientOverlayL : styles.gradientOverlayR}>
             <LinearGradient
             colors={[task.color, darkenColor(task.color, 0.9)]}              
@@ -1045,11 +1051,29 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 
                 
             </ScrollView>
+
+            {viewTree &&
+            <View  style={[{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505'}, isLeft ? {left:windowWidth*0.475} : {right:windowWidth*0.475}]}>
+                <View style={[styles.container, isLeft ? styles.containerL : styles.containerR, {overflow:'hidden'}]}>
+                    <Canvas/>
+
+                </View>
+                <View style={isLeft ? styles.gradientOverlayL : styles.gradientOverlayR}>
+                    <LinearGradient
+                    colors={[task.color, darkenColor(task.color, 0.9)]}              
+                    style={styles.gradient}/>
+                </View>
+            </View>
+            }
             
             {/* X and other page manipulation components */}
-            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20} : {left:20}]}>
+            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20 - (viewTree ? windowWidth*0.51 : 0)} : {left:20 - (viewTree ? windowWidth*51 : 0)}]}>
                     <TouchableOpacity onPress={onPress}>
                         <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{position:'absolute', top:useWindowDimensions().height*0.49}} onPress={()=>{setViewTree(!viewTree)}}>
+                        <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: viewTree ? '90deg' : '-90deg'}]}}/>
                     </TouchableOpacity>
             </View>
             

@@ -263,7 +263,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       setRootTaskMap(orderedMaps[1])
     }, [rootTasks]);
 
-    const animationRef = useRef(new Animated.Value(task ? 0 : 222)).current;
+    const animationRef = useRef(new Animated.Value(task ? 0 : windowWidth*0.49)).current;
     const animationProfileRef = useRef(new Animated.Value(profileClicked ? 0 : 222)).current;
 
     useEffect(() => {
