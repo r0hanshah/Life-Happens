@@ -85,7 +85,7 @@ const Canvas: React.FC = () => {
     onMouseLeave={() => setIsHovered(false)}>
         <GestureDetector gesture={composedGesture}>
         <Animated.View style={[styles.canvas, animatedStyle]}>
-            {/* Add your interactive components here */}
+            {/*Generate Tree Here */}
             <View style={styles.box} />
             <View style={[styles.box, { top: 200, left: 200 }]} />
         </Animated.View>
