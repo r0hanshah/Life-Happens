@@ -17,6 +17,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToLogin, navigateToMain, navigateToLanding}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [badLogin, setBadLogin] = useState(false);
   const controller = new AuthController()
 
 
@@ -91,9 +92,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
                    value={password} />
 
 
-        <TouchableOpacity style={styles.button} onPress={()=>{controller.handleLogin(email, password, navigateToMain)}}>
+        <TouchableOpacity style={styles.button} onPress={()=>{
+          setBadLogin(false)
+          controller.handleLogin(email, password, navigateToMain, ()=>{setBadLogin(true)})
+          }}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
+        {badLogin &&
+        <Text style={{color:'red'}}>Log in was unsuccessful...</Text>
+        }
         {/*<TouchableOpacity style={[styles.button, styles.googleButton]} onPress={signInWithGoogle}>*/}
         {/*  <Ionicons name="logo-google" size={24} color="white" />*/}
         {/*  <Text style={styles.buttonText}>Log in with Google</Text>*/}

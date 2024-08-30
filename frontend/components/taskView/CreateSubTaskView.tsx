@@ -70,8 +70,8 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
 
   return(
-    <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, zIndex:zIndex}}>
-        <View style={{flexDirection:'column', alignItems:'flex-start',  height:300 + (task.notes.length > 0 ? 100 : 0), width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:zIndex}}>
+    <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, paddingBottom:20, zIndex:zIndex}}>
+        <View style={{flexDirection:'column', alignItems:'flex-start', width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:zIndex, paddingBottom:20}}>
             <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
                     
                     <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
@@ -176,7 +176,7 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
             </View>
 
             {/* Cancel or Create sub task */}
-            <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingVertical:10, zIndex:-1}}>
+            <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingTop:20, zIndex:-1}}>
                 <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'red', justifyContent:'center', alignItems:'center'}} onPress={()=>{handleDeleteNewTask(task)}}>
                     <Text style={{color:'white'}}>Cancel</Text>
                 </TouchableOpacity>

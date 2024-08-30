@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
 import moment, { Duration } from 'moment';
 import TaskModel from '../../models/TaskModel';
@@ -10,10 +10,28 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [hexCode, setHexCode] = useState(task.color.substring(1))
+
+    const mainController = MainController.getInstance()
    
     const handleContainerClick = () => {
-      setIsSquareVisible(!isSquareVisible);
+      mainController.setToggledPopupKey(mainController.getToggledPopupKey().getValue() == task.id+'c' ? '' : task.id + 'c')
+      setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id+'c');
     };
+
+    useEffect(()=>{
+      const popupListener = mainController.getToggledPopupKey();
+  
+      const listener = (key:string) => {
+        setIsSquareVisible(mainController.getToggledPopupKey().getValue() == task.id+'c')
+      };
+  
+      popupListener.addListener(listener)
+  
+      return () => {
+          popupListener.removeListener(listener);
+      }
+  
+    },[mainController])
 
     const handleChangeColor = () => {
       const hexRegex = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
@@ -23,8 +41,8 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
         const color = "#" + hexCode
         colorTree(task.ancestors.length > 0 ? task.ancestors[task.ancestors.length-1] : task, color)
 
-        const mainController = MainController.getInstance();
         mainController.setReRender(mainController.getReRender().getValue() ? false : true)
+        mainController.setToggledPopupKey('')
         setIsSquareVisible(false)
       }
       else

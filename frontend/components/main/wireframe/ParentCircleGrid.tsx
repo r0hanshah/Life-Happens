@@ -22,12 +22,16 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
   const controller = MainController.getInstance();
 
   const windowWidth = useWindowDimensions().width;
-  const windowHeight = useWindowDimensions().height;
+  const windowHeight = 630;
 
   const [colors, setColors] = useState<ColorMapType>({});
   const [parentTasksMap, setParentTasksMap] = useState<{[key: string]: TaskModel}>({})
 
   const [currentMonth, setCurrentMonth] = useState(inMoment);
+
+  useEffect(()=>{
+    setCurrentMonth(moment(inMoment))
+  }, [inMoment])
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {
@@ -66,15 +70,16 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
     const endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
 
     const daysDifference = endDay.diff(startDay, 'days');
+    const rows = (daysDifference+1)/7
 
     const columns = 8;
     const components = [];
-    for(var row = 0; row < daysDifference; row+=7)
+    for(var row = 0; row < rows; row++)
     {
       const rowComponents = [];
   
       for (let col = 0; col < columns; col++) {
-        const id = `${row/7}${col}`;
+        const id = `${row}${col}`;
   
         rowComponents.push(
           <View key={id}>
@@ -92,7 +97,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
       }
   
       components.push(
-        <View key={`row${row/7}`} style={[styles.row, { height: ((windowHeight / 6) * 0.9 + (row/7 == Math.ceil(daysDifference/7 - 1) ? 50.5 : 0))}]}>
+        <View key={`row${row}`} style={[styles.row, { position:'absolute', top: ((windowHeight / 6) * 0.9 )*(row)-(rows > 5 ? 222  : 175) + (row == rows-1 ? 50 : 0), width:'100%'}]}>
           {rowComponents}
         </View>
       );

@@ -63,12 +63,25 @@ class AIFunctions:
     def __init__(self) -> None:
         self.llm = ChatOpenAI(api_key=OPENAI_APIKEY)
 
-    def generate_tasks(self, context_text, start_date_iso_string, end_date_iso_string, pre_existing_subtasks=[], file_paths=[]): 
+    def generate_tasks(self, task_name, context_text, start_date_iso_string, end_date_iso_string, pre_existing_subtasks=[], file_paths=[]): 
         #TODO: Pass pre existing sub tasks and their durations
         #TODO: Limit the number of tasks that can be produced by the AI based on user's membership
 
         # Find and load the observed documents in firebase firestore
         print(file_paths)
+
+        if(len(file_paths) == 0):
+            prompt = ChatPromptTemplate.from_template("""The user needs to complete their task from """+start_date_iso_string+" to "+end_date_iso_string+"."+"""Help the user make 3 new sub tasks to finish their task based on the information available:
+
+            Task: {input}"""+"\nUser Provided Context:"+context_text + "\nPre-Existing Subtasks:\n" + self.__stringify_subtasks(pre_existing_subtasks))
+
+            parser = JsonKeyOutputFunctionsParser(key_name="task")
+
+            chain = prompt | self.llm.bind(functions=openai_functions) | parser
+
+            response = chain.invoke({"input": task_name})
+
+            return response
 
         docs = []
 
@@ -109,7 +122,7 @@ class AIFunctions:
 
         parser = JsonKeyOutputFunctionsParser(key_name="task")
 
-        doc_response = retrieval_chain.invoke({"input": "What are the next steps to complete the app?"})
+        doc_response = retrieval_chain.invoke({"input": task_name})
 
         parser_prompt = ChatPromptTemplate.from_template("""The user needs to completer their task from """+start_date_iso_string+" to "+end_date_iso_string+"."+"""Help the user make 3 new sub tasks to finish their task based on the information available:
 
@@ -123,7 +136,7 @@ class AIFunctions:
 
         chain = parser_prompt | self.llm.bind(functions=openai_functions) | parser
 
-        response = chain.invoke({"input": "I need to build an AI that can scan documents and summarize them."})
+        response = chain.invoke({"input": task_name})
         return response
     
     def __convert_files_to_txt(self):

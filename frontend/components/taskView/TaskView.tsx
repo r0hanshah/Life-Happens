@@ -16,6 +16,7 @@ import TimeSelector from './TimeSelector';
 import CreateSubTaskView from './CreateSubTaskView';
 import ColorSelector from './ColorSelector';
 import InviteUser from './InviteUser';
+import Canvas from './treeView/Canvas';
 
 
 interface TaskViewProps {
@@ -31,6 +32,11 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const [viewUsers, setViewUsers] = useState(false)
   const [isMovable, setIsMovable] = useState(task.isMovable)
   const [generating, setGenerating] = useState(false)
+
+  const [viewTree, setViewTree] = useState(false);
+
+  let windowHeight = useWindowDimensions().height;
+  let windowWidth = useWindowDimensions().width;
 
   let [fontsLoaded] = useFonts({
     Inter_900Black
@@ -294,6 +300,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
     validateDelete()
   }, [deleteInput])
 
+  // Re render task view here
+  const [rerender, setRerender] = useState(false)
+
+  useEffect(()=>{
+    console.log("Rerendering")
+  },[rerender])
+
   const scrollViewRef = useRef<ScrollView>(null);
 
   const scrollToBottom = () => {
@@ -314,7 +327,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20}}>
 
                     {task.children.map((task, index) => (
-                        <TouchableOpacity key={index} style={{ height: selectedTask && selectedTask.id == task.id ? 250 : 50, width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginTop: 10, zIndex:-index}} onPress={()=>{
+                        <TouchableOpacity key={index} style={{ width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, alignItems: selectedTask && selectedTask.id == task.id ? 'flex-start' : 'center', marginVertical: 10, zIndex:-index}} onPress={()=>{
                             if (selectedTask && selectedTask.id == task.id)
                             {
                                 MainController.getInstance().setSelectedTask(selectedTask)
@@ -333,7 +346,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     <Text style={{color:'white'}}>{task.children.length == 0 ? 'Leaf Task' : task.children.length +' Sub Tasks'}</Text>
                                     <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
 
-                                            <CircularProgressBar percentage={task.getPercentCompleteness()}></CircularProgressBar>
+                                            <CircularProgressBar percentage={task.getPercentCompleteness()} task={task}/>
 
                                             <Text style={{color: 'gray'}}>{(task.getPercentCompleteness()*100).toFixed(1)}%</Text>
 
@@ -343,7 +356,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 </View>
 
                                 {(selectedTask && selectedTask.id == task.id) && 
-                                <View style={[{width:'100%', zIndex:4, paddingHorizontal:25}]}>
+                                <View style={[{width:'100%', zIndex:4, paddingHorizontal:25, paddingBottom:20}]}>
                                     <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
                                         <View style={{flexDirection:'row'}}>
                                             <Image
@@ -399,6 +412,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         <Text style={{color:'gray'}}>{durationFromNow}</Text>
                                     </View>
                                     { task.children.length == 0 &&
+                                    <View>
                                         <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
                                             <View style={{flexDirection:'row'}}>
                                             <Image
@@ -412,6 +426,21 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                                 <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                             </TouchableOpacity>
                                         </View>
+
+                                        <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginTop:20}} onPress={()=>{
+                                            task.completeness = 1
+                                            console.log("clicked", rerender)
+                                            setRerender(rerender? false : true)
+                                        }}>
+                                            <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
+                                            <Image
+                                                style={{width: 20, height: 20, marginHorizontal: 10}}
+                                                source={require('../../assets/check_mark_icon.png')}
+                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                            />
+                                        </TouchableOpacity>
+
+                                    </View>
                                     }
                                     
                                 </View>
@@ -572,7 +601,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
 
   return(
-    <View style={{overflow:'hidden', minHeight:'100%'}}>
+    <View style={{minHeight:'100%'}}>
         <View style={isLeft ? styles.gradientOverlayL : styles.gradientOverlayR}>
             <LinearGradient
             colors={[task.color, darkenColor(task.color, 0.9)]}              
@@ -609,7 +638,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                 {/*TODO: Generate this part of the task view*/}
                                 <View style={{flexDirection: 'row', paddingVertical: 10, alignItems:'center'}}>
                                                                 
-                                    <CircularProgressBar percentage={completion}></CircularProgressBar>
+                                    <CircularProgressBar percentage={task.getPercentCompleteness()} task={task}/>
 
                                     <Text style={{color: 'gray'}}>{(completion*100).toFixed(1)}%</Text>
 
@@ -639,6 +668,12 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         </View>
                         {/* Display users/ancestor tasks */}
                         {!viewUsers && renderAncestors()}
+                        {viewUsers && 
+                        <View>
+                            {/* Invite User */}
+                            <InviteUser taskId={task.id} inviterId={inviterId} />  
+                        </View>
+                        }
                         
                         {/* View displaying dates */}
                         <View style={[{width:'100%', zIndex:4}, isLeft? {paddingRight: 30} : {paddingLeft:25}]}>
@@ -713,28 +748,12 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                             }
                             
                         </View>
-                        {/* Invite User */}
-                        <InviteUser taskId={task.id} inviterId={inviterId} />
 
                         {/* Notes */}
                         <View style={[{ width: '100%', marginTop: 20 }, isLeft ? { paddingRight: 30 } : { paddingLeft: 35 }]}>
                              <Text style={{ color: 'white', fontFamily: fontsLoaded ? 'Inter_900Black' : 'Arial', fontSize: 20 }}>Notes</Text>
                             <TextInput
                                 style={{ width: "100%", color: 'white', backgroundColor: 'rgba(50, 50, 50, 1)', borderRadius: 5, minHeight: 300, marginTop: 10, padding: 10, justifyContent: 'flex-start' }}
-                                onChangeText={onChangeText}
-                                value={text}
-                                multiline={true}
-                                placeholder="Enter text here..."
-                                onSubmitEditing={onSubmitEditing}
-                            />
-                        </View>
-
-
-                        {/* Notes */}
-                        <View style={[ {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>
-                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>Notes</Text>
-                            <TextInput
-                                style={{width:"100%", color:'white', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:5, minHeight: 300, marginTop:10, padding:10, justifyContent:'flex-start'}}
                                 onChangeText={onChangeText}
                                 value={text}
                                 multiline={true}
@@ -1032,11 +1051,29 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                 
                 
             </ScrollView>
+
+            {viewTree &&
+            <View  style={[{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505'}, isLeft ? {left:windowWidth*0.475} : {right:windowWidth*0.475}]}>
+                <View style={[styles.container, isLeft ? styles.containerL : styles.containerR, {overflow:'hidden'}]}>
+                    <Canvas/>
+
+                </View>
+                <View style={isLeft ? styles.gradientOverlayL : styles.gradientOverlayR}>
+                    <LinearGradient
+                    colors={[task.color, darkenColor(task.color, 0.9)]}              
+                    style={styles.gradient}/>
+                </View>
+            </View>
+            }
             
             {/* X and other page manipulation components */}
-            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20} : {left:20}]}>
+            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20 - (viewTree ? windowWidth*0.51 : 0)} : {left:20 - (viewTree ? windowWidth*51 : 0)}]}>
                     <TouchableOpacity onPress={onPress}>
                         <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{position:'absolute', top:useWindowDimensions().height*0.49}} onPress={()=>{setViewTree(!viewTree)}}>
+                        <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: viewTree ? '90deg' : '-90deg'}]}}/>
                     </TouchableOpacity>
             </View>
             

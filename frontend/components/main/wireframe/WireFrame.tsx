@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import GridComponent from './GridComponent';
 import ParentNodeGridComponent from './ParentCircleGrid';
 import CalendarDisplay from '../calendar/CalendarDisplay';
 import TaskModel from '../../../models/TaskModel';
 import moment from 'moment';
+import MainController from '../../../controllers/main/MainController';
 
 
 
@@ -12,9 +13,10 @@ interface WireFrameProps {
     leafNodesMap: {[key:string]:TaskModel[]};
     sidedRootTasksMap: {[key:string]:TaskModel[]};
     inMoment: moment.Moment;
+    scrollY:Animated.Value
 }
 
-const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment }) => {
+const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment, scrollY }) => {
     // Produce ids for leaf nodes and their parents
     const [leafIds, setLeafIds] = useState<{ [key: number]: string[] }>({});
     const [parentNodeIds, setParentNodeIds] = useState<{ [key: number]: string[] }>({})
@@ -22,6 +24,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
     const [parentTaskByWireFrame, setParentTaskByWireframe] = useState<{[key: number]: TaskModel[]}>({})
 
     const [currentMonth, setCurrentMonth] = useState(inMoment);
+    const mainController = MainController.getInstance()
 
     useEffect(()=>{
         console.log("Updating date from wireframe")
@@ -153,6 +156,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                             break
                         }
                     }
+                    leafNode.rootIndex = rootIndex
                     
 
                     // Create Leaf Id and parent node id
@@ -172,6 +176,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                 count += 1
             }
         }
+        console.log("Leaf node map passed into Calendar display: ", leafTaskByIndex)
         return [leafIdsByWireFrame, parentNodeIdsByWireFrame, leafTaskByIndex, parentTaskByWireFrame]
     }
 
@@ -185,15 +190,25 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
     return (
         <View style={styles.container}>
-            <GridComponent offset={0} subtaskDispIds={leafIds.hasOwnProperty(0) ? leafIds[0]: []} inMoment={inMoment}/>
-            <GridComponent offset={1} subtaskDispIds={leafIds.hasOwnProperty(1) ? leafIds[1]: []} inMoment={inMoment}/>
-            <GridComponent offset={2} subtaskDispIds={leafIds.hasOwnProperty(2) ? leafIds[2]: []} inMoment={inMoment}/>
 
-            <ParentNodeGridComponent offset={0} parentNodeIds={parentNodeIds.hasOwnProperty(0) ? parentNodeIds[0]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(0) ? parentTaskByWireFrame[0] : [] } inMoment={inMoment}/>
-            <ParentNodeGridComponent offset={1} parentNodeIds={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(1) ? parentTaskByWireFrame[1] : [] } inMoment={inMoment}/>
-            <ParentNodeGridComponent offset={2} parentNodeIds={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(2) ? parentTaskByWireFrame[2] : [] } inMoment={inMoment}/>
+            {mainController.getDisplay().getValue() == 0 &&
+                <>
+                    <GridComponent offset={0} subtaskDispIds={leafIds.hasOwnProperty(0) ? leafIds[0]: []} inMoment={inMoment}/>
+                    <GridComponent offset={1} subtaskDispIds={leafIds.hasOwnProperty(1) ? leafIds[1]: []} inMoment={inMoment}/>
+                    <GridComponent offset={2} subtaskDispIds={leafIds.hasOwnProperty(2) ? leafIds[2]: []} inMoment={inMoment}/>
+                </>
+            }
+            
 
-            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment}/>
+            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment} scrollY={scrollY}/>
+
+            {mainController.getDisplay().getValue() == 0 &&
+                <>
+                    <ParentNodeGridComponent offset={0} parentNodeIds={parentNodeIds.hasOwnProperty(0) ? parentNodeIds[0]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(0) ? parentTaskByWireFrame[0] : [] } inMoment={inMoment}/>
+                    <ParentNodeGridComponent offset={1} parentNodeIds={parentNodeIds.hasOwnProperty(1) ? parentNodeIds[1]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(1) ? parentTaskByWireFrame[1] : [] } inMoment={inMoment}/>
+                    <ParentNodeGridComponent offset={2} parentNodeIds={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(2) ? parentTaskByWireFrame[2] : [] } inMoment={inMoment}/>
+                </>
+            }
         </View>
     )
 }

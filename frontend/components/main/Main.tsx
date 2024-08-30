@@ -14,6 +14,7 @@ import UserModel from '../../models/UserModel';
 
 import { BlurView } from 'expo-blur';
 import DeleteAccount from './deleteAccount/DeleteAccount';
+import EditAccount from './editAccount/EditAccount';
 
 interface Tasks {
     rootTasks: TaskModel[]; // Only root tasks
@@ -49,6 +50,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   var selectedTask = controller.getSelectedTask();
 
   const [blurVisible, setBlurVisible] = useState(false);
+  const [editAccount, setEditAccount] = useState(false);
 
   const [reRender, setReRender] = useState<boolean>(false)
 
@@ -56,7 +58,24 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const [slideAnimation] = useState(new Animated.Value(0));
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
-  const [profileClicked, setProfileClicked] = useState(false)
+  const [profileClicked, setProfileClicked] = useState(false);
+
+  const [displayType, setDisplayType] = useState(0);
+
+  // Update display type
+  useEffect(()=>{
+    const displayListener = controller.getDisplay();
+
+    const listener = (display: number) => {
+      setDisplayType(display);
+    };
+
+    displayListener.addListener(listener)
+
+    return () => {
+      displayListener.removeListener(listener);
+    };
+  }, [controller])
 
   // Load in tasks on appear
   useEffect(() => {
@@ -146,7 +165,30 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
   const [currentMonth, setCurrentMonth] = useState(moment());
 
-  var currentMonthAndYear = currentMonth.format('MMMM YYYY');
+  useEffect(()=>{
+    const momentListener = controller.getMoment();
+
+    const listener = (moment: moment.Moment) => {
+      setCurrentMonth(moment);
+    };
+
+    momentListener.addListener(listener)
+
+    return () => {
+      momentListener.removeListener(listener);
+    };
+  },[controller])
+
+  const [weekNumber, setWeekNumber] = useState(1);
+  
+  useEffect(()=>{
+    const firstDayOfDisplay = currentMonth.clone().startOf('month').startOf('week');
+    const lastDayOfCurrentWeek = currentMonth.clone().endOf('week')
+    const diff = lastDayOfCurrentWeek.diff(firstDayOfDisplay, 'days') + 1
+
+    setWeekNumber(diff/7)
+
+  },[currentMonth])
 
   let [fontsLoaded] = useFonts({
       Inter_900Black
@@ -221,7 +263,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       setRootTaskMap(orderedMaps[1])
     }, [rootTasks]);
 
-    const animationRef = useRef(new Animated.Value(task ? 0 : 222)).current;
+    const animationRef = useRef(new Animated.Value(task ? 0 : windowWidth*0.49)).current;
     const animationProfileRef = useRef(new Animated.Value(profileClicked ? 0 : 222)).current;
 
     useEffect(() => {
@@ -258,6 +300,8 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       }
     }, [profileClicked]);
 
+    const scrollY = useRef(new Animated.Value(0)).current;
+
     return (
       <View style={{flex: 1, width:'100%'}}>
         
@@ -281,7 +325,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}}/>}
+                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}} editAccount={()=>{setEditAccount(true)}}/>}
 
             </Animated.View>
 
@@ -313,18 +357,81 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               </View>
               
             )}
+
+            {editAccount && (
+              <View style={{
+                position: 'absolute',
+                zIndex: 999,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                justifyContent:'center',
+                alignItems:'center'
+                }}>
+
+                <BlurView
+                  intensity={50}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                  tint="dark"
+                />
+                <EditAccount cancel={()=>{setEditAccount(false)}} user={controller.getUser().getValue()!} saveChanges={signOut}/>
+
+              </View>
+              
+            )}
           
-        <ScrollView style={{width:"100%"}}>
-          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between'}]}>
+        <Animated.ScrollView style={{width:"100%", paddingBottom:80}}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+        >
+          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
             <View style={styles.hstack}>
-              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).subtract(1, 'months')); console.log(currentMonth)}}>
+
+              {displayType != 0 ? 
+              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+                controller.setDisplay(0)
+                }}>
+                <Image source={require('../../assets/calendar_icon.png')} style={{
+                  width:30, height:30, opacity: 0.5
+                }}/>
+              </TouchableOpacity>
+              : <View style={{display:'none'}}/>}
+
+              {/* Month displayed here */}
+
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' :'months'));
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
+                }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableOpacity>
               
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format('MMMM YYYY')}</Text>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format( displayType == 1 ? 'MMM YYYY' : 'MMMM YYYY')}{displayType == 1 ? ' - Week ' + weekNumber : ''}</Text>
 
-              <TouchableOpacity onPress={()=>{setCurrentMonth(moment(currentMonth).add(1, 'months')); console.log(currentMonth)}}>
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(displayType == 1 ? currentMonth.clone().endOf('week') : currentMonth).add(1, displayType == 1 ? 'weeks' : 'months'))
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
+                }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, alignItems:'center', justifyContent:'center', marginLeft:20}} onPress={
+                ()=>{
+                  controller.setMoment(displayType==1? moment(new Date()).endOf('week') : moment(new Date()))
+                  controller.setReRender(controller.getReRender().getValue() ? false: true)
+                }
+              }>
+                <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20}}>Today</Text>
               </TouchableOpacity>
             </View>
             
@@ -339,25 +446,37 @@ const Main: React.FC<Tasks> = ({signOut}) => {
             </TouchableOpacity>
           </View>          
           
-          <View style={[styles.container, {height: windowHeight * 0.95}]}>
-            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth}/>
+          {/* Calendar */}
+          <View style={[styles.container, {marginTop:20}]}>
+            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth} scrollY={scrollY}/>
           </View>
-          <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
-            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
-            <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
-            onPress={() => {
-              if(controller.getSelectedTask().getValue() === null)
-                controller.createNewTask()
-            }}
-            >
-              <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
-            </TouchableOpacity>
+
+          {/* Root task list */}
+          <View>
+            <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+
+              <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
+              onPress={() => {
+                if(controller.getSelectedTask().getValue() === null)
+                  controller.createNewTask()
+                  if(controller.getDisplay().getValue() != 0)
+                    console.log(controller.getReRender().getValue())
+                    controller.setReRender(controller.getReRender().getValue()? false : true)
+                    console.log(controller.getReRender().getValue())
+              }}
+              >
+                <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={{maxWidth: "auto", alignItems:"center"}}>
+              <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
+            </View>
           </View>
           
-          <View style={{maxWidth: "auto", alignItems:"center", paddingBottom:80}}>
-            <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
-          </View>
-        </ScrollView>
+          
+        </Animated.ScrollView>
       </View>
       );
 }

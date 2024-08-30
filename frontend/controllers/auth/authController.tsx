@@ -12,7 +12,7 @@ class AuthController {
       // Initialization code here
     }
 
-    async handleLogin(email:string, password:string, completion:()=>void) {
+    async handleLogin(email:string, password:string, completion:()=>void, handleBadLogin:()=>void) {
         try {
           const response = await fetch('http://127.0.0.1:5000/login', {
             method: 'POST',
@@ -26,6 +26,7 @@ class AuthController {
           });
     
           if (!response.ok) {
+            handleBadLogin();
             throw new Error('Login failed');
           }
     
@@ -61,13 +62,33 @@ class AuthController {
             const name = data['Name']
             const picture = data['ProfilePicture']
             const rootTaskIds = data['TaskTreeRoots']
+            const restPeriods = data['RestPeriods']
+            // composer rest period matrix
+
             console.log(typeof rootTaskIds)
-            return [new UserModel(userId, name, picture, email), rootTaskIds]
+            return [restPeriods ? new UserModel(userId, name, picture, email, this.composeRestPeriodMatrix(restPeriods)) : new UserModel(userId, name, picture, email), rootTaskIds]
         } catch (e) {
             console.error('Error fetching user:', e);
             return [null, []]
         }
     };
+
+    private composeRestPeriodMatrix(restPeriods:[string])
+    {
+      var matrix = Array.from({ length: 24 }, () => Array(7).fill(false));
+      for(const period of restPeriods)
+      {
+        const parts = period.split(',');
+
+        // Extract the numbers from the substrings
+        const row = parseInt(parts[0], 10);
+        const col = parseInt(parts[1], 10); 
+
+        matrix[row][col] = true
+      }
+
+      return matrix
+    }
 
     private handleGetUserTasks = async (userId:string, taskIds:object):Promise<TaskModel[]> => {
       const tasks: TaskModel[] = [];

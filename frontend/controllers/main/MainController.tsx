@@ -6,6 +6,7 @@ import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
 import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask } from "../../services/taskServices";
+import moment from "moment";
 
 // This will control anything that happens inside Main view
 
@@ -16,6 +17,12 @@ class MainController {
     private reRender: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
+    private displayMode:PropertyListener<number> = new PropertyListener<number>(0);
+    private movingMoment:PropertyListener<moment.Moment> = new PropertyListener<moment.Moment>(moment());
+    // 0 : in calendar display
+    // 1 : in week display
+    // 2 : in day display
+    private toggledPopupKey:PropertyListener<string> = new PropertyListener<string>('');
 
     // Private constructor to prevent uploadFileinstantiation from outside
     private constructor() {
@@ -28,6 +35,30 @@ class MainController {
         MainController.instance = new MainController();
       }
       return MainController.instance;
+    }
+
+    public getToggledPopupKey():PropertyListener<string> {
+      return this.toggledPopupKey
+    }
+
+    public setToggledPopupKey(key:string){
+      this.toggledPopupKey.setValue(key)
+    }
+
+    public getMoment(): PropertyListener<moment.Moment> {
+      return this.movingMoment
+    }
+
+    public setMoment(moment: moment.Moment) {
+      this.movingMoment.setValue(moment)
+    }
+
+    public getDisplay(): PropertyListener<number> {
+      return this.displayMode
+    }
+
+    public setDisplay(display:number){
+      this.displayMode.setValue(display)
     }
   
     // Other methods and properties can be added as needed
@@ -73,6 +104,7 @@ class MainController {
     public async handleGenerateTasks(task: TaskModel):Promise<TaskModel[]> {
       this.setLoadingGenerateTasks(true)
       try {
+        const taskName = task.title
         const context = task.contextText
         const start = task.startDate.toISOString()
         const end = task.endDate.toISOString()
@@ -91,6 +123,7 @@ class MainController {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            "taskName": taskName,
             "contextText": context,
             "start":start,
             "end": end,
@@ -254,6 +287,8 @@ class MainController {
 
     public saveEditToTask(task:TaskModel)
     {
+      console.log("updating task...")
+      this.setReRender(this.getReRender().getValue() ? false : true)
       this.debounce(this.saveChangesToTask, 1000)(task)
     }
 
@@ -281,6 +316,7 @@ class MainController {
         IsRoot: task.isRoot,
         Completeness: task.completeness
       }
+
       updateTask(taskData, taskPathArray)
     }
 
