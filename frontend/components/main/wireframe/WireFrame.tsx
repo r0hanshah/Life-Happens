@@ -102,8 +102,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
                     leafTaskByIndex.hasOwnProperty(daysFromStartDay) ? leafTaskByIndex[daysFromStartDay].push(leafNode) :  leafTaskByIndex[daysFromStartDay] = [leafNode]
 
-                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor((daysFromStartDay)/7) : daysFromStartDay > numberOfDaysBetween? 999 : -1
-                    const column:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 : daysFromStartDay > numberOfDaysBetween ? 999 : -1
+                    const row:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor((daysFromStartDay)/7) : daysFromStartDay > numberOfDaysBetween? 999 : 999
+                    const column:number = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 : daysFromStartDay > numberOfDaysBetween ? 999 : 999
 
                     // Get firts ancestor and calculate row and column of parent W/ Parent Cache
                     var pRow = -999
@@ -126,8 +126,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
 
                             const daysFromLatestStartDay = momentOfLatestStatrDate.dayOfYear() - startDay.dayOfYear()
 
-                            pRow = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? Math.floor((daysFromLatestStartDay)/7) : daysFromLatestStartDay > numberOfDaysBetween? 999 : -1
-                            pColumn = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? daysFromLatestStartDay % 7 : daysFromLatestStartDay > numberOfDaysBetween ? 999 : -1
+                            pRow = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? Math.floor((daysFromLatestStartDay)/7) : daysFromLatestStartDay > numberOfDaysBetween? 999 : 999
+                            pColumn = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? daysFromLatestStartDay % 7 : daysFromLatestStartDay > numberOfDaysBetween ? 999 : 999
 
 
 
@@ -136,9 +136,9 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                             // const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
                             // console.log(daysFromStartDay)
 
-                            // pRow = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : -1
+                            // pRow = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? Math.floor(daysFromStartDay/numberOfColumns) : daysFromStartDay > numberOfDaysBetween? 999 : 999
 
-                            // pColumn = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 + (daysFromStartDay % 7 == 0 && leftBound == "1"? 1 : daysFromStartDay % 7 == 6 && leftBound == "0"? - 1 : leftBound == "1" ? -1 : 2) : daysFromStartDay > numberOfDaysBetween ? 999 : -1
+                            // pColumn = daysFromStartDay <= numberOfDaysBetween && daysFromStartDay >= 0 ? daysFromStartDay % 7 + (daysFromStartDay % 7 == 0 && leftBound == "1"? 1 : daysFromStartDay % 7 == 6 && leftBound == "0"? - 1 : leftBound == "1" ? 999 : 2) : daysFromStartDay > numberOfDaysBetween ? 999 : 999
 
                             pColumn += leftBound == "1" ? 0 : 1
                             console.log("parent row and col", pRow, pColumn)
