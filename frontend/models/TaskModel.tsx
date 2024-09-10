@@ -31,6 +31,7 @@ class TaskModel
         this.unobservedFiles = unobservedFiles
 
         this.offset = 0
+        this.y = ancestors.length
     }
 
     id:string
@@ -58,9 +59,31 @@ class TaskModel
 
     isLeft:boolean = false
     completeness:number = 0
+
     //UI Aids
     offset:number
     rootIndex:number = 0
+    x=0
+    y=0
+    mod=0
+
+    isLeftMost(): boolean {
+        return this.ancestors.length === 0 || this.ancestors[0].children[0] === this;
+    }
+
+    getPreviousSibling(): TaskModel | null {
+        if (this.isLeftMost()) return null;
+        const siblings = this.ancestors[0].children;
+        return siblings[siblings.indexOf(this) - 1];
+    }
+
+    getFirstChild(): TaskModel {
+        return this.children[0];
+    }
+
+    getLastChild(): TaskModel {
+        return this.children[this.children.length - 1];
+    }
 
     isLeftBound():boolean {
         if (this.ancestors.length > 0)

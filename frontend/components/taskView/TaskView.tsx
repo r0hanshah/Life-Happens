@@ -1053,10 +1053,9 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
             </ScrollView>
 
             {viewTree &&
-            <View  style={[{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505'}, isLeft ? {left:windowWidth*0.475} : {right:windowWidth*0.475}]}>
-                <View style={[styles.container, isLeft ? styles.containerL : styles.containerR, {overflow:'hidden'}]}>
-                    <Canvas/>
-
+            <View  style={[{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505'}, isLeft ? {left:windowWidth*0.475} : {right:windowWidth*0.485}]}>
+                <View style={[styles.container, {justifyContent:'center', alignItems:'center'}, isLeft ? styles.containerL : styles.containerR, {overflow:'hidden'}]}>
+                    <Canvas rootTask={task.ancestors.length > 0 ? task.ancestors[task.ancestors.length-1] : task} currentTask={task}/>
                 </View>
                 <View style={isLeft ? styles.gradientOverlayL : styles.gradientOverlayR}>
                     <LinearGradient
@@ -1067,13 +1066,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
             }
             
             {/* X and other page manipulation components */}
-            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20 - (viewTree ? windowWidth*0.51 : 0)} : {left:20 - (viewTree ? windowWidth*51 : 0)}]}>
+            <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20}, isLeft ? {right:20 - (viewTree ? windowWidth*0.51 : 0)} : {left:20 - (viewTree ? windowWidth*0.52 : 0)}]}>
                     <TouchableOpacity onPress={onPress}>
                         <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{position:'absolute', top:useWindowDimensions().height*0.49}} onPress={()=>{setViewTree(!viewTree)}}>
-                        <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: viewTree ? '90deg' : '-90deg'}]}}/>
+                        <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: viewTree ? isLeft ? '90deg' : '-90deg' : isLeft ? '-90deg' : '90deg'}]}}/>
                     </TouchableOpacity>
             </View>
             

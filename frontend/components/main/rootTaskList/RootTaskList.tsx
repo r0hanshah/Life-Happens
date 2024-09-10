@@ -27,6 +27,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
         var count = 0
         for(const task of rootTasksMap["1"])
         {
+            console.log("Task: ",task.title, task.endDate, task.startDate)
             const momentEndDate = moment(task.endDate)
             if (momentEndDate.isBetween(startDay,endDay))
             {

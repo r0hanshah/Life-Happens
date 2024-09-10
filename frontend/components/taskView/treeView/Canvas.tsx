@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import TaskModel from '../../../models/TaskModel';
+import Tree from './Tree';
+import Tree_RTA from './Tree_RTA';
 
 const { width, height } = Dimensions.get('window');
 
-const Canvas: React.FC = () => {
+interface CanvasProps {
+    rootTask:TaskModel
+    currentTask:TaskModel
+}
+
+const Canvas: React.FC<CanvasProps> = ({rootTask, currentTask}) => {
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
   const prevTranslationX = useSharedValue(0);
@@ -48,7 +56,7 @@ const Canvas: React.FC = () => {
       scale.value = event.scale;
     })
     .onEnd(() => {
-      scale.value = withSpring(Math.max(1, Math.min(scale.value, 3))); // Constrain scale between 1 and 3
+      scale.value = withSpring(Math.max(1, Math.min(scale.value, 3))); // Constrain scale between 0.1 and 3
     });
 
     
@@ -84,11 +92,12 @@ const Canvas: React.FC = () => {
     <div onMouseEnter={() => setIsHovered(true)}
     onMouseLeave={() => setIsHovered(false)}>
         <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[styles.canvas, animatedStyle]}>
-            {/*Generate Tree Here */}
-            <View style={styles.box} />
-            <View style={[styles.box, { top: 200, left: 200 }]} />
-        </Animated.View>
+            <Animated.View style={[styles.canvas, animatedStyle]}>
+                {/*Generate Tree Here */}
+                <Tree_RTA rootTask={rootTask} currentTask={currentTask} />
+                {/* <View style={styles.box} />
+                <View style={[styles.box, { top: 200, left: 200 }]} /> */}
+            </Animated.View>
         </GestureDetector>
     </div>
   );
@@ -96,12 +105,12 @@ const Canvas: React.FC = () => {
 
 const styles = StyleSheet.create({
   canvas: {
-    width: width * 2,
-    height: height * 2,
-    overflow:'hidden'
+    width: width,
+    height: height,
+    justifyContent: 'center',
+    alignItems:'flex-start',
   },
   box: {
-    position: 'absolute',
     width: 100,
     height: 100,
     backgroundColor: 'lightblue',
