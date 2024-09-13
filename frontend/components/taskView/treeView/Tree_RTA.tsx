@@ -188,16 +188,20 @@ function reingoldTilford(root: TaskModel): void {
     const nodes: JSX.Element[] = [];
     const queue: { task: TaskModel; level: number }[] = [{ task: rootTask, level: 0 }];
     const xOffsetMap: Map<number, number> = new Map([[0,width/2]])
+    const selectedTask = controller.getSelectedTask().getValue()
 
     while (queue.length > 0) {
       const { task, level } = queue.shift()!;
       console.log(task.title, level, task.x)
+
+      const inPath = selectedTask?.ancestors.some(ancestor => ancestor.id == task.id) || task.id == selectedTask?.id
 
       nodes.push(
         <TreeNode
           key={task.id}
           task={task}
           style={{top:level*YOFFSET, left:task.x*XOFFSET + XOFFSET, position:'absolute'}}
+          pathColor={inPath ? task.color : 'gray'}
         />
       );
 
