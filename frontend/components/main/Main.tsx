@@ -255,6 +255,32 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       return leafNodes
     }
 
+    function getOrdinalSuffix(day: number): string {
+      if (day > 3 && day < 21) return 'th'; // for 11th to 20th
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    }
+    
+    function formatDate(date: Date): string {
+      const day = date.getDate();
+      const dayWithSuffix = day + getOrdinalSuffix(day);
+      
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long', // e.g., Monday
+        month: 'short',  // e.g., Sep
+        year: 'numeric', // e.g., 2024
+      };
+      
+      const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+      
+      // Construct the final formatted string
+      return `${formattedDate.split(",")[0]} ${dayWithSuffix}, ${formattedDate.split(",")[1].trim()}`;
+    }
+
     // Set all leaf nodes
     useEffect(() => {
       console.log("Running use effect")
@@ -397,7 +423,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
           <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
             <View style={styles.hstack}>
 
-              {displayType != 0 ? 
+              {displayType > 0 ? 
               <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
                 controller.setDisplay(0)
                 }}>
@@ -407,19 +433,33 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               </TouchableOpacity>
               : <View style={{display:'none'}}/>}
 
+              {displayType > 1 ? 
+              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+                controller.setMoment(currentMonth.clone().endOf('week'))
+                controller.setDisplay(1)
+                }}>
+                <Image source={require('../../assets/week_icon.png')} style={{
+                  width:30, height:30, opacity: 0.5
+                }}/>
+              </TouchableOpacity>
+              : <View style={{display:'none'}}/>}
+
               {/* Month displayed here */}
 
               <TouchableOpacity onPress={()=>{
-                controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' :'months'));
+                controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
                 controller.setReRender(controller.getReRender().getValue() ? false : true)
                 }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
               </TouchableOpacity>
               
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>{currentMonth.format( displayType == 1 ? 'MMM YYYY' : 'MMMM YYYY')}{displayType == 1 ? ' - Week ' + weekNumber : ''}</Text>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>
+                {currentMonth.format( displayType == 1 ? 'MMM YYYY' : displayType == 2? 'dddd Do, MMM YYYY' :  'MMMM YYYY')}
+                {displayType == 1 ? ' - Week ' + weekNumber : ''}
+              </Text>
 
               <TouchableOpacity onPress={()=>{
-                controller.setMoment(moment(displayType == 1 ? currentMonth.clone().endOf('week') : currentMonth).add(1, displayType == 1 ? 'weeks' : 'months'))
+                controller.setMoment(moment(currentMonth).add(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
                 controller.setReRender(controller.getReRender().getValue() ? false : true)
                 }}>
                 <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>

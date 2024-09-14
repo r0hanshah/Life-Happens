@@ -15,9 +15,10 @@ interface DayNodeProps {
   inMonth: boolean;
   lastRowExtension: number;
   scrollY: Animated.Value
+  dayMoment: moment.Moment
 }
 
-const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth, lastRowExtension, scrollY }) => {
+const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, currentDay, inMonth, lastRowExtension, scrollY, dayMoment }) => {
 
   const controller = MainController.getInstance();
 
@@ -346,12 +347,18 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     return `${hours}:${minutes}`;
   };
 
+  const dayPressed = () => {
+    console.log("Moment of Day pressed: ", dayMoment)
+    controller.setMoment(dayMoment)
+    controller.setDisplay(2)
+  }
+
   const renderDayNode = () =>
   {
-    if (controller.getDisplay().getValue() != 0)
+    if (controller.getDisplay().getValue() == 1)
     {
         return (
-          <View style={weekContainerStyle}>
+          <TouchableOpacity onPress={dayPressed} style={weekContainerStyle}>
             {(scrollValue > 200 && scrollValue < 1000) ? 
             <View style={{position:'absolute', top: scrollValue-250, backgroundColor:'#151515', height: 120,
               width: windowWidth/7 * 0.75, paddingTop:80, zIndex: 999}}>
@@ -381,13 +388,13 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                 }}>{(scrollValue > 200) ? '' : dayNumber}</Text>
             </View>
             {renderTaskCirclesForWeek()}
-          </View>
+          </TouchableOpacity>
         )
     }
-    else
+    else if (controller.getDisplay().getValue() == 0)
     {
       return (
-        <View style={{flexDirection:"column", alignItems:"center"}}>
+        <TouchableOpacity onPress={dayPressed} style={{flexDirection:"column", alignItems:"center"}}>
           <View style={{flexDirection: "row"}}>
             <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
               <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 8 ? leafTasks[8].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
@@ -425,6 +432,42 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
             <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.057 + leafTasks[2].offset * 4 + 1 + lastRowExtension : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
           </View>
+        </TouchableOpacity>
+      )
+    }
+    else
+    {
+      return (
+        <View style={[weekContainerStyle, {width:windowWidth*0.80}]}>
+          {(scrollValue > 200 && scrollValue < 1000) ? 
+          <View style={{position:'absolute', top: scrollValue-250, backgroundColor:'#151515', height: 120,
+            width: windowWidth * 0.8, paddingTop:80, zIndex: 999}}>
+              <View style={{height:40, width: windowWidth * 0.8 + 10, left:-5, bottom:0, borderTopLeftRadius:20, borderTopRightRadius:20, backgroundColor: currentDay ? '#00488A' : '#383838', flexDirection: "row", 
+                borderLeftWidth:5, borderLeftColor: '#151515',
+                borderRightWidth:5, borderRightColor:'#151515'
+                }}>
+                <Text style={{
+                  color: '#fff',
+                  paddingLeft: 15,
+                  paddingTop:15,
+                  fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
+                  alignContent: "flex-start",
+                  width: 35
+                }}>{dayNumber}</Text>
+              </View>
+          </View> 
+          : <></>}
+          <View style={{flexDirection: "row", maxWidth:'100%'}}>
+            <Text style={{
+                color: '#fff',
+                paddingLeft: 15,
+                paddingTop:15,
+                fontFamily: fontsLoaded ? 'Inter_500Medium' : 'Arial',
+                alignContent: "flex-start",
+                width: 35
+              }}>{(scrollValue > 200) ? '' : dayNumber}</Text>
+          </View>
+          {renderTaskCirclesForWeek()}
         </View>
       )
     }

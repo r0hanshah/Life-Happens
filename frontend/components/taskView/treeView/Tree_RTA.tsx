@@ -200,7 +200,7 @@ function reingoldTilford(root: TaskModel): void {
         <TreeNode
           key={task.id}
           task={task}
-          style={{top:level*YOFFSET, left:task.x*XOFFSET + XOFFSET, position:'absolute'}}
+          style={{top:level*YOFFSET + 200, left:task.x*XOFFSET + 800, position:'absolute'}}
           pathColor={inPath ? task.color : 'gray'}
         />
       );

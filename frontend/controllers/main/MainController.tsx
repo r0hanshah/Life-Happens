@@ -18,10 +18,10 @@ class MainController {
     private loading: PropertyListener<boolean> = new PropertyListener<boolean>(false);
     private user:PropertyListener<UserModel | null> = new PropertyListener<UserModel | null>(null);
     private displayMode:PropertyListener<number> = new PropertyListener<number>(0);
-    private movingMoment:PropertyListener<moment.Moment> = new PropertyListener<moment.Moment>(moment());
     // 0 : in calendar display
     // 1 : in week display
     // 2 : in day display
+    private movingMoment:PropertyListener<moment.Moment> = new PropertyListener<moment.Moment>(moment());
     private toggledPopupKey:PropertyListener<string> = new PropertyListener<string>('');
 
     // Private constructor to prevent uploadFileinstantiation from outside

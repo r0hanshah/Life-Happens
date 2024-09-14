@@ -84,7 +84,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
         rowComponents.push(
           <View key={id}>
             { colors.hasOwnProperty(id) && parentTasks.hasOwnProperty(id) ? (
-              <TouchableHighlight  style={{borderRadius: 10}} onPress={() => controller.setSelectedTask(parentTasks[id])}>
+              <TouchableHighlight  style={{borderRadius: 10, zIndex:999}} onPress={() => controller.setSelectedTask(parentTasks[id])}>
                 <Circle diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
               </TouchableHighlight>
             ) :
