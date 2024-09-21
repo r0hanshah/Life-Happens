@@ -492,7 +492,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
           </View>
 
           {/* Root task list */}
-          <View>
+          <View style={{width:controller.getDisplay().getValue() == 2 ? "95%" : "100%", alignSelf:'center'}}>
             <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
               <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
 

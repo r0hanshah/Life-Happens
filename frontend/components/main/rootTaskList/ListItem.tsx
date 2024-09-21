@@ -16,6 +16,10 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
 {
     const controller = MainController.getInstance();
 
+    let display = controller.getDisplay().getValue()
+
+    leftBound = display == 2 ? true : leftBound
+
     const windowWidth = useWindowDimensions().width;
 
     let [fontsLoaded] = useFonts({
@@ -28,11 +32,11 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index }) =>
             <View  key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
 
                 {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/> */}
-                <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
+                <View style={{width: windowWidth*(display == 2 ? 0.009 : 0.018), height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
 
                     <TouchableHighlight style={{borderRadius: 25}} onPress={() => controller.setSelectedTask(rootTask)}>
                         
-                        <View style={[styles.container, {width: windowWidth * 0.395, justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
+                        <View style={[styles.container, {width: windowWidth * (display == 2 ? 0.80 : 0.395), justifyContent: leftBound ? "flex-start" : "flex-end"}]}>
 
                             <View style={[styles.circle, {backgroundColor: rootTask.color, display: leftBound ? "flex": "none"}]}/>
 

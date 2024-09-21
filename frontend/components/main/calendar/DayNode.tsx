@@ -368,6 +368,13 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       startedIter = false
     }
 
+    wires.push(
+      <>
+        <View style={{backgroundColor:task.color, width:start_i*3,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: 2, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
+        <View style={{backgroundColor:task.color, width:2,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: calculateMinutesTillMidnight(task.startDate)*0.547 + yDiffFromLeftNeighbour + index_offset + (start_i*3), left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
+      </>
+    )
+
     return wires
   }
 
@@ -389,7 +396,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
         let heightFromStartDate = (-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.547 +132
         let heightFromEndOfCalendar = 153 + task.rootIndex*60
 
-        if(i < 5) // Figure out how many days in day groups to change
+        if(true) // Figure out how many days in day groups to change
         {
           let widthFromDay = task.isLeftBound() ? weekDay * (windowWidth/7 * 0.86) : (7 - weekDay) * (windowWidth/7 * 0.86)
           console.log("Difference between tasks in groups: ", i > 0 ? getMinutesDifference(displayGroup[i-1].startDate, displayGroup[i].startDate) : 0)
@@ -403,15 +410,14 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
               <View style={{position:'absolute', top:3, left:-5}}>
                 <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
-                {i > 0 && 
-                  renderHorizontalWire(displayGroup, i)
-                }
+                {renderHorizontalWire(displayGroup, i)}
+                
               </View>
 
-              <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.547, width: (windowWidth * 0.77 - 10) / displayGroup.length}}>
+              <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.547, width: (windowWidth * 0.77 - 10) / displayGroup.length-5}}>
                 <LinearGradient
                     colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)']}              
-                    style={{ flex: 1}}/>
+                    style={{ flex: 1, left: 5}}/>
                 <View style={{position:'absolute', paddingLeft:15, top:-5}}>
                   <Text style={{color:'white'}}>{task.title}</Text>
                   {getMinutesDifference(task.startDate, task.endDate) >= 60 ? 
@@ -487,6 +493,19 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     return totalMinutes;
   };
 
+  const calculateMinutesTillMidnight = (date:Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    // Convert hours to 12-hour format
+    hours = 24 - hours;
+
+    // Calculate total minutes since 12:00 AM
+    const totalMinutes = hours * 60 + minutes;
+
+    return totalMinutes;
+  };
+
   const getMinutesDifference = (d1:Date, d2:Date) => {
     const date1Moment = moment(d1);
     const date2Moment = moment(d2);
@@ -528,6 +547,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                     width: 35
                   }}>{dayNumber}</Text>
                 </View>
+                <View style={{width:'120%',top:0, height:'100%', position:'absolute', backgroundColor:'#151515', alignSelf:'center', zIndex:-999}}/>
             </View> 
             : <></>}
             <View style={{flexDirection: "row", maxWidth:'100%'}}>
@@ -608,6 +628,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                   width: 35
                 }}>{dayNumber}</Text>
               </View>
+              <View style={{width:'105%',top:0, height:'100%', position:'absolute', backgroundColor:'#151515', alignSelf:'center', zIndex:-999}}/>
           </View> 
           : <></>}
           <View style={{flexDirection: "row", maxWidth:'100%'}}>
