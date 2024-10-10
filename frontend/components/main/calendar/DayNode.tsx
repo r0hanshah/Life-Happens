@@ -321,7 +321,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     return displays
   }
 
-  const renderHorizontalWire = (displayGroup: TaskModel[], i:number) => {
+  const renderHorizontalWire = (displayGroup: TaskModel[], i:number, heightFromEndOfCalendar:number) => {
     let wires = []
     let task = displayGroup[i]
 
@@ -330,7 +330,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
     const start_i = i
     const width = ((windowWidth * 0.77 - 10) / displayGroup.length)
-    const index_offset =  8 + i*3
+    const index_offset =   i > 0 ? 8 + i*3 : 0
 
     let yDiffFromLeftNeighbour = (i > 0 ? getMinutesDifference(displayGroup[i-1].startDate, displayGroup[i].startDate) > 0 ? getMinutesDifference(displayGroup[i-1].startDate, displayGroup[i].startDate) * 0.547 : 0 : 0) + 8 + i*3
     let xDiffFromLeftNeighbour = ((windowWidth * 0.77 - 10) / displayGroup.length)
@@ -368,10 +368,13 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       startedIter = false
     }
 
+    let vertical_length = calculateMinutesTillMidnight(task.startDate)*0.547 + yDiffFromLeftNeighbour + (start_i > 0 ? 8 : 0) + heightFromEndOfCalendar
+
     wires.push(
       <>
         <View style={{backgroundColor:task.color, width:start_i*3,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: 2, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
-        <View style={{backgroundColor:task.color, width:2,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: calculateMinutesTillMidnight(task.startDate)*0.547 + yDiffFromLeftNeighbour + index_offset + (start_i*3), left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
+        <View style={{backgroundColor:task.color, width:2,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: vertical_length, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
+        <View style={{backgroundColor:task.color, width:start_i*10 + 30,top: vertical_length - (start_i > 0 ? yDiffFromLeftNeighbour : 0),  height: 3, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
       </>
     )
 
@@ -394,7 +397,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
         //Length of wires
         let heightFromStartDate = (-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.547 +132
-        let heightFromEndOfCalendar = 153 + task.rootIndex*60
+        let heightFromEndOfCalendar = 220 + task.rootIndex*60
 
         if(true) // Figure out how many days in day groups to change
         {
@@ -410,7 +413,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
               <View style={{position:'absolute', top:3, left:-5}}>
                 <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
-                {renderHorizontalWire(displayGroup, i)}
+                {renderHorizontalWire(displayGroup, i, heightFromEndOfCalendar)}
                 
               </View>
 
@@ -420,9 +423,9 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                     style={{ flex: 1, left: 5}}/>
                 <View style={{position:'absolute', paddingLeft:15, top:-5}}>
                   <Text style={{color:'white'}}>{task.title}</Text>
-                  {getMinutesDifference(task.startDate, task.endDate) >= 60 ? 
+                  {getMinutesDifference(task.startDate, task.endDate) >= 59 ? 
                   <Text style={{color:'#919191', fontSize:10}}>{formatTime(task.startDate)} - {formatTime(task.endDate)}</Text> : <></>}
-                  {getMinutesDifference(task.startDate, task.endDate) >= 120 ? 
+                  {getMinutesDifference(task.startDate, task.endDate) >= 118 ? 
                   <Text style={{color:'#919191', fontSize:10}}>{getMinutesDifference(task.startDate, task.endDate)} minutes</Text> : <></>}
                 </View>
                 

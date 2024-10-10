@@ -426,19 +426,31 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                                 <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
                                             </TouchableOpacity>
                                         </View>
-
-                                        <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginTop:20}} onPress={()=>{
-                                            task.completeness = 1
-                                            console.log("clicked", rerender)
-                                            setRerender(rerender? false : true)
-                                        }}>
-                                            <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
-                                            <Image
-                                                style={{width: 20, height: 20, marginHorizontal: 10}}
-                                                source={require('../../assets/check_mark_icon.png')}
-                                                resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                                            />
-                                        </TouchableOpacity>
+                                        
+                                        {task.completeness == 1 && task.children.length == 0 &&
+                                            <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'black', borderColor:'white', borderWidth:2, margin:10, marginTop:20}} onPress={()=>{
+                                                task.completeness = 0
+                                                console.log("clicked", rerender)
+                                                setRerender(rerender? false : true)
+                                            }}>
+                                                <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Incomplete...</Text>
+                                            </TouchableOpacity>
+                                        }
+                                        {task.completeness == 0 && task.children.length == 0 &&
+                                            <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginTop:20}} onPress={()=>{
+                                                task.completeness = 1
+                                                console.log("clicked", rerender)
+                                                setRerender(rerender? false : true)
+                                            }}>
+                                                <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
+                                                <Image
+                                                    style={{width: 20, height: 20, marginHorizontal: 10}}
+                                                    source={require('../../assets/check_mark_icon.png')}
+                                                    resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                                />
+                                            </TouchableOpacity>
+                                        }
+                                        
 
                                     </View>
                                     }
@@ -483,19 +495,29 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
     
             <View style={{alignItems: isLeft ? 'flex-start': 'flex-end'}}>
-                <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'#86C28B', margin:10}} onPress={()=>{
-                    setCompletion(1)
-                    task.completeness = 1
+                {task.completeness == 1 && task.children.length == 0 &&
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'black', borderColor:'white', borderWidth:2, margin:10}} onPress={()=>{
+                        task.completeness = 0
+                        setCompletion(0)
+                        setRerender(rerender? false : true)
                     }}>
-
-                    <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10}}
-                        source={require('../../assets/check_mark_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
-
-                </TouchableOpacity>
+                        <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Incomplete...</Text>
+                    </TouchableOpacity>
+                }
+                {task.completeness == 0 && task.children.length == 0 &&
+                    <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'#86C28B', margin:10}} onPress={()=>{
+                        task.completeness = 1
+                        setCompletion(1)
+                        setRerender(rerender? false : true)
+                    }}>
+                        <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
+                        <Image
+                            style={{width: 20, height: 20, marginHorizontal: 10}}
+                            source={require('../../assets/check_mark_icon.png')}
+                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                        />
+                    </TouchableOpacity>
+                }
 
                 <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'rgba(50, 50, 50, 1)', margin:10}} 
                 onPress={async ()=>{
