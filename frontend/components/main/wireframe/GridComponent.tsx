@@ -336,7 +336,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           }
 
           // Draw horizontal lines
-          columnOffset = columnOffset //- 1
+          columnOffset = columnOffset - 1
           while(leftBound ? columnOffset > 0 : columnOffset < 7)
           {
             leftBound ? columnOffset -= 1 : columnOffset += 1;

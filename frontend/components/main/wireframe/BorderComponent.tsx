@@ -49,7 +49,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
                 zIndex:zIndex,
                 position: orientation==='horizontal' ? 'absolute' : 'relative',
                 backgroundColor: backgroundColor,
-                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) : 2,
+                width: orientation === 'horizontal' ? ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1? 1 :  1-amountFill) + (amountFill == 1 ? 2 : 0) : 2,
                 height: orientation === 'vertical' ?  lastRow ? ((windowHeight / 6)* 0.9)*amountFill + 50 : ((windowHeight / 6) * 0.9)*amountFill : 2,
                 top: orientation ==='vertical'? lastRow && amountFill <= 1 ? -48*(1-amountFill): 0: 2
               },
@@ -67,7 +67,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
       <View key= 'base' style={{
         position:'absolute', 
         zIndex:-999, 
-        backgroundColor:'rgba(255, 255, 255, 0.1)', 
+        backgroundColor:'rgba(255, 255, 255, 0)', 
         width: orientation==='horizontal' ? (windowWidth/7)*0.83 : 2, 
         height: orientation === 'vertical' && lastRow? (windowHeight / 6) * 0.9 + 50 : orientation === 'vertical' ? (windowHeight / 6) * 0.9 : 2, 
         top: 2}}/>
