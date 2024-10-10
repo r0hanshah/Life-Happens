@@ -158,7 +158,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
   const windowHeight = useWindowDimensions().height;
   const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
-  const [rootTaskMap, setRootTaskMap] = useState<{[key:string]:TaskModel[]}>({
+  const [rootTaskMap, setRootTaskMap] = useState<{[key:string]:TaskModel[]}>({ // O for left bound root tasks and 1 for right bound root tasks
     "0":[],
     "1":[]
   });

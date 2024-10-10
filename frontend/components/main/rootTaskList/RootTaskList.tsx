@@ -81,7 +81,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
             const momentEndDate = moment(task.endDate)
             if (findLeafNodeWithinDates(task,startDay.toDate(),endDay.toDate()))
             {
-                leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count}/>)
+                leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={true} index={count} lowerDate={startDay.toDate()} higherDate={endDay.toDate()}/>)
                 task.rootIndex = count;
                 count += 1;
             }
@@ -95,7 +95,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
             const momentEndDate = moment(task.endDate)
             if (findLeafNodeWithinDates(task,startDay.toDate(),endDay.toDate()))
             {
-                display == 2 ? leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>) : rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count}/>)
+                display == 2 ? leftBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count} lowerDate={startDay.toDate()} higherDate={endDay.toDate()}/>) : rightBoundTasks.push(<ListItem key={task.id} rootTask={task} leftBound={false} index={count} lowerDate={startDay.toDate()} higherDate={endDay.toDate()}/>)
 
                 task.rootIndex = count;
                 count += 1;
