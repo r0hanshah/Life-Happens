@@ -242,7 +242,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           let widthFromDay = task.isLeftBound() ? weekDay * (windowWidth/7 * 0.86) : (7 - weekDay) * (windowWidth/7 * 0.86)
 
           displays.push(
-            <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}} onPress={() => {
+            <TouchableOpacity style={{ position:'absolute', left:-5, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 45, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}} onPress={() => {
                 controller.setSelectedTask(task);
                 setSelectedTask(task);
               }}>
@@ -286,7 +286,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           let distanceFromCircle = 6 + 10*(i-1)
 
           displays.push(
-            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width:10, zIndex:-i}} onPress={() => {
+            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 45, width:10, zIndex:-i}} onPress={() => {
                 displayGroups[j] = swap(displayGroups[j], 0, i)
                 setDisplayGroups(displayGroups)
                 setSecondRerender(!secondReender)
@@ -321,7 +321,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
     return displays
   }
 
-  const renderHorizontalWire = (displayGroup: TaskModel[], i:number, heightFromEndOfCalendar:number) => {
+  const renderHorizontalWire = (displayGroup: TaskModel[], i:number) => {
     let wires = []
     let task = displayGroup[i]
 
@@ -368,13 +368,15 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
       startedIter = false
     }
 
+    let heightFromEndOfCalendar = 239.5 + displayGroup[start_i].rootIndex*60
     let vertical_length = calculateMinutesTillMidnight(task.startDate)*0.547 + yDiffFromLeftNeighbour + (start_i > 0 ? 8 : 0) + heightFromEndOfCalendar
+    console.log(heightFromEndOfCalendar, vertical_length, calculateMinutesTillMidnight(task.startDate)*0.547, yDiffFromLeftNeighbour)
 
     wires.push(
       <>
         <View style={{backgroundColor:task.color, width:start_i*3,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: 2, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
         <View style={{backgroundColor:task.color, width:2,top: start_i == 0 ? 0 : -yDiffFromLeftNeighbour,  height: vertical_length, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
-        <View style={{backgroundColor:task.color, width:start_i*10 + 30,top: vertical_length - (start_i > 0 ? yDiffFromLeftNeighbour : 0),  height: 3, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
+        <View style={{backgroundColor:task.color, width:start_i*10 + 30,top: vertical_length - (start_i > 0 ? yDiffFromLeftNeighbour : 0),  height: 2, left:-(width*start_i) - (start_i*3), position:'absolute'}}/>
       </>
     )
 
@@ -406,14 +408,14 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
           let yDiffFromLeftNeighbour = i > 0 ? getMinutesDifference(displayGroup[i-1].startDate, displayGroup[i].startDate) > 0 ? getMinutesDifference(displayGroup[i-1].startDate, displayGroup[i].startDate) * 0.547 : 0 : 0
 
           displays.push(
-            <TouchableOpacity style={{ position:'absolute', left:-5 + ((windowWidth * 0.77 - 10) / displayGroup.length)*(i), top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width: (windowWidth * 0.77 - 10) / displayGroup.length}} onPress={() => {
+            <TouchableOpacity style={{ position:'absolute', left:-5 + ((windowWidth * 0.77 - 10) / displayGroup.length)*(i), top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 45, width: (windowWidth * 0.77 - 10) / displayGroup.length}} onPress={() => {
                 controller.setSelectedTask(task);
                 setSelectedTask(task);
               }}>
 
               <View style={{position:'absolute', top:3, left:-5}}>
                 <View style={{backgroundColor:task.color, width:6, height:2, position:'absolute'}}/>
-                {renderHorizontalWire(displayGroup, i, heightFromEndOfCalendar)}
+                {renderHorizontalWire(displayGroup, i)}
                 
               </View>
 
@@ -442,41 +444,41 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
             </TouchableOpacity>
           )
         }
-        else
-        {
-          let widthFromDay = task.isLeftBound() ? (weekDay+1) * (windowWidth/7 * 0.86) : (6 - weekDay) * (windowWidth/7 * 0.86)
-          let distanceFromCircle = 6 + 10*(i-1)
+        // else
+        // {
+        //   let widthFromDay = task.isLeftBound() ? (weekDay+1) * (windowWidth/7 * 0.86) : (6 - weekDay) * (windowWidth/7 * 0.86)
+        //   let distanceFromCircle = 6 + 10*(i-1)
 
-          displays.push(
-            <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 50, width:10, zIndex:-i}} onPress={() => {
-                displayGroups[j] = swap(displayGroups[j], 0, i)
-                setDisplayGroups(displayGroups)
-                setSecondRerender(!secondReender)
-                setIdOfInterest(task.id)
-              }}>
-                <View style={{position:'absolute', top:3, right:-5}}>
-                  <View style={{backgroundColor:task.color, width:distanceFromCircle, height:2, position:'absolute'}}/>
+        //   displays.push(
+        //     <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 45, width:10, zIndex:-i}} onPress={() => {
+        //         displayGroups[j] = swap(displayGroups[j], 0, i)
+        //         setDisplayGroups(displayGroups)
+        //         setSecondRerender(!secondReender)
+        //         setIdOfInterest(task.id)
+        //       }}>
+        //         <View style={{position:'absolute', top:3, right:-5}}>
+        //           <View style={{backgroundColor:task.color, width:distanceFromCircle, height:2, position:'absolute'}}/>
 
-                  <View style={{backgroundColor:task.color, width:2, height: heightFromStartDate, left:distanceFromCircle, position:'absolute'}}/>
+        //           <View style={{backgroundColor:task.color, width:2, height: heightFromStartDate, left:distanceFromCircle, position:'absolute'}}/>
 
-                  <View style={[{backgroundColor:task.color, width:widthFromDay, top:heightFromStartDate, height:2, left:distanceFromCircle, position:'absolute'}, task.isLeftBound() ? {left:-widthFromDay + distanceFromCircle+2} : {}]}/>
+        //           <View style={[{backgroundColor:task.color, width:widthFromDay, top:heightFromStartDate, height:2, left:distanceFromCircle, position:'absolute'}, task.isLeftBound() ? {left:-widthFromDay + distanceFromCircle+2} : {}]}/>
 
-                  <View style={[{backgroundColor:task.color, width:2, top:heightFromStartDate, height:heightFromEndOfCalendar, position:'absolute'}, task.isLeftBound() ? {right: -distanceFromCircle + widthFromDay-2} : {left: widthFromDay + distanceFromCircle}]}/>
+        //           <View style={[{backgroundColor:task.color, width:2, top:heightFromStartDate, height:heightFromEndOfCalendar, position:'absolute'}, task.isLeftBound() ? {right: -distanceFromCircle + widthFromDay-2} : {left: widthFromDay + distanceFromCircle}]}/>
 
-                  <View style={[{backgroundColor:task.color, width:10 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-10} : {left: widthFromDay + distanceFromCircle-10}]}/>
-                </View>
+        //           <View style={[{backgroundColor:task.color, width:10 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-10} : {left: widthFromDay + distanceFromCircle-10}]}/>
+        //         </View>
 
-                <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547}}>
-                  <LinearGradient
-                    colors={[task.color, 'rgba(0, 0, 0, 0)']}              
-                    style={{ flex: 1}}/>
-                </View>
+        //         <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547}}>
+        //           <LinearGradient
+        //             colors={[task.color, 'rgba(0, 0, 0, 0)']}              
+        //             style={{ flex: 1}}/>
+        //         </View>
 
-                <View style={{position:'absolute', right:-5, backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
-            </TouchableOpacity>
-          )
+        //         <View style={{position:'absolute', right:-5, backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
+        //     </TouchableOpacity>
+        //   )
           
-        }
+        // }
       }
     }
 
@@ -499,12 +501,10 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
   const calculateMinutesTillMidnight = (date:Date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
-
-    // Convert hours to 12-hour format
-    hours = 24 - hours;
+    console.log(hours, minutes)
 
     // Calculate total minutes since 12:00 AM
-    const totalMinutes = hours * 60 + minutes;
+    const totalMinutes = 24 * 60 - (hours*60 + minutes);
 
     return totalMinutes;
   };
