@@ -235,7 +235,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
         //Length of wires
         let heightFromStartDate = (-getMinutesDifference(setDateToEndOfDay(task.startDate), task.startDate))*0.547 +132
-        let heightFromEndOfCalendar = 153 + task.rootIndex*60
+        let heightFromEndOfCalendar = 158 + task.rootIndex*60
 
         if(i == 0)
         {
