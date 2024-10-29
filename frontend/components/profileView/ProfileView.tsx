@@ -26,6 +26,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
     
     const [toggleUpcomingRoots, setToggleUpcomingRoots] = useState(true)
     const [togglePastRoots, setTogglePastRoots] = useState(false)
+
+    const displayAllTaskList = () => {
+        // Takes in what level of task that the user wants to display
+        // SPECIAL CASE: -1 for if the user only wants to display leaf tasks
+
+        // Organize by month and root task
+    }
     
 
     return(
@@ -63,6 +70,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
                                     }}/>
                                 <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>Upcoming Root Tasks</Text>
                             </TouchableOpacity>
+
+                            {/* Get all root tasks */}
 
                             <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={()=>{setTogglePastRoots(!togglePastRoots)}}>
                                 <Image source={require('../../assets/triangle_right.png')} style={{
