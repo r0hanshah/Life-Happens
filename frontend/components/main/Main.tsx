@@ -355,11 +355,8 @@ const Main: React.FC<Tasks> = ({signOut}) => {
                 <ProfileView 
                   user={controller.getUser().getValue()!} 
                   onPress={()=>{setProfileClicked(false)}} 
-                  signOut={async ()=>{
-                    const response = await fetch('http://127.0.0.1:5000/logout',{
-                      method: 'POST',
-                    })
-                    console.log("Logout successful? ", response.ok)
+                  signOut={()=>{
+                  localStorage.removeItem('authToken');
                     signOut();
                   }} 
                   deletAccount={()=>{setBlurVisible(true)}} 

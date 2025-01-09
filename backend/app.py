@@ -26,7 +26,8 @@ SECRET_KEY = 'your_secret_key'
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+app.secret_key = SECRET_KEY
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'lifehappensnotif@gmail.com'
@@ -34,10 +35,8 @@ app.config['MAIL_PASSWORD'] = 'pzyilmwlsyohszip'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365) # Year of persistent log in
+
 mail = Mail(app)
-Session(app)
 
 def _build_cors_preflight_response():
     response = make_response()
@@ -110,30 +109,22 @@ def signup():
 #     except Exception as e:
 #         return jsonify({'error': str(e)}), 400
 # Login route
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({"message": "Logged out successfully"}), 200
-
 @app.route('/verify-login', methods=['GET'])
 def verify_login():
     print("Just got called")
-    user_id = session.get('user_id')
-    id_token = session.get('id_token')
-
-    if not user_id or not id_token:
-        return jsonify({"logged_in": False}), 401
+    token = request.headers.get('Authorization')
+    print(token)
+    if not token:
+        return jsonify({"logged_in": False, "error": "No token provided"}), 401
 
     try:
-        # Optionally verify the ID token with Firebase
-        # This step ensures the token is still valid
-        auth.get_account_info(id_token)
-
-        return jsonify({"logged_in": True, "user_id": user_id})
-    except Exception as e:
-        # Clear session if token is invalid
-        session.clear()
-        return jsonify({"logged_in": False, "error": str(e)}), 401
+        # Decode the token
+        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return jsonify({"logged_in": True, "user_id": decoded_token['user_id'], "email": decoded_token['email']}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"logged_in": False, "error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"logged_in": False, "error": "Invalid token"}), 401
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -144,18 +135,14 @@ def login():
     try:
         user = auth.sign_in_with_email_and_password(email, password)
 
-        print("About to print session")
-        print(session)
-        print("Printed session")
+        token_payload = {
+            "user_id": user['localId'],
+            "email": email,
+            "exp": datetime.utcnow() + timedelta(days=365),  # Token valid for 365 days
+        }
+        token = jwt.encode(token_payload, SECRET_KEY, algorithm="HS256")
 
-        session['user_id'] = user['localId']
-        session['id_token'] = user['idToken']
-        session['email'] = email
-        session.permanent = True
-
-        print("set session")
-
-        return jsonify({'user_id': user['localId']})
+        return jsonify({'user_id': user['localId'], 'token':token})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

@@ -20,47 +20,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigateToSignUp, navigateToL
   const [badLogin, setBadLogin] = useState(false);
   const controller = new AuthController()
 
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          "email": email,
-          "password":password
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      Alert.alert('Success', 'Login successful');
-      // Redirect user or do something else on success
-      navigateToMain();
-    } catch (error) {
-      Alert.alert('Error', 'Login failed');
-      console.error('Login error:', error);
-    }
-  };
-
-
-  // const signInWithGoogle = () => {
-  //   // Add logic for Google sign-in
-  // };
-  //
-  // const signInWithApple = () => {
-  //   // Add logic for Apple sign-in
-  // };
-  //
-  // const signInWithGitHub = () => {
-  //   // Add logic for GitHub sign-in
-  //   console.log("Hello")
-  // };
-
   return (
       <View style={styles.container}>
         <TouchableOpacity style={{

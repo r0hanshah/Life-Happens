@@ -12,6 +12,24 @@ class AuthController {
       // Initialization code here
     }
 
+    async handleFetch(user_id:string, email:string, completion:()=>void)
+    {
+      const userData = await this.handleGetUser(user_id, email)
+          const user = userData[0]
+          const rootTaskIds = userData[1]
+
+          const mainController = MainController.getInstance()
+
+          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds).then( (tasks) => {
+            console.log(tasks.length)
+            mainController.setUser(user)
+            mainController.setTasks(tasks)
+            
+            // Redirect user or do something else on success
+            completion();
+          })
+    }
+
     async handleLogin(email:string, password:string, completion:()=>void, handleBadLogin:()=>void) {
         try {
           const response = await fetch('http://127.0.0.1:5000/login', {
@@ -34,6 +52,17 @@ class AuthController {
     
           Alert.alert('Success', 'Login successful');
           const data = await response.json();
+
+          // Handle persistent log in 
+          if (data.token) {
+            console.log("GOT TOKEN: ", data.token)
+            localStorage.setItem('authToken', data.token);
+          }
+          else
+          {
+            console.log("DID NOT GET TOKEN")
+          }
+
           const user_id = data['user_id']
           const userData = await this.handleGetUser(user_id, email)
           const user = userData[0]
