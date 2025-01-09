@@ -444,41 +444,6 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
             </TouchableOpacity>
           )
         }
-        // else
-        // {
-        //   let widthFromDay = task.isLeftBound() ? (weekDay+1) * (windowWidth/7 * 0.86) : (6 - weekDay) * (windowWidth/7 * 0.86)
-        //   let distanceFromCircle = 6 + 10*(i-1)
-
-        //   displays.push(
-        //     <TouchableOpacity style={{ position:'absolute', right:-5 + 10 * i, top:calculateMinutesSinceMidnight(task.startDate)*0.547 + 45, width:10, zIndex:-i}} onPress={() => {
-        //         displayGroups[j] = swap(displayGroups[j], 0, i)
-        //         setDisplayGroups(displayGroups)
-        //         setSecondRerender(!secondReender)
-        //         setIdOfInterest(task.id)
-        //       }}>
-        //         <View style={{position:'absolute', top:3, right:-5}}>
-        //           <View style={{backgroundColor:task.color, width:distanceFromCircle, height:2, position:'absolute'}}/>
-
-        //           <View style={{backgroundColor:task.color, width:2, height: heightFromStartDate, left:distanceFromCircle, position:'absolute'}}/>
-
-        //           <View style={[{backgroundColor:task.color, width:widthFromDay, top:heightFromStartDate, height:2, left:distanceFromCircle, position:'absolute'}, task.isLeftBound() ? {left:-widthFromDay + distanceFromCircle+2} : {}]}/>
-
-        //           <View style={[{backgroundColor:task.color, width:2, top:heightFromStartDate, height:heightFromEndOfCalendar, position:'absolute'}, task.isLeftBound() ? {right: -distanceFromCircle + widthFromDay-2} : {left: widthFromDay + distanceFromCircle}]}/>
-
-        //           <View style={[{backgroundColor:task.color, width:10 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-10} : {left: widthFromDay + distanceFromCircle-10}]}/>
-        //         </View>
-
-        //         <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547}}>
-        //           <LinearGradient
-        //             colors={[task.color, 'rgba(0, 0, 0, 0)']}              
-        //             style={{ flex: 1}}/>
-        //         </View>
-
-        //         <View style={{position:'absolute', right:-5, backgroundColor: task.color, height:10, width:10, borderRadius:10}}/>
-        //     </TouchableOpacity>
-        //   )
-          
-        // }
       }
     }
 
@@ -573,9 +538,9 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
         <TouchableOpacity onPress={dayPressed} style={{flexDirection:"column", alignItems:"center"}}>
           <View style={{flexDirection: "row"}}>
             <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 8 ? leafTasks[8].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 7 ? leafTasks[7].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 6 ? leafTasks[6].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
             </View>
             <View style={containerStyle}>
               <Text style={{
@@ -590,22 +555,22 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
               {/* {renderWiresForDay()} */}
             </View>
             <View style={{flexDirection: "column", height: "auto", justifyContent:"center"}}>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 5 ? leafTasks[5].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 4 ? leafTasks[4].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
-              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:leafTasks.length > 3 ? leafTasks[3].color : "rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
+              <View style={{width: windowWidth * 0.01, height: 2, backgroundColor:"rgba(255,255,255,0)", marginBottom: 3}}/>
             </View>
           </View>
           <View style={{flexDirection: "row", justifyContent: "flex-start", width: "100%"}}>
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3, marginLeft: windowWidth * 0.04}}/>
-            <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.057 + leafTasks[0].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:leafTasks.length > 0 ? leafTasks[0].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 0 ? windowHeight*0.057 + leafTasks[0].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
   
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-            <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.057 + leafTasks[1].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:leafTasks.length > 1 ? leafTasks[1].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 1 ? windowHeight*0.057 + leafTasks[1].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 8}}/>
   
             <View style={{width: 2, height: 30, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
-            <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.057 + leafTasks[2].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:leafTasks.length > 2 ? leafTasks[2].color : "rgba(255,255,255,0)", marginRight: 3}}/>
+            <View style={{width: 2, height: leafTasks.length > 2 ? windowHeight*0.057 + leafTasks[2].offset * 4 + 2 + lastRowExtension : 33, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
             <View style={{width: 2, height: 37, backgroundColor:"rgba(255,255,255,0)", marginRight: 3}}/>
           </View>
         </TouchableOpacity>

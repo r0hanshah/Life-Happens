@@ -11,7 +11,7 @@ interface GridProps {
 }
 
 interface ColorQueueType {
-  [key: string]: Set<[string, number, string, boolean, boolean?]>;
+  [key: string]: Set<[string, number, string, boolean, boolean?, boolean?]>;
 }
 
 const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }) => {
@@ -21,7 +21,7 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
 
   // useEffect to compute the value when myParameter changes
   useEffect(() => {
-    const computedResult:{[key: string]: Set<[string, number, string, boolean, boolean?]>}  = generatePathsForIds(subtaskDispIds);
+    const computedResult:{[key: string]: Set<[string, number, string, boolean, boolean?, boolean?]>}  = generatePathsForIds(subtaskDispIds);
     setColorQueues(computedResult);
   }, [subtaskDispIds]);
 
@@ -30,12 +30,12 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
   }, [inMoment])
 
 
-  const generatePathsForIds = (ids : string[]): { [key: string]: Set<[string, number, string, boolean, boolean?]> } => // Returns array of #COLORHEX, Amount fill (0-1), root_task_id
+  const generatePathsForIds = (ids : string[]): { [key: string]: Set<[string, number, string, boolean, boolean?, boolean?]> } => // Returns array of #COLORHEX, Amount fill (0-1), root_task_id
   {
     /*
       This function assumes the parent id index has already been calculated and the subtask indices have also been calculated
     */
-    var colorQueuesMap:{[key: string]: Set<[string, number, string, boolean, boolean?]>} = {}
+    var colorQueuesMap:{[key: string]: Set<[string, number, string, boolean, boolean?, boolean?]>} = {}
     const firstDayOfMonth = currentMonth.clone().startOf('month');
     const startDay = firstDayOfMonth.clone().startOf('week');
     const endDay = currentMonth.clone().endOf('month').endOf('week');
@@ -178,13 +178,15 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           amountFill == 0 ? amountFill += 3 : amountFill += 0
 
           var columnOffset = lIndex % 2 == 0 ? lColumn : lColumn + 1
+          var pointLeft = lIndex % 2 != 0
+
           if(colorQueuesMap.hasOwnProperty(`${lRow}v${columnOffset}`))
           {
-            colorQueuesMap[`${lRow}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound])
+            colorQueuesMap[`${lRow}v${columnOffset}`].add([hexcode, 0.25 * amountFill, rootId, leftBound, false, pointLeft])
           }
           else
           {
-            colorQueuesMap[`${lRow}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound]])
+            colorQueuesMap[`${lRow}v${columnOffset}`] = new Set([[hexcode, 0.25 * amountFill, rootId, leftBound, false, pointLeft]])
           }
 
           // Draw horizontal lines towards parent
@@ -324,15 +326,18 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           var amountFill = index % 3
           amountFill == 0 ? amountFill += 3 : amountFill += 0
           var columnOffset = index > 6 ? column : column + 1
+          var pointLeft = index <= 6
 
-          // Draw first column line
+          console.log(pointLeft ? "I will point left <= " + index : "I will point RIGHT <= " + index)
+
+          // Draw first vertical line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
-            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.23 + 0.05*((offset) + (((index)-4)%3+1)), rootId, leftBound])
+            colorQueuesMap[`${row}v${columnOffset}`].add([hexcode, 0.23 + 0.05*((offset) + (((index)-4)%3+1)), rootId, leftBound, false, pointLeft])
           }
           else
           {
-            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.23 + 0.05* ((offset) + (((index)-4)%3+1)), rootId, leftBound]])
+            colorQueuesMap[`${row}v${columnOffset}`] = new Set([[hexcode, 0.23 + 0.05* ((offset) + (((index)-4)%3+1)), rootId, leftBound, false, pointLeft]])
           }
 
           // Draw horizontal lines
