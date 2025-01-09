@@ -34,6 +34,8 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
       const existsInLastRowOnly = amountFill < 0
       amountFill = Math.abs(amountFill)
 
+      console.log("Is last?", lastRow, "Offset fill: ", ((windowHeight / 6)* 0.9)*amountFill + 50, "Orientation: ", orientation)
+
       return (
         <View key={`cont${index}`} style={[containerStyle, {
           width: '100%',
@@ -60,6 +62,7 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
               existsInLastRowOnly ? {top: 144.5} : {}
             ]}
           />
+          {/* Wire that connects the rest of the wire to the day it belongs to */}
           {
             amountFill < 1 &&
             <View
@@ -70,11 +73,29 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
                 position: 'absolute',
                 backgroundColor: backgroundColor,
                 width: orientation === 'horizontal' ? 2 : 20,
-                height: orientation === 'vertical' ?  2 : 20,
-                top: orientation ==='vertical'? lastRow ? -48*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : -16
+                height: orientation === 'vertical' ?  2 : 14 + (lastRow ? 49: 0),
+                top: orientation ==='vertical'? lastRow ? -48*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : -10 - (lastRow ? 49: 0)
               },
               existsInLastRowOnly ? {top: 144.5} : {},
               orientation == 'vertical' ? pointLeft ? {right:2} : {left:2} : leftBound ? {left: ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1 ? 1 :  1-amountFill) + (amountFill == 1 ? 2 : 0)} : {right: ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1 ? 1 :  1-amountFill) + (amountFill == 1 ? 2 : 0)}
+            ]}
+            />
+          }
+          {/* Wire that connects the rest to the task it belongs to */}
+          {
+            lastRow && orientation === 'vertical' &&
+            <View
+            key={index + 0.9}
+            style ={[
+              {
+                zIndex: zIndex,
+                position: 'absolute',
+                backgroundColor: backgroundColor,
+                width: 100,
+                height: 2,
+                top: ((windowHeight / 6)* 0.9)*amountFill + 50 + (existsInLastRowOnly ? 144.5 : 0)
+              },
+              leftBound ? {left:0} : {right:0}
             ]}
             />
           }

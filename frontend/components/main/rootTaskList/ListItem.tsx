@@ -5,6 +5,7 @@ import TaskModel from '../../../models/TaskModel';
 
 import MainController from '../../../controllers/main/MainController';
 import CircularProgressBar from '../../taskView/CircularProgressView';
+import { rgbaColor } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 interface ListItemProps
 {
@@ -67,7 +68,7 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index, lowerDa
             <View  key={rootTask.id} style={{height: 50, width: "auto", flexDirection: "row", overflow:"visible", marginBottom: 10, justifyContent: leftBound ? "flex-start" : "flex-end"}}>
 
                 {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: leftBound ? "flex": "none"}}/> */}
-                <View style={{width: windowWidth*(display == 2 ? 0.009 : 0.018), height: 2, backgroundColor: rootTask.color, marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
+                <View style={{width: windowWidth*(display == 2 ? 0.009 : 0.018), height: 2, backgroundColor: "rgba(255,255,255,0)", marginTop: 25, marginLeft:1, display: leftBound ? "flex": "none"}}/>
 
                     <TouchableHighlight style={{borderRadius: 25}} onPress={() => controller.setSelectedTask(rootTask)}>
                         
@@ -115,8 +116,7 @@ const ListItem: React.FC<ListItemProps> = ({ rootTask, leftBound, index, lowerDa
 
                     </TouchableHighlight>
 
-                <View style={{width: windowWidth*0.018, height: 2, backgroundColor: rootTask.color, marginTop: 25, marginRight:1, display: !leftBound ? "flex": "none"}}/>
-                {/* <View style={{width: 2, height: 195 + index * 60, backgroundColor: rootTask.color, bottom: 168 + index * 60, display: !leftBound ? "flex": "none"}}/> */}
+                <View style={{width: windowWidth*0.018, height: 2, backgroundColor: "rgba(255,255,255,0)", marginTop: 25, marginRight:1, display: !leftBound ? "flex": "none"}}/>
 
             </View>
     )

@@ -90,7 +90,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     // Get row and column from start date
                     const momentOfStatrDate = moment(leafNode.startDate)
 
-                    const daysFromStartDay = momentOfStatrDate.dayOfYear() - startDay.dayOfYear()
+                    const daysFromStartDay = momentOfStatrDate.diff(startDay, 'days')
 
                     var index = priority
 

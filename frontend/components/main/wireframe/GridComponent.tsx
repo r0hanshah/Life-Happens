@@ -328,8 +328,6 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
           var columnOffset = index > 6 ? column : column + 1
           var pointLeft = index <= 6
 
-          console.log(pointLeft ? "I will point left <= " + index : "I will point RIGHT <= " + index)
-
           // Draw first vertical line
           if(colorQueuesMap.hasOwnProperty(`${row}v${columnOffset}`))
           {
