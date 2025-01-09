@@ -7,11 +7,12 @@ import Main from './components/main/Main';
 import TaskModel from './models/TaskModel';
 import LandingScreen from './components/landing/LandingScreen';
 import ButtonTest from './components/buttonTest/ButtonTest'; // Import the ButtonTest component
+import AuthLoadingScreen from './components/auth/AuthLoadingScreen';
 
 
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main'>('Main');
+  const [currentScreen, setCurrentScreen] = useState<'Login' | 'SignUp' | 'Landing' | 'ButtonTest' | 'Main' | 'App'>('App');
 
   const navigateToSignUp = () => {
     setCurrentScreen('SignUp');
@@ -53,6 +54,7 @@ export default function App() {
   
   return (
         <View style={styles.container}>
+          {currentScreen === 'App' && <AuthLoadingScreen navigateToMain={navigateToMain} navigateToLogin={navigateToLogin}></AuthLoadingScreen>}
           {currentScreen === 'Landing' && <LandingScreen navigateToSignUp={navigateToSignUp} navigateToLogin={navigateToLogin} navigateToMain={navigateToMain}/>}
           {currentScreen === 'Main' && <Main rootTasks={[]} signOut={navigateToLanding}/>}
           {currentScreen === 'ButtonTest' && <ButtonTest userId={userId} taskId={taskId} />}

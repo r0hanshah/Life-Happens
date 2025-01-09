@@ -21,7 +21,7 @@ interface Tasks {
     signOut: ()=>void;
 }
 
-const DEBUG = true
+const DEBUG = false
 
 //TODO: Have main do a useEffect to load in the tasks from the backend
 
@@ -351,7 +351,20 @@ const Main: React.FC<Tasks> = ({signOut}) => {
               ]}
               >
                 {/* Content of the sliding view */}
-                {profileClicked && <ProfileView user={controller.getUser().getValue()!} onPress={()=>{setProfileClicked(false)}} signOut={signOut} deletAccount={()=>{setBlurVisible(true)}} editAccount={()=>{setEditAccount(true)}}/>}
+                {profileClicked && 
+                <ProfileView 
+                  user={controller.getUser().getValue()!} 
+                  onPress={()=>{setProfileClicked(false)}} 
+                  signOut={async ()=>{
+                    const response = await fetch('http://127.0.0.1:5000/logout',{
+                      method: 'POST',
+                    })
+                    console.log("Logout successful? ", response.ok)
+                    signOut();
+                  }} 
+                  deletAccount={()=>{setBlurVisible(true)}} 
+                  editAccount={()=>{setEditAccount(true)}}
+                />}
 
             </Animated.View>
 

@@ -1,6 +1,7 @@
 import firebase_admin
-from flask import Flask, request, jsonify, render_template, make_response
+from flask import Flask, request, jsonify, render_template, make_response, session
 from flask_mail import Mail, Message
+from flask_session import Session
 from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
@@ -12,7 +13,6 @@ import base64
 import jwt
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from flask import request, jsonify
 
 CRED = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(CRED, {
@@ -24,7 +24,6 @@ from ai_funcs import AIFunctions
 
 SECRET_KEY = 'your_secret_key'
 
-
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -35,7 +34,10 @@ app.config['MAIL_PASSWORD'] = 'pzyilmwlsyohszip'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365) # Year of persistent log in
 mail = Mail(app)
+Session(app)
 
 def _build_cors_preflight_response():
     response = make_response()
@@ -108,15 +110,51 @@ def signup():
 #     except Exception as e:
 #         return jsonify({'error': str(e)}), 400
 # Login route
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully"}), 200
+
+@app.route('/verify-login', methods=['GET'])
+def verify_login():
+    print("Just got called")
+    user_id = session.get('user_id')
+    id_token = session.get('id_token')
+
+    if not user_id or not id_token:
+        return jsonify({"logged_in": False}), 401
+
+    try:
+        # Optionally verify the ID token with Firebase
+        # This step ensures the token is still valid
+        auth.get_account_info(id_token)
+
+        return jsonify({"logged_in": True, "user_id": user_id})
+    except Exception as e:
+        # Clear session if token is invalid
+        session.clear()
+        return jsonify({"logged_in": False, "error": str(e)}), 401
+
 @app.route('/login', methods=['POST'])
 def login():
-    print("HERE")
     data = request.json
     email = data.get('email')
     password = data.get('password')
+
     try:
         user = auth.sign_in_with_email_and_password(email, password)
-        print(user)
+
+        print("About to print session")
+        print(session)
+        print("Printed session")
+
+        session['user_id'] = user['localId']
+        session['id_token'] = user['idToken']
+        session['email'] = email
+        session.permanent = True
+
+        print("set session")
+
         return jsonify({'user_id': user['localId']})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
