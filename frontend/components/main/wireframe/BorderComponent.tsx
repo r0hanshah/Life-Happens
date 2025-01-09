@@ -73,8 +73,8 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
                 position: 'absolute',
                 backgroundColor: backgroundColor,
                 width: orientation === 'horizontal' ? 2 : 20,
-                height: orientation === 'vertical' ?  2 : 14 + (lastRow ? 49: 0),
-                top: orientation ==='vertical'? lastRow ? -48*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : -10 - (lastRow ? 49: 0)
+                height: orientation === 'vertical' ?  2 : 20 + (lastRow ? 50: 0),
+                top: orientation ==='vertical'? lastRow ? -48*(1-amountFill) : ((windowHeight / 6) * 0.9)*(1-amountFill) : -16 - (lastRow ? 50: 0)
               },
               existsInLastRowOnly ? {top: 144.5} : {},
               orientation == 'vertical' ? pointLeft ? {right:2} : {left:2} : leftBound ? {left: ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1 ? 1 :  1-amountFill) + (amountFill == 1 ? 2 : 0)} : {right: ((windowWidth / 7) * 0.83)*(leftBound ? amountFill : amountFill==1 ? 1 :  1-amountFill) + (amountFill == 1 ? 2 : 0)}
