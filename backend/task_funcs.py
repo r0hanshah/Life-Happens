@@ -13,10 +13,10 @@ from datetime import datetime, timedelta, timezone
 def add_task_to_firestore(user_id, task_data, taskPathArray, db):
     try:
         # Generate a new document reference with a unique ID if not provided
-        task_ref = db.collection('Users').document(user_id).collection('Tasks').document()
-        task_id = task_ref.id
+        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_data['ID'])
+        task_id = task_data['ID']
         
-        task_data['ID'] = task_id
+        # task_data['ID'] = task_id
         task_data['ExtraMedia'] = {'ID': task_id}  # Set ExtraMedia ID to task ID
         
         # Convert ISO formatted date strings to datetime objects
