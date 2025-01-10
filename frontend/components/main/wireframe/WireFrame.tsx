@@ -136,9 +136,14 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     }
                     
                     var rootIndex = 0
-                    for(var i = 0; i < sidedRootTasksMap[leftBound].length; i += 1)
+                    // Only set the rootIndex based on the root tasks in the month
+                    let unfiltered_root_sided_tasks = sidedRootTasksMap[leftBound].filter(({ startDate, endDate }) =>
+                        moment(startDate).isSame(inMoment, 'month') || moment(endDate).isSame(inMoment, 'month')
+                      );
+
+                    for(var i = 0; i < unfiltered_root_sided_tasks.length; i += 1)
                     {
-                        const rootTask = sidedRootTasksMap[leftBound][i]
+                        const rootTask = unfiltered_root_sided_tasks[i]
                         if (rootTask.id == rootId)
                         {
                             rootIndex = i

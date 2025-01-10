@@ -252,7 +252,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
                 <View style={{backgroundColor:task.color, width:2, height:heightFromStartDate, position:'absolute'}}/>
                 <View style={[{backgroundColor:task.color, width: widthFromDay + (task.isLeftBound() && weekDay>0 ? 2 : 0) , top:heightFromStartDate, height:2, position:'absolute'}, task.isLeftBound() ? {left:-widthFromDay} : {}]}/>
                 <View style={[{backgroundColor:task.color, width:2, top:heightFromStartDate, height: heightFromEndOfCalendar, position:'absolute'}, task.isLeftBound() ? {right: widthFromDay-2} : {left: widthFromDay}]}/>
-                <View style={[{backgroundColor:task.color, width:30, top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? {right:widthFromDay-30 } : {left: widthFromDay - 30}]}/>
+                <View style={[{backgroundColor:task.color, width:100, top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? {right:widthFromDay-100 } : {left: widthFromDay - 100}]}/>
               </View>
 
               <View style={{flexDirection:'column', height:getMinutesDifference(task.startDate, task.endDate)*0.547, width: windowWidth/7 * 0.77 - 10 * displayGroup.length}}>
@@ -301,7 +301,7 @@ const DayNode: React.FC<DayNodeProps> = ({ dayNumber, dayOfWeek, leafTasks, curr
 
                   <View style={[{backgroundColor:task.color, width:2, top:heightFromStartDate, height:heightFromEndOfCalendar, position:'absolute'}, task.isLeftBound() ? {right: -distanceFromCircle + widthFromDay-2} : {left: widthFromDay + distanceFromCircle}]}/>
 
-                  <View style={[{backgroundColor:task.color, width:10 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-10} : {left: widthFromDay + distanceFromCircle-10}]}/>
+                  <View style={[{backgroundColor:task.color, width:100 + (task.isLeftBound()? 6: 0), top:heightFromStartDate + heightFromEndOfCalendar - 2, height: 2, position:'absolute'}, task.isLeftBound() ? { right: -distanceFromCircle + widthFromDay-6-100} : {left: widthFromDay + distanceFromCircle-100}]}/>
                 </View>
 
                 <View style={{position:'absolute', right:-1,width:2, height:getMinutesDifference(task.startDate, task.endDate)*0.547}}>
