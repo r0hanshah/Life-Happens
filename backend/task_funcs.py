@@ -55,7 +55,14 @@ def edit_task_in_firestore(data, taskPathArray, db):
         ID = data.get('ID')
 
         # Navigate to the correct task document
-        task_ref = db.collection('Users').document(creatorID).collection('Tasks').document(ID)
+        parent_task_ref = db.collection('Users').document(creatorID).collection('Tasks') #.document(ID)
+
+        for taskId in taskPathArray:
+            parent_task_ref = parent_task_ref.document(taskId)
+            parent_task_ref = parent_task_ref.collection('Tasks')
+
+        # Add current task ID
+        task_ref = parent_task_ref.document(ID)
         
         # Check if the document exists
         task_doc = task_ref.get()
@@ -69,6 +76,7 @@ def edit_task_in_firestore(data, taskPathArray, db):
         # Update the user's TaskTreeRoots with the new StartDate
         user_ref = db.collection('Users').document(creatorID)
         user_ref.update({f"TaskTreeRoots.{ID}": data.get('StartDate')})
+        user_ref.update({f"Nodes.{ID}":f"{data.get('StartDate')}:::{data.get('EndDate')}:::{'/'.join(taskPathArray)}"})
 
         print(f"Task {ID} updated successfully for user {creatorID}.")
     except Exception as e:
