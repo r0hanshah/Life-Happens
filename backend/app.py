@@ -52,7 +52,6 @@ BUCKET = storage.bucket()
 @app.route('/signup', methods=['POST'])
 def signup():
     try:
-        print("HERE")
         email = request.json.get('email')
         password = request.json.get('password')
         name = request.json.get('name')
@@ -77,7 +76,8 @@ def signup():
             'SharedTaskTrees':[],
             'TaskTreeRoots':[],
             'WeeklyAITimesAllowed':[],
-            'RestPeriods':[]
+            'RestPeriods':[],
+            'Nodes':{},
         }
 
         db.collection('Users').document(user_id).set(data)
@@ -89,26 +89,6 @@ def signup():
         print(request.data.decode())
         return jsonify({'error': str(e)}), 400
 
-# Login route for persistent login
-# @app.route('/login', methods=['POST'])
-# def login():
-#     data = request.json
-#     email = data.get('email')
-#     password = data.get('password')
-#     try:
-#         user = auth.sign_in_with_email_and_password(email, password)
-#         user_id = user['localId']
-        
-#         # Generate JWT
-#         token = jwt.encode({
-#             'user_id': user_id,
-#             'exp': datetime.utcnow() + timedelta(days=7)
-#         }, SECRET_KEY, algorithm='HS256')
-        
-#         return jsonify({'user_id': user_id, 'token': token})
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 400
-# Login route
 @app.route('/verify-login', methods=['GET'])
 def verify_login():
     print("Just got called")
@@ -224,12 +204,24 @@ def get_task_by_user_and_task_id(user_id, task_id):
         # Navigating to the Task document within the User subcollection
         task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
         task = task_ref.get()
+        
         if task.exists:
-            return task.to_dict()
+            task_dict = task.to_dict()
+            
+            # Check if the task_ref has a 'Tasks' collection
+            children_ref = task_ref.collection('Tasks')
+            print(children_ref)
+            children_docs = children_ref.stream()
+            print(children_docs)
+            
+            # If it does, add all the document IDs to the 'Children' field of the task_dict
+            task_dict['Children'] = [child.id for child in children_docs]
+            
+            return task_dict
         else:
             return None
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error retrieving task: {e}")
         return None
 
 @app.route('/addTask', methods=['POST'])
@@ -332,8 +324,10 @@ def fetch_task():
         data = get_task_in_firestore(task_id, user_id, task_path_array, db)
 
         print(data)
-
-        return data, 201
+        if data:
+            return data, 201
+        else:
+            raise Exception(f"Failed to fetch task: {task_id} (It might not exist)")
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
@@ -435,6 +429,7 @@ def delete_file():
 @app.route('/user/<user_id>/task/<task_id>', methods=['GET'])
 def get_user_task(user_id, task_id):
     task = get_task_by_user_and_task_id(user_id, task_id)
+    print("LOADED TASK:",task)
     if task:
         return jsonify(task), 200
     else:

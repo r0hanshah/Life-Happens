@@ -23,26 +23,23 @@ def add_task_to_firestore(user_id, task_data, taskPathArray, db):
         task_data['EndDate'] = datetime.fromisoformat(task_data['EndDate'].replace('Z', '+00:00'))
         task_data['StartDate'] = datetime.fromisoformat(task_data['StartDate'].replace('Z', '+00:00'))
         
-        tempCount = 0
         parent_task_ref = db.collection('Users').document(user_id).collection('Tasks')
 
         # Create the path to the Task and update children references if needed
         for taskId in taskPathArray:
             parent_task_ref = parent_task_ref.document(taskId)
-
-            tempCount += 1
-            if tempCount == len(taskPathArray):
-                parent_task_ref.update({'Children': firestore.ArrayUnion([task_id])})
-
             parent_task_ref = parent_task_ref.collection('Tasks')
 
         # Add current task ID
         task_ref = parent_task_ref.document(task_id)
         task_ref.set(task_data)
 
+        user_ref = db.collection('Users').document(user_id)
+        
         if len(taskPathArray) == 0:
-            user_ref = db.collection('Users').document(user_id)
             user_ref.update({f"TaskTreeRoots.{task_id}": task_data.get('StartDate')})
+
+        user_ref.update({f"Nodes.{task_id}":f"{task_data.get('StartDate')}:::{task_data.get('EndDate')}:::{'/'.join(taskPathArray)}"})
 
         return task_id
     except Exception as e:
@@ -122,12 +119,17 @@ def delete_task_in_firestore(data, taskPathArray, db):
         # Add current task id
         task_ref = task_ref.document(task_id)
 
+        print(f"Attempting to delete task: {task_id}")
         task_ref.delete()
+        print(f"Successfully deleted: {task_id}")
 
         user_ref = db.collection('Users').document(creatorId)
-        
+        print(f"Attempting to remove reference from lookup table: {task_id}")
         if is_root:
             user_ref.update({f"TaskTreeRoots.{task_id}": firestore.DELETE_FIELD})
+        
+        user_ref.update({f"Nodes.{task_id}": firestore.DELETE_FIELD})
+        print(f"Successfully removed reference from lookup table: {task_id}")
 
     except Exception as e:
         print(f"Error deleting document: {e}")

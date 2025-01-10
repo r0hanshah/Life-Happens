@@ -34,6 +34,7 @@ const DeleteAccount: React.FC<DeleteAccountProps> = ({cancel, deleteAccount, use
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{
                 handleDeleteUser(user.id)
+                localStorage.removeItem('authToken')
                 deleteAccount()
             }} style={{
                 padding:10,

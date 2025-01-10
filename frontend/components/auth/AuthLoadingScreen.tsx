@@ -23,10 +23,14 @@ const AuthLoadingScreen: React.FC<AuthLoadingScreenProps> = ({ navigateToMain, n
         },
         credentials: 'include', // Include cookies for session
       })
+      .catch(err=>{
+        console.log(err)
+        navigateToLogin()
+      })
 
       console.log("Response: ", response)
       
-      if (response.ok)
+      if (response && response.ok)
       {
         const data = await response.json()
         console.log(data)
@@ -46,36 +50,6 @@ const AuthLoadingScreen: React.FC<AuthLoadingScreenProps> = ({ navigateToMain, n
         console.log("Failed to verify token")
         navigateToLogin()
       }
-      // try {
-      //   const token = await AsyncStorage.getItem('token');
-      //   console.log('Token in AuthLoadingScreen:', token);
-      //   if (token) {
-      //     const response = await fetch('http://127.0.0.1:5000/verify-token', {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //         'Authorization': `Bearer ${token}`, // Ensure the token is correctly included
-      //       },
-      //       body: JSON.stringify({ token }),
-      //     });
-
-      //     if (response.ok) {
-      //       const data = await response.json();
-      //       console.log('Token verified:', data);
-      //       navigateToMain();
-      //     } else {
-      //       const errorData = await response.json();
-      //       console.log('Token verification failed:', errorData);
-      //       navigateToLogin();
-      //     }
-      //   } else {
-      //     console.log('No token found');
-      //     navigateToLogin();
-      //   }
-      // } catch (error) {
-      //   console.error('Error checking token in AuthLoadingScreen:', error);
-      //   navigateToLogin();
-      // }
     };
 
     checkToken();
@@ -83,8 +57,8 @@ const AuthLoadingScreen: React.FC<AuthLoadingScreenProps> = ({ navigateToMain, n
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#0000ff" />
-      <Text>Loading...</Text>
+      <ActivityIndicator size="large" color="#ffffff" />
+      <Text style={{color:'white', margin:10}}>Loading...</Text>
     </View>
   );
 };

@@ -1,5 +1,4 @@
 // taskServices.tsx
-
 import { DocumentPickerAsset } from "expo-document-picker"
 import TaskModel from "../models/TaskModel";
 import UserModel from "../models/UserModel";
@@ -16,7 +15,7 @@ type UserData = {
   ProfilePicture: string;
   Settings: any; // Define a more specific type based on the settings structure
   SharedTaskTrees: any[]; // Define a more specific type if possible
-  TaskTreeRoots: any[]; // Define a more specific type if possible
+  TaskTreeNodes: any[]; // Define a more specific type if possible
   WeeklyAITimesAllowed: number;
 };
 

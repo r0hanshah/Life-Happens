@@ -967,14 +967,28 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                         {/* Subtasks */}
                         <View style={{width:'100%'}}>
                             <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'flex-end'}}>
+
                                 <Text style={[{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:40}, {width:'100%', marginTop:20}, isLeft? {paddingRight: 30} : {paddingLeft:35}]}>{task.children.length} Sub tasks</Text>
-                                <TouchableOpacity style={{justifyContent:'center', alignItems:'center', width:30, height:30, backgroundColor:'rgba(50,50,50,1)', borderRadius:30, margin:5, marginRight:isLeft ? 20 : 0}} onPress={()=>{setNewTasks([...newTasks, new TaskModel(undefined, task.creatorId, task.rootId, task.users, undefined, "Sub Task " + (task.children.length + newTasks.length + 1), task.color, [task ,...task.ancestors], undefined, task.startDate.toISOString(), task.endDate.toISOString(), false)])}}>
+
+                                <TouchableOpacity style={{
+                                    justifyContent:'center', 
+                                    alignItems:'center', 
+                                    width:30, 
+                                    height:30, 
+                                    backgroundColor:'rgba(50,50,50,1)', 
+                                    borderRadius:30, 
+                                    margin:5, 
+                                    marginRight:isLeft ? 20 : 0}} 
+                                    onPress={()=>{
+                                        setNewTasks([...newTasks, new TaskModel(undefined, task.creatorId, task.rootId, task.users, undefined, "Sub Task " + (task.children.length + newTasks.length + 1), task.color, [task ,...task.ancestors], undefined, task.startDate.toISOString(), task.endDate.toISOString(), false)])
+                                        }}>
                                     <Image
                                         style={{width: 10, height: 10, marginHorizontal: 10, transform:[{rotate: '45deg'}], margin:5}}
                                         source={require('../../assets/x_mark_white.png')}
                                         resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                     />
                                 </TouchableOpacity>
+
                             </View>
 
                             {newTasks.length > 0 &&  

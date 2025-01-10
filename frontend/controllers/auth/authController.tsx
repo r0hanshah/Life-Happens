@@ -17,6 +17,7 @@ class AuthController {
       const userData = await this.handleGetUser(user_id, email)
           const user = userData[0]
           const rootTaskIds = userData[1]
+          const nodes = userData[2]
 
           const mainController = MainController.getInstance()
 
@@ -87,20 +88,21 @@ class AuthController {
         }
       };
 
-    private handleGetUser = async (userId:string, email:string):Promise<[UserModel | null, string[]]> => {
+    private handleGetUser = async (userId:string, email:string):Promise<[UserModel | null, string[], string[]]> => {
         try {
             const data = await getUser(userId);
             const name = data['Name']
             const picture = data['ProfilePicture']
             const rootTaskIds = data['TaskTreeRoots']
             const restPeriods = data['RestPeriods']
+            const nodes = data['Nodes']
             // composer rest period matrix
 
             console.log(typeof rootTaskIds)
-            return [restPeriods ? new UserModel(userId, name, picture, email, this.composeRestPeriodMatrix(restPeriods)) : new UserModel(userId, name, picture, email), rootTaskIds]
+            return [restPeriods ? new UserModel(userId, name, picture, email, this.composeRestPeriodMatrix(restPeriods)) : new UserModel(userId, name, picture, email), rootTaskIds, nodes]
         } catch (e) {
             console.error('Error fetching user:', e);
-            return [null, []]
+            return [null, [], []]
         }
     };
 
