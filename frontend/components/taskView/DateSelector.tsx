@@ -138,6 +138,7 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
 
         // Refresh main view
         const mainController = MainController.getInstance();
+        mainController.setMoment(moment(date))
 
         if(updateServer)
         {
