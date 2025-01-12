@@ -91,7 +91,7 @@ def get_task_in_firestore(task_Id, creatorId, taskPathArray, db):
         task_ref = db.collection('Users').document(creatorId).collection('Tasks')
 
         # Create the path to the Task
-        for taskId in taskPathArray:
+        for taskId in list(reversed(taskPathArray)):
             task_ref = task_ref.document(taskId).collection('Tasks')
 
         # Add current task id
@@ -102,7 +102,14 @@ def get_task_in_firestore(task_Id, creatorId, taskPathArray, db):
         task = task_ref.get()
 
         if task.exists:
-            return task.to_dict()
+
+            task_dict = task.to_dict()
+            
+            children_ref = task_ref.collection('Tasks')
+            children_docs = children_ref.stream()
+            task_dict['Children'] = [child.id for child in children_docs]
+
+            return task_dict
         else:
             return None
 

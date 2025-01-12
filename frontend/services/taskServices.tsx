@@ -80,11 +80,12 @@ export const getTask = async (userId: string, taskId:string) => {
       console.log(children)
       for(const child of children)
       {
+        // Call get task for the children and add them to the children array of the return task
+        // const child_task = await getTask(userId, `${taskId}.${child}`)
+        // returnTask.children.push(child_task)
+
         loadChildren(userId, child, [returnTask.id], returnTask)
       }
-      
-
-
       return returnTask;
     } else {
       throw new Error(task.error || 'An error occurred while fetching the task');
@@ -155,25 +156,25 @@ export const fetchTask = async (userId: string, taskId: string, ancestorArray: s
     console.error('Failed to fetch task:', error);
 
     // Fetch from shared paths if personal task fetch fails
-    try {
-      const userDoc = await firestore.collection('Users').doc(userId).get();
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        const sharedTaskPaths = userData?.SharedTaskTrees || [];
-        for (const path of sharedTaskPaths) {
-          const pathComponents = path.split('/');
-          const sharedUserId = pathComponents[1]; // Extract user ID from path
-          const sharedTaskId = pathComponents[pathComponents.length - 1]; // Extract task ID from path
-          const taskPathArray = pathComponents.slice(3, pathComponents.length - 1); // Extract task path array
+    // try {
+    //   const userDoc = await firestore.collection('Users').doc(userId).get();
+    //   if (userDoc.exists) {
+    //     const userData = userDoc.data();
+    //     const sharedTaskPaths = userData?.SharedTaskTrees || [];
+    //     for (const path of sharedTaskPaths) {
+    //       const pathComponents = path.split('/');
+    //       const sharedUserId = pathComponents[1]; // Extract user ID from path
+    //       const sharedTaskId = pathComponents[pathComponents.length - 1]; // Extract task ID from path
+    //       const taskPathArray = pathComponents.slice(3, pathComponents.length - 1); // Extract task path array
 
-          if (sharedTaskId === taskId) {
-            return await fetchTask(sharedUserId, taskId, taskPathArray, parent);
-          }
-        }
-      }
-    } catch (sharedError) {
-      console.error('Failed to fetch shared task:', sharedError);
-    }
+    //       if (sharedTaskId === taskId) {
+    //         return await fetchTask(sharedUserId, taskId, taskPathArray, parent);
+    //       }
+    //     }
+    //   }
+    // } catch (sharedError) {
+    //   console.error('Failed to fetch shared task:', sharedError);
+    // }
 
     throw error;
   }

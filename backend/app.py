@@ -199,10 +199,17 @@ def get_time():
     }
 
 
-def get_task_by_user_and_task_id(user_id, task_id):
+def get_task_by_user_and_task_id(user_id, task_id:str):
     try:
+        # TODO: Seperate task id by periods and form array of nesting to get the actual task_ref
+        ancestery_array = task_id.split('.')
+        print("ANCESTERY ARRAY: ", ancestery_array)
+
         # Navigating to the Task document within the User subcollection
-        task_ref = db.collection('Users').document(user_id).collection('Tasks').document(task_id)
+        task_ref = db.collection('Users').document(user_id) #.collection('Tasks').document(task_id)
+        for id in ancestery_array:
+            task_ref = task_ref.collection('Tasks').document(id)
+
         task = task_ref.get()
         
         if task.exists:
