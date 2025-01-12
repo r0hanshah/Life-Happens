@@ -29,12 +29,8 @@ const BorderComponent: React.FC<BorderComponentProps> = ({ colorQueue, orientati
       const containerStyle = orientation === 'horizontal' ? (leftBound? styles.HLContainer : styles.HRContainer) : styles.VContainer
       const zIndex = -(index + 1); // Set zIndex to stack borders
 
-      console.log(amountFill)
-
       const existsInLastRowOnly = amountFill < 0
       amountFill = Math.abs(amountFill)
-
-      console.log("Is last?", lastRow, "Offset fill: ", ((windowHeight / 6)* 0.9)*amountFill + 50, "Orientation: ", orientation)
 
       return (
         <View key={`cont${index}`} style={[containerStyle, {

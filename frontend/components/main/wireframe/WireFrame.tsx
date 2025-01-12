@@ -124,7 +124,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                             
                             const momentOfLatestStatrDate = moment(latestChild.startDate)
 
-                            const daysFromLatestStartDay = momentOfLatestStatrDate.dayOfYear() - startDay.dayOfYear()
+                            const daysFromLatestStartDay = momentOfLatestStatrDate.diff(startDay, 'days')
 
                             pRow = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? Math.floor((daysFromLatestStartDay)/7) : daysFromLatestStartDay > numberOfDaysBetween? 999 : 999
                             pColumn = daysFromLatestStartDay <= numberOfDaysBetween && daysFromLatestStartDay >= 0 ? daysFromLatestStartDay % 7 : daysFromLatestStartDay > numberOfDaysBetween ? 999 : 999
@@ -134,6 +134,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                             parentCache[parentId] = [pRow, pColumn]
                         }
                     }
+                    console.log("P ROW AND COLUMN: ", pRow, pColumn, " <= ", parentId)
                     
                     var rootIndex = 0
                     // Only set the rootIndex based on the root tasks in the month

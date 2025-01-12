@@ -21,14 +21,16 @@ class AuthController {
 
           const mainController = MainController.getInstance()
 
-          const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds).then( (tasks) => {
-            console.log(tasks.length)
-            mainController.setUser(user)
-            mainController.setTasks(tasks)
-            
-            // Redirect user or do something else on success
-            completion();
-          })
+          const tasks = await this.handleGetUserTasks(user_id, rootTaskIds)
+      
+          console.log(tasks.length)
+          mainController.setUser(user)
+          mainController.setTasks(tasks)
+
+          await this.sleep(500) // sleep for 0.5 seconds
+          
+          // Redirect user or do something else on success
+          completion();
     }
 
     async handleLogin(email:string, password:string, completion:()=>void, handleBadLogin:()=>void) {
@@ -146,7 +148,11 @@ class AuthController {
       });
   
       return tasks;
-  }
+    }
+
+    private sleep(ms:number) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
   }
 
 export default AuthController
