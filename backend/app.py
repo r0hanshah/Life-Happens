@@ -1,7 +1,6 @@
 import firebase_admin
 from flask import Flask, request, jsonify, render_template, make_response, session
 from flask_mail import Mail, Message
-from flask_session import Session
 from firebase_auth import auth
 from flask_cors import CORS
 from firebase_admin import credentials
