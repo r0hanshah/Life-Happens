@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeHappens Get Started Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #303030;
+            color: white;
+            text-align: left;
+            font-weight: bold;
+            align-items: center;
+        }
+        .content {
+            padding: 20px;
+            padding-inline: 20%;
+            text-align: left;
+        }
+        .content h1 {
+            font-size: 30px;
+            color: #303030;
+        }
+        .content h2 {
+            font-size: 20px;
+            color: #505050;
+        }
+        .content h3 {
+            font-size: 15px;
+            color: #505050;
+        }
+        .task-details {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .task-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .button-ai {
+            background-color: #505050;
+        }
+        .button-reschedule {
+            background-color: #505050;
+        }
+        .move-options {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .move-options span {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div style="width: 20px; height: 20px; border-radius: 10px; background-color: #e74c3c; margin-left: 20px; display: inline-block;"></div>
+            <h1 style="padding: 10px; display: inline-block;">LifeHappens.</h1>
+        </div>
+        <div class="content">
+            <h1>Time to get started!</h1>
+            <div class="task-details">
+                <h2><strong>Task Name</strong></h2>
+                <div style="gap: 50px;">
+                    <p style="display: inline-block; width: 49%;"><strong>Due Date</strong></p>
+                    <p style="display: inline-block; width: 49%; text-align: right;">1/1/2025 3:30PM</p>
+                </div>
+                
+                <div>
+                    <p style="display: inline-block; width: 49%;"><strong>Estimated Duration</strong></p>
+                    <p style="display: inline-block; text-align: right; width: 49%;">1 Hour</p>
+                </div>
+                
+                <h3><strong>Notes</strong></h3>
+                <p>Notes that were written to describe what the person will be working on that can give them an idea of where to start.</p>
+            </div>
+            <h1>Not a good time?</h1>
+            <div class="actions">
+                <a href="#" class="button button-ai">Move with AI</a>
+                <a href="#" class="button button-reschedule">Reschedule</a>
+            </div>
+            <h2>Move up start time</h2>
+            <div class="move-options">
+                <span>+ 30 min</span>
+                <span>+ 1 hr</span>
+                <span>+ 1 day</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

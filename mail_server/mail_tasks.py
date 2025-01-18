@@ -1,22 +1,21 @@
-from mail_server.celery_app import celery
+from celery_app import celery
 
 from boto3 import client
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
-from datetime import datetime
-
 ses_client = client('ses', region_name='us-east-1')
 sender = "lifehappensnotifications@gmail.com"
 
-@celery.task
-def send_email(recipient, subject, body_text, body_html):
+@celery.task(bind=True)
+def send_email_task(recipient, subject, body_text, body_html, doc_ref):
     """
     Send an email using Amazon SES.
 
-    :param recipient: Email address of the recipient (must be verified in sandbox mode).
-    :param subject: Subject of the email.
-    :param body_text: Plain text version of the email body.
-    :param body_html: HTML version of the email body.
+    Parameters:
+        recipient: Email address of the recipient (must be verified in sandbox mode).
+        subject: Subject of the email.
+        body_text: Plain text version of the email body.
+        body_html: HTML version of the email body.
     """
     try:
         # Send the email
@@ -35,9 +34,15 @@ def send_email(recipient, subject, body_text, body_html):
         )
         print("Email sent successfully! Message ID:", response['MessageId'])
 
+        # Deleting notification document after successful delivery
+        doc_ref.delete()
+
     except NoCredentialsError:
         print("AWS credentials not found.")
+        doc_ref.update({"status":"incomplete=>AWS credentials not found."})
     except PartialCredentialsError:
         print("Incomplete AWS credentials configuration.")
+        doc_ref.update({"status":"incomplete=>AWS credentials not found."})
     except Exception as e:
         print("Error sending email:", e)
+        doc_ref.update({"status":f"incomplete=>{e}"})
