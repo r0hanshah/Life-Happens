@@ -1,5 +1,4 @@
-import PropertyListener from "../Listener";
-import UserModel from "../../models/UserModel";
+import UserModel, { REST_PERIOD_DEFAULT } from "../../models/UserModel";
 import MainController from "../main/MainController";
 import { Alert } from "react-native";
 import { getUser, getTask } from "../../services/taskServices";
@@ -98,10 +97,12 @@ class AuthController {
             const rootTaskIds = data['TaskTreeRoots']
             const restPeriods = data['RestPeriods']
             const nodes = data['Nodes']
+            const settings = data['Settings']
             // composer rest period matrix
-
+            const restPeriodMatrix = restPeriods ? this.composeRestPeriodMatrix(restPeriods) : REST_PERIOD_DEFAULT
             console.log(typeof rootTaskIds)
-            return [restPeriods ? new UserModel(userId, name, picture, email, this.composeRestPeriodMatrix(restPeriods)) : new UserModel(userId, name, picture, email), rootTaskIds, nodes]
+
+            return [new UserModel(userId, name, picture, email, restPeriodMatrix, settings), rootTaskIds, nodes]
         } catch (e) {
             console.error('Error fetching user:', e);
             return [null, [], []]

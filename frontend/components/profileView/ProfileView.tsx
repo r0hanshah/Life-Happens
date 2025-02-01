@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, ViewStyle, useWindowDimensions, Text, Image, TouchableOpacity, TextInput, Alert, Button, ScrollView, FlatList, Platform, Linking, ActivityIndicator } from 'react-native';
 import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as DocumentPicker from 'expo-document-picker';
 
 import UserModel from '../../models/UserModel';
-import MainController from '../../controllers/main/MainController';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
 
 import TimeBlocker from './TimeBlocker';
+import EmailSettings from './settings/EmailSection';
 
 interface ProfileViewProps {
   user: UserModel;
@@ -26,7 +25,11 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
     
     const [toggleUpcomingRoots, setToggleUpcomingRoots] = useState(true)
     const [togglePastRoots, setTogglePastRoots] = useState(false)
+    const [viewSettings, setViewSettings] = useState(false);
 
+    let windowWidth = useWindowDimensions().width;
+    let windowHeight = useWindowDimensions().height;
+    
     const displayAllTaskList = () => {
         // Takes in what level of task that the user wants to display
         // SPECIAL CASE: -1 for if the user only wants to display leaf tasks
@@ -36,12 +39,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
     
 
     return(
-        <View style={{overflow:'hidden', minHeight:'100%'}}>
+        <View style={{overflow: viewSettings ? 'visible' : 'hidden', minHeight:'100%'}}>
             <View style={styles.gradientOverlayL}>
                 <LinearGradient
                 colors={["orange", "orange"]}              
                 style={styles.gradient}/>
             </View>
+
             <View style={[styles.container,styles.containerL]}>
                 <View style ={{flexDirection:'row', width:'100%', paddingBottom: 20}}>
                     <ScrollView style={{ height: useWindowDimensions().height, padding:39}}>
@@ -55,10 +59,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
                                 </TouchableOpacity>
                                 <Text style={{color:'white', fontSize:40}}>{user.name.at(0)}</Text>
                             </View>
-                        <View>
-                            <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:40, marginBottom:5}}>{user.name}</Text>
-                            <Text style={{color:'gray', fontSize:20}}>{user.email}</Text>
-                        </View>
+                            <View>
+                                <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:40, marginBottom:5}}>{user.name}</Text>
+                                <Text style={{color:'gray', fontSize:20}}>{user.email}</Text>
+                            </View>
+                            <TouchableOpacity style={{marginLeft:'auto', alignItems:'flex-end', alignSelf:'flex-end'}} onPress={()=>{setViewSettings(!viewSettings)}}>
+                                <Image source={require('../../assets/gear-icon.png')} style={{height:40, width:40, margin:20}}/>
+                            </TouchableOpacity>
                         </View>
                         <View style={{padding: 25}}>
                             <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginBottom:30}}>Rest Periods</Text>
@@ -95,18 +102,54 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
                         
 
                     </ScrollView>
-                    <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20, right:20}]}>
+                    <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20, right: 20 - (viewSettings ? windowWidth*0.51 : 0)}]}>
                             <TouchableOpacity onPress={onPress}>
                                 <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
                             </TouchableOpacity>
                     </View>
                 </View>
             </View>
+
+            {viewSettings &&
+            <View  style={{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505', left:windowWidth*0.485}}>
+                <View style={[styles.container, {flexDirection:'column', overflow:'hidden', padding:10, paddingHorizontal:80}]}>
+                    <Text style={styles.h1}>Settings</Text>
+                    <EmailSettings user={user}/>
+                </View>
+                <View style={styles.gradientOverlayL}>
+                    <LinearGradient
+                    colors={["orange", "orange"]}              
+                    style={styles.gradient}/>
+                </View>
+            </View>
+            }
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    h1: {
+        color:"white", 
+        fontFamily: 'Inter_900Black', 
+        fontSize:40, 
+        marginVertical:30
+    },
+    h2: {
+        color:"white", 
+        fontFamily: 'Inter_900Black', 
+        fontSize:30, 
+        marginVertical:20
+    },
+    p: {
+        color:"white", 
+        fontFamily: 'Arial', 
+        fontSize:15, 
+    },
+    p_sub: {
+        color:"#505050", 
+        fontFamily: 'Arial', 
+        fontSize:15, 
+    },
     gradientOverlayL: {
         ...StyleSheet.absoluteFillObject,
         borderBottomRightRadius: 0,

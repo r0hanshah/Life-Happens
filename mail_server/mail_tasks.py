@@ -7,7 +7,7 @@ ses_client = client('ses', region_name='us-east-1')
 sender = "lifehappensnotifications@gmail.com"
 
 @celery.task(bind=True)
-def send_email_task(recipient, subject, body_text, body_html, doc_ref):
+def send_email_task(self, recipient, subject, body_text, body_html):
     """
     Send an email using Amazon SES.
 
@@ -35,14 +35,14 @@ def send_email_task(recipient, subject, body_text, body_html, doc_ref):
         print("Email sent successfully! Message ID:", response['MessageId'])
 
         # Deleting notification document after successful delivery
-        doc_ref.delete()
+        # doc_ref.delete()
 
     except NoCredentialsError:
         print("AWS credentials not found.")
-        doc_ref.update({"status":"incomplete=>AWS credentials not found."})
+        # doc_ref.update({"status":"incomplete=>AWS credentials not found."})
     except PartialCredentialsError:
         print("Incomplete AWS credentials configuration.")
-        doc_ref.update({"status":"incomplete=>AWS credentials not found."})
+        # doc_ref.update({"status":"incomplete=>AWS credentials not found."})
     except Exception as e:
         print("Error sending email:", e)
-        doc_ref.update({"status":f"incomplete=>{e}"})
+        # doc_ref.update({"status":f"incomplete=>{e}"})

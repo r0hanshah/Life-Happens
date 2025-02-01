@@ -19,6 +19,7 @@ const AuthLoadingScreen: React.FC<AuthLoadingScreenProps> = ({ navigateToMain, n
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:8081',
           'Authorization': token ? token : ""
         },
         credentials: 'include', // Include cookies for session

@@ -35,6 +35,9 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const [viewTree, setViewTree] = useState(false);
 
+  const [startNotify, setStartNotify] = useState(mainController.getUser().getValue()!.settings["allow_start_time_email_notif"])
+  const [endNotify, setEndNotify] = useState(mainController.getUser().getValue()!.settings["allow_end_time_email_notif"])
+
   let windowHeight = useWindowDimensions().height;
   let windowWidth = useWindowDimensions().width;
 
@@ -706,6 +709,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         source={require('../../assets/calendar_icon.png')}
                                         resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                     />
+                                    <TouchableOpacity onPress={()=>setStartNotify(!startNotify)}>
+                                        <Image
+                                            style={{width: 20, height: 20, marginRight: 10, opacity: startNotify ? 1 : 0.3, transform: startNotify ? 'rotate(45deg)' : 'rotate(0deg)'}}
+                                            source={require('../../assets/bell-icon.png')}
+                                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                        />
+                                    </TouchableOpacity>
                                     <Text style={{color:'gray'}}>Start Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
@@ -723,6 +733,13 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     source={require('../../assets/calendar_icon.png')}
                                     resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                 />
+                                <TouchableOpacity onPress={()=>setEndNotify(!endNotify)}>
+                                    <Image
+                                        style={{width: 20, height: 20, marginRight: 10, opacity: endNotify ? 1 : 0.3, transform: endNotify ? 'rotate(45deg)' : 'rotate(0deg)'}}
+                                        source={require('../../assets/bell-icon.png')}
+                                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
+                                    />
+                                </TouchableOpacity>
                                 <Text style={{color:'gray'}}>End Date</Text>
                                 </View>
                                 <View style={{flexDirection:'row'}}>
@@ -980,7 +997,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     margin:5, 
                                     marginRight:isLeft ? 20 : 0}} 
                                     onPress={()=>{
-                                        setNewTasks([...newTasks, new TaskModel(undefined, task.creatorId, task.rootId, task.users, undefined, "Sub Task " + (task.children.length + newTasks.length + 1), task.color, [task ,...task.ancestors], undefined, task.startDate.toISOString(), task.endDate.toISOString(), false)])
+                                        setNewTasks([...newTasks, new TaskModel(undefined, task.creatorId, task.rootId, task.users, undefined, "Sub Task " + (task.children.length + newTasks.length + 1), task.color, [task ,...task.ancestors], undefined, task.startDate.toISOString(), task.endDate.toISOString(), false, mainController.getUser().getValue()!.settings["allow_start_time_email_notif"],mainController.getUser().getValue()!.settings["allow_end_time_email_notif"])])
                                         }}>
                                     <Image
                                         style={{width: 10, height: 10, marginHorizontal: 10, transform:[{rotate: '45deg'}], margin:5}}
@@ -1021,7 +1038,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
                                         <View style={{flexDirection:'row', marginHorizontal:20, justifyContent:'space-around'}}>
                                             <TextInput
-                                                style={{color:'white'}}
+                                                style={{color:'white', paddingHorizontal:5}}
                                                 placeholderTextColor="gray"
                                                 onChangeText={setDeleteInput}
                                                 value={deleteInput}

@@ -37,14 +37,16 @@ app.config['MAIL_DEFAULT_SENDER'] = 'lifehappensnotif@gmail.com'
 
 mail = Mail(app)
 
-def _build_cors_preflight_response():
+BUCKET = storage.bucket()
+
+@app.route('/api/resource', methods=['GET', 'POST', 'OPTIONS'])
+def build_cors_preflight_response():
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Headers", "*")
     response.headers.add("Access-Control-Allow-Methods", "*")
     return response
 
-BUCKET = storage.bucket()
 
 # user passwords are all 123456
 # Signup route
@@ -71,7 +73,10 @@ def signup():
             'Name': name,
             'ParentsOfLeafNodesByTask':[],
             'ProfilePicture':'',
-            'Settings':[],
+            'Settings':{
+                "allow_start_time_email_notif":False,
+                "allow_end_time_email_notif":False
+            },
             'SharedTaskTrees':[],
             'TaskTreeRoots':[],
             'WeeklyAITimesAllowed':[],
@@ -185,6 +190,20 @@ def protected_route(current_user):
     return jsonify({'message': 'This is a protected route', 'user': current_user})
 ### persistent login above
 
+@app.route('/user/<user_id>/update_setting', methods=['PUT'])
+def update_setting(user_id):
+    data = request.json
+    item = data.get("item")
+    value = data.get("value")
+    try:
+        user_ref = db.collection('Users').document(user_id)
+        user_ref.update({"Settings."+item:value})
+        return jsonify({"message":f"Successfully updated settings field {item}"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'message': f'Could not update field: {item}'}), 403
+
+        
 
 # Dummy data route
 @app.route('/data')
@@ -242,7 +261,7 @@ def add_task():
             return jsonify({'error': 'Invalid data'}), 400
 
         task_id = add_task_to_firestore(user_id, task_data, task_path_array, db)
-        schedule_due_task_reminder(user_id, task_id, task_data['EndDate'], task_data['StartDate'])
+        # schedule_due_task_reminder(user_id, task_id, task_data['EndDate'], task_data['StartDate'])
         
         return jsonify({'message': 'Task added successfully', 'task_id': task_id}), 201
     except Exception as e:

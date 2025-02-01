@@ -2,6 +2,7 @@
 import { DocumentPickerAsset } from "expo-document-picker"
 import TaskModel from "../models/TaskModel";
 import UserModel from "../models/UserModel";
+import moment from "moment";
 
 
 // No need to import fetch as it's a global function available in React Native
@@ -34,6 +35,8 @@ export type TaskData = {
   ID: string,
   InvitedUsers: string[],
   IsMovable: boolean,
+  StartNotify: boolean,
+  EndNotify: boolean,
   Notes: string,
   StartDate: string,
   Title: string,
@@ -43,6 +46,7 @@ export type TaskData = {
 };
 
 const BASE_URL = 'http://127.0.0.1:5000'; // Make sure to use the correct URL for your backend.
+const MAIL_URL = 'http://127.0.0.1:4000';
 
 export const getTask = async (userId: string, taskId:string) => {
   try {
@@ -69,8 +73,13 @@ export const getTask = async (userId: string, taskId:string) => {
       const unobservedFiles = task['UnobservedFiles'] as string[]
       const users = task['Users'] as string[]
       const completeness = task['Completeness'] as number
+
+      // Notification fields
+      const startNotify = task['StartNotify'] as boolean
+      const endNotify = task['EndNotify'] as boolean
+      
      
-      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length-1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable,startNotify,endNotify, content, notes, extraMedia, isRoot, contextText, [], [])
       returnTask.completeness = completeness
 
       loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(()=>{
@@ -136,7 +145,11 @@ export const fetchTask = async (userId: string, taskId: string, ancestorArray: s
       const users = task['Users'] as string[]
       const completeness = task['Completeness'] as number
 
-      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length - 1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable, content, notes, extraMedia, isRoot, contextText, [], [])
+      // Notification fields
+      const startNotify = task['StartNotify'] as boolean
+      const endNotify = task['EndNotify'] as boolean
+
+      const returnTask = new TaskModel(id, creatorId, isRoot ? id : ancestors[ancestors.length - 1], [], invitedUsers, title, color, [], [], startDate, endDate, isMovable,startNotify,endNotify, content, notes, extraMedia, isRoot, contextText, [], [])
       returnTask.completeness = completeness
 
       loadFilesToUser(returnTask, "context", contextFiles, id, ancestors, creatorId).finally(() => {
@@ -254,10 +267,10 @@ const loadFilesToUser = async (task:TaskModel, fileArrayType:string, fileNameArr
 
 // taskServices.tsx
 
-export const addTask = async (taskData: TaskData, taskPathArray: string[], userId: string) => {
+export const addTask = async (taskData: TaskData, taskPathArray: string[], user:UserModel) => {
   try {
     const payload = {
-      user_id: userId,
+      user_id: user.id,
       task: taskData,
       task_path_array: taskPathArray
     };
@@ -278,6 +291,29 @@ export const addTask = async (taskData: TaskData, taskPathArray: string[], userI
 
     if (response.ok) {
       console.log('Task added:', result);
+      
+      // Attempt to schedule notifications
+      // Check that the user has enabled permissions
+      if (taskData.EndNotify || taskData.StartNotify)
+      {
+        // Schedule email notification if the task is root
+        if (taskPathArray.length == 0)
+        {
+          
+          if (taskData.StartNotify)
+          {
+            request_email_notification(taskData, user, "start_task")
+          }
+          if (taskData.EndNotify)
+          {
+            request_email_notification(taskData, user, "end_task")
+          }
+          
+        }
+      }
+      
+
+
       return result;
     } else {
       throw new Error(result.error || 'An error occurred while adding the task');
@@ -289,7 +325,55 @@ export const addTask = async (taskData: TaskData, taskPathArray: string[], userI
 };
 
 
+const request_email_notification = async (taskData: TaskData, user: UserModel, type: 'start_task' | 'end_task') => 
+{
+  const email_data = {
+    task_name: taskData.Title,
+    due_date: moment(taskData.EndDate).format("M/D/YYYY h:mm A"),
+    duration: getTimeDifference(taskData.StartDate, taskData.EndDate),
+    notes: taskData.Notes
+  }
+  const payload = {
+    notification_id:`${user.id}:::${taskData.ID}:::${type}`,
+    time_to_send: type === 'start_task' ? taskData.StartDate : taskData.EndDate,
+    subject: type === 'start_task' ? `Time to get started on ${taskData.Title}` : `Need more time to work on ${taskData.Title}?`,
+    recipient: user.email,
+    body_text: JSON.stringify(email_data),
+    type: type,
+    email_data: email_data
+  }
+  try {
+    const response = await fetch(`${MAIL_URL}/schedule_email_notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  } 
+  catch(error) {
+    console.log("Could not schedule email notifications because:", error)
+    throw error
+  }
+}
 
+const getTimeDifference = (dateString1: string, dateString2: string): string => {
+  const date1 = moment(dateString1);
+  const date2 = moment(dateString2);
+  const diffInMinutes = Math.abs(date2.diff(date1, "minutes"));
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes === 1 ? "" : "s"}`;
+  }
+
+  const diffInHours = Math.abs(date2.diff(date1, "hours"));
+  if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours === 1 ? "" : "s"}`;
+  }
+
+  const diffInDays = Math.abs(date2.diff(date1, "days"));
+  return `${diffInDays} day${diffInDays === 1 ? "" : "s"}`;
+}
 
 // taskServices.tsx
 

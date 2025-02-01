@@ -22,10 +22,10 @@ SUBJECT = "Get Started on Task Name"
 BODY_TEXT = "Fall back"
 
 def send_html_email():
-    print(AWS_SECRET_KEY, AWS_ACCESS_KEY)
-
     with open("../templates/get_started_email.html", "r", encoding="utf-8") as file:
         html_content = file.read()
+
+    html_body = html_content.format(TASK_NAME = "Homework 1", DUE_DATE = "1/1/2025 3:00 PM", DURATION = "1 Hour", NOTES = "Some notes I wrote about this assignment")
 
     try:
         # Send the email
@@ -38,7 +38,7 @@ def send_html_email():
                 'Subject': {'Data': SUBJECT},
                 'Body': {
                     'Text': {'Data': BODY_TEXT},
-                    'Html': {'Data': html_content},
+                    'Html': {'Data': html_body},
                 },
             },
         )

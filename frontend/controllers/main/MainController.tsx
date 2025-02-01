@@ -143,7 +143,7 @@ class MainController {
         const user_id = this.getUser().getValue()?.id!
         for (const taskJSON of responseData)
         {
-          taskModels.push(new TaskModel(undefined, user_id, task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true, {}, taskJSON["notes"]))
+          taskModels.push(new TaskModel(undefined, user_id, task.rootId, [], [], taskJSON["title"], task.color, [task, ...task.ancestors], [], taskJSON["startDateISO"], taskJSON["endDateISO"], true,this.user.getValue()!.settings["allow_start_time_email_notif"],this.user.getValue()!.settings["allow_end_time_email_notif"], {}, taskJSON["notes"]))
         }
         console.log(taskModels)
         this.setLoadingGenerateTasks(false)
@@ -202,11 +202,12 @@ class MainController {
     {
       const user = this.user.getValue()
       if (user == null) {throw Error("User is missing")}
-      const id = uuid.v4().toString()
+      const id = uuid.v4().toString().replace(/-/g, "")
       const currentDate = new Date();
-      const oneHourAhead = new Date(currentDate.getTime() + 3600000)
+      const startDate = new Date(currentDate.getTime() + 30 * 60 * 1000)
+      const oneHourAhead = new Date(startDate.getTime() + 3600000)
 
-      const newRootTask = new TaskModel(id, user.id, id, [],[],"New Task", this.getRandomHexColor(),[],[],currentDate.toISOString(), oneHourAhead.toISOString(), false, {}, "", [], true);
+      const newRootTask = new TaskModel(id, user.id, id, [],[],"New Task", this.getRandomHexColor(),[],[],startDate.toISOString(), oneHourAhead.toISOString(), false,this.user.getValue()!.settings["allow_start_time_email_notif"],this.user.getValue()!.settings["allow_end_time_email_notif"], {}, "", [], true);
 
       this.storeTaskOnFirestore(newRootTask)
 
@@ -242,20 +243,21 @@ class MainController {
         ID: task.id,
         InvitedUsers: task.invitedUsers,
         IsMovable: task.isMovable,
+        StartNotify: task.startNotify,
+        EndNotify: task.endNotify,
         Notes: task.notes,
         StartDate: task.startDate.toISOString(),
         Title: task.title,
         Users: task.users.map(user => user.id),
         IsRoot: task.isRoot,
-        Completeness: task.completeness
+        Completeness: task.completeness,
       }
       const user = this.getUser().getValue();
       if (user == null) {
         throw new Error("User is missing");
       }
-      const userId = user.id;
     
-      addTask(taskData, taskPathArray, userId)
+      addTask(taskData, taskPathArray, user)
     }
 
     public deleteTaskOnFirestore(task:TaskModel)
@@ -275,6 +277,8 @@ class MainController {
         ID: task.id,
         InvitedUsers: task.invitedUsers,
         IsMovable: task.isMovable,
+        StartNotify: task.startNotify,
+        EndNotify: task.endNotify,
         Notes: task.notes,
         StartDate: task.startDate.toISOString(),
         Title: task.title,
@@ -309,6 +313,8 @@ class MainController {
         ID: task.id,
         InvitedUsers: task.invitedUsers,
         IsMovable: task.isMovable,
+        StartNotify: task.startNotify,
+        EndNotify: task.endNotify,
         Notes: task.notes,
         StartDate: task.startDate.toISOString(),
         Title: task.title,

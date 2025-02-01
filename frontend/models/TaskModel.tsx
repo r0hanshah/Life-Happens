@@ -4,7 +4,7 @@ import UserModel from "./UserModel";
 
 class TaskModel
 {
-    constructor(id:string = uuid.v4().toString(), creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[] = [], title:string, color:string, ancestors:TaskModel[], children:TaskModel[] = [], startDate:string, endDate:string, isMovable:boolean, content:{[key:string]:any} = {}, notes:string = "", extraMedia:string[] = [], isRoot:boolean = false, contextText:string = "", contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
+    constructor(id:string = uuid.v4().toString(), creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[] = [], title:string, color:string, ancestors:TaskModel[], children:TaskModel[] = [], startDate:string, endDate:string, isMovable:boolean,startNotify:boolean = false, endNotify:boolean = false, content:{[key:string]:any} = {}, notes:string = "", extraMedia:string[] = [], isRoot:boolean = false, contextText:string = "", contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
     {
         this.id = id
         this.creatorId = creatorId
@@ -32,6 +32,10 @@ class TaskModel
 
         this.offset = 0
         this.y = ancestors.length
+
+        // Notifications
+        this.startNotify = startNotify
+        this.endNotify = endNotify
     }
 
     id:string
@@ -66,6 +70,10 @@ class TaskModel
     x=0
     y=0
     mod=0
+
+    // Notifications
+    startNotify:boolean = false
+    endNotify:boolean = false
 
     isLeftMost(): boolean {
         return this.ancestors.length === 0 || this.ancestors[0].children[0] === this;
