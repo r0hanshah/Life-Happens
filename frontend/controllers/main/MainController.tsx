@@ -5,7 +5,7 @@ import uuid from 'react-native-uuid'
 import { Alert } from "react-native";
 import UserModel from "../../models/UserModel";
 
-import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask } from "../../services/taskServices";
+import { addTask, updateTask, uploadFile, TaskData, deleteFile, deleteTask, remove_email_notification, request_email_notification } from "../../services/taskServices";
 import moment from "moment";
 
 // This will control anything that happens inside Main view
@@ -204,7 +204,7 @@ class MainController {
       if (user == null) {throw Error("User is missing")}
       const id = uuid.v4().toString().replace(/-/g, "")
       const currentDate = new Date();
-      const startDate = new Date(currentDate.getTime() + 30 * 60 * 1000)
+      const startDate = new Date(currentDate.getTime() + 1 * 60 * 1000)
       const oneHourAhead = new Date(startDate.getTime() + 3600000)
 
       const newRootTask = new TaskModel(id, user.id, id, [],[],"New Task", this.getRandomHexColor(),[],[],startDate.toISOString(), oneHourAhead.toISOString(), false,this.user.getValue()!.settings["allow_start_time_email_notif"],this.user.getValue()!.settings["allow_end_time_email_notif"], {}, "", [], true);
@@ -228,30 +228,7 @@ class MainController {
     public storeTaskOnFirestore(task:TaskModel)
     {
       const taskPathArray = task.ancestors.map(task => task.id).reverse()
-      console.log('Task Path Array:', taskPathArray); // Log the taskPathArray to ensure it's correct
-      const taskData:TaskData = {
-        Color:task.color,
-        Ancestors: task.ancestors.map(task => task.id),
-        Children: task.children.map(task => task.id),
-        Content: task.content,
-        ContextFiles: task.contextFiles.map(doc => doc.name),
-        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
-        ContextText: task.contextText,
-        CreatorID: task.creatorId,
-        EndDate: task.endDate.toISOString(),
-        ExtraMedia: task.extraMedia,
-        ID: task.id,
-        InvitedUsers: task.invitedUsers,
-        IsMovable: task.isMovable,
-        StartNotify: task.startNotify,
-        EndNotify: task.endNotify,
-        Notes: task.notes,
-        StartDate: task.startDate.toISOString(),
-        Title: task.title,
-        Users: task.users.map(user => user.id),
-        IsRoot: task.isRoot,
-        Completeness: task.completeness,
-      }
+      const taskData:TaskData = task.toTaskData()
       const user = this.getUser().getValue();
       if (user == null) {
         throw new Error("User is missing");
@@ -262,29 +239,20 @@ class MainController {
 
     public deleteTaskOnFirestore(task:TaskModel)
     {
+      // Check if parent becomes childless after deletion
+      const parent = task.ancestors.length > 0 ? task.ancestors[0] : null
+      if(parent != null && parent.children.length == 1)
+      {
+        request_email_notification(task.toTaskData(), this.user.getValue()!, "start_task")
+        request_email_notification(task.toTaskData(), this.user.getValue()!, "end_task")
+      }
+
       const taskPathArray = task.ancestors.map(task => task.id).reverse()
-      const taskData:TaskData = {
-        Color:task.color,
-        Ancestors: task.ancestors.map(task => task.id),
-        Children: task.children.map(task => task.id),
-        Content: task.content,
-        ContextFiles: task.contextFiles.map(doc => doc.name),
-        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
-        ContextText: task.contextText,
-        CreatorID: task.creatorId,
-        EndDate: task.endDate.toISOString(),
-        ExtraMedia: task.extraMedia,
-        ID: task.id,
-        InvitedUsers: task.invitedUsers,
-        IsMovable: task.isMovable,
-        StartNotify: task.startNotify,
-        EndNotify: task.endNotify,
-        Notes: task.notes,
-        StartDate: task.startDate.toISOString(),
-        Title: task.title,
-        Users: task.users.map(user => user.id),
-        IsRoot: task.isRoot,
-        Completeness: task.completeness
+      const taskData:TaskData = task.toTaskData()
+      if (task.children.length == 0)
+      {
+        remove_email_notification(this.user.getValue()!.id, task.id, 'start_task')
+        remove_email_notification(this.user.getValue()!.id, task.id, 'end_task')
       }
       deleteTask(taskData, taskPathArray)
     }
@@ -299,30 +267,7 @@ class MainController {
     private saveChangesToTask(task:TaskModel)
     {
       const taskPathArray = task.ancestors.map(task => task.id).reverse()
-      const taskData:TaskData = {
-        Color:task.color,
-        Ancestors: task.ancestors.map(task => task.id),
-        Children: task.children.map(task => task.id),
-        Content: task.content,
-        ContextFiles: task.contextFiles.map(doc => doc.name),
-        UnobservedFiles: task.unobservedFiles.map(doc => doc.name),
-        ContextText: task.contextText,
-        CreatorID: task.creatorId,
-        EndDate: task.endDate.toISOString(),
-        ExtraMedia: task.extraMedia,
-        ID: task.id,
-        InvitedUsers: task.invitedUsers,
-        IsMovable: task.isMovable,
-        StartNotify: task.startNotify,
-        EndNotify: task.endNotify,
-        Notes: task.notes,
-        StartDate: task.startDate.toISOString(),
-        Title: task.title,
-        Users: task.users.map(user => user.id),
-        IsRoot: task.isRoot,
-        Completeness: task.completeness
-      }
-
+      const taskData:TaskData = task.toTaskData()
       updateTask(taskData, taskPathArray)
     }
 

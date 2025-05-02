@@ -37,3 +37,7 @@ yarn-error.*
 # keys
 */serviceAccountKey.json
 *.env
+
+# others
+*/*.rdb
+*/*.sqlite

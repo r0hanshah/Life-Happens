@@ -325,7 +325,7 @@ export const addTask = async (taskData: TaskData, taskPathArray: string[], user:
 };
 
 
-const request_email_notification = async (taskData: TaskData, user: UserModel, type: 'start_task' | 'end_task') => 
+export const request_email_notification = async (taskData: TaskData, user: UserModel, type: 'start_task' | 'end_task', reschedule:boolean = false) => 
 {
   const email_data = {
     task_name: taskData.Title,
@@ -343,8 +343,8 @@ const request_email_notification = async (taskData: TaskData, user: UserModel, t
     email_data: email_data
   }
   try {
-    const response = await fetch(`${MAIL_URL}/schedule_email_notification`, {
-      method: 'POST',
+    const response = await fetch(`${MAIL_URL}/${reschedule ? "reschedule_email_notification" : "schedule_email_notification"}`, {
+      method: reschedule ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -353,6 +353,24 @@ const request_email_notification = async (taskData: TaskData, user: UserModel, t
   } 
   catch(error) {
     console.log("Could not schedule email notifications because:", error)
+    throw error
+  }
+}
+
+export const remove_email_notification = (userId:string, taskId:string, type: 'start_task' | 'end_task') => {
+  try {
+    const payload = {
+      'notification_id': userId + ":::" + taskId + ":::" + type
+    }
+    fetch(`${MAIL_URL}/remove_email_notification`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+  } catch(error) {
+    console.log("Could not remove email notification because: ", error)
     throw error
   }
 }

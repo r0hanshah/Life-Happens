@@ -3,9 +3,14 @@ import { View, TouchableOpacity, StyleSheet, Text, ScrollView, Dimensions, Image
 import TaskModel from '../../models/TaskModel';
 import moment from 'moment';
 import MainController from '../../controllers/main/MainController';
+import { request_email_notification } from '../../services/taskServices';
+import TaskViewController from '../../controllers/taskView/TaskViewController';
 
 
 const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string)=>void>, updateServer:boolean}) => {
+
+    const mainController = MainController.getInstance();
+    const taskController = new TaskViewController(task)
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(modStartDate ? task.startDate.getMonth() : task.endDate.getMonth());
@@ -23,7 +28,6 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
     
     const [formattedDate, setFormattedDate] = useState(`${dayOfWeek}, ${monthName} ${dayOfMonth}, ${year}`);
 
-    const mainController = MainController.getInstance();
 
     useEffect(()=>{
       const popupListener = mainController.getToggledPopupKey();
@@ -106,6 +110,7 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
     };
 
     const handleDaySelect = (year:number , month:number, day:number|"") => {
+      const mainController = MainController.getInstance();
    
       if (typeof day === 'number')
       {
@@ -129,15 +134,12 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
         setFormattedDate(formattedDate);
 
         // Update task date
-        (modStartDate ? task.startDate : task.endDate).setFullYear(year);
-        (modStartDate ? task.startDate : task.endDate).setMonth(month-1);
-        (modStartDate ? task.startDate : task.endDate).setDate(day);
+        taskController.handle_datetime_changes(year, month-1, day, task.startDate.getHours(), task.startDate.getMinutes(), modStartDate ? 'start' : 'end', mainController.getUser().getValue()!)
 
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
         updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
 
         // Refresh main view
-        const mainController = MainController.getInstance();
         mainController.setMoment(moment(date))
 
         if(updateServer)

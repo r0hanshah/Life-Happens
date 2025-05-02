@@ -72,6 +72,8 @@ class AuthController {
 
           const mainController = MainController.getInstance()
 
+          console.log("here")
+
           const userTasks = await this.handleGetUserTasks(user_id, rootTaskIds).then( (tasks) => {
             console.log(tasks.length)
             mainController.setUser(user)

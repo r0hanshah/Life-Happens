@@ -557,8 +557,11 @@ def update_task(user_id, task_id):
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
     try:
+        print("trying to find user")
         user_ref = db.collection('Users').document(user_id)
+        print("established ref for "  + user_id)
         user = user_ref.get()
+        print(user)
         if user.exists:
             return jsonify(user.to_dict()), 200
         else:

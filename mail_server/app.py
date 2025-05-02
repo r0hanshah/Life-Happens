@@ -1,8 +1,12 @@
+import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from mail_tasks import send_email_task
+from dateutil import parser
+
+from mail_tasks import sendgrid_send_email_task
 from flask import Flask, request, jsonify, render_template, make_response, session
 from flask_cors import CORS
-from celery_app import celery
+# from celery_app import celery
 
 from flask_mail import Mail, Message
 
@@ -10,11 +14,9 @@ from flask_mail import Mail, Message
 from firebase_admin import credentials, initialize_app
 from firebase_admin import firestore
 
-# Mail delivery related imports
-import boto3
-
 # Configure celery app
-# from utils import celery_init_app
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 # Initialize firestore
 CRED = credentials.Certificate('./serviceAccountKey.json')
@@ -25,15 +27,22 @@ db = firestore.client()
 
 app = Flask(__name__)
 
-# # Set up celery
-# app.config["CELERY_CONFIG"] = {
-#     "broker_url":"redis://localhost:6379/0",
-#     "result_backend":"redis://localhost:6379/0"
-#     }
-# celery = celery_init_app(app)
-# celery.set_default()
+# # Set up scheduler with application
+app.config['SCHEDULER_JOBSTORES'] = {
+    'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')
+}
+scheduler = BackgroundScheduler()
+scheduler.configure(jobstores=app.config['SCHEDULER_JOBSTORES'])
+scheduler.start()
 
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+
+load_dotenv()
+
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
+
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 @app.route('/api/resource', methods=['GET', 'POST', 'OPTIONS'])
 def build_cors_preflight_response():
@@ -97,16 +106,23 @@ def schedule_email_notification():
         "email_data" : email_data,
         "status" : "pending"
     }
-    new_notification_ref.set(notidication_data)
+
+    # NOTE: To store in firestore uncomment the line below
+    # new_notification_ref.set(notidication_data)
+    print(time_to_send, parser.parse(time_to_send).hour)
 
     # Schedule email to be sent
     # Pass in the reference to the firebase document so it can be deleted once the notification is sent
     # try:
-    send_email_task.apply_async(
-        args=(recipient, subject, body_text, body_html), 
-        task_id = notification_id,
-        eta=datetime.fromisoformat(time_to_send)
-        )
+    scheduler.add_job(
+        func=sendgrid_send_email_task,
+        trigger="date",
+        next_run_time=parser.parse(time_to_send),
+        args=[recipient, subject, body_text, body_html, SENDGRID_API_KEY],
+        id=notification_id,
+        replace_existing=True
+    )
+
     return jsonify({'message': 'Email scheduled successfully!'}), 201
     # except Exception as e:
     #     print(f"An error occurred: {e}")
@@ -128,7 +144,10 @@ def reschedule_email_notification():
     email_data = data.get('email_data')
 
     # Delete the scheduled task
-    celery.control.revoke(notification_id, terminate=True)
+    try:
+        scheduler.remove_job(notification_id)
+    except Exception as e:
+        print(f"[INFO]: Could not find the email notification id: {notification_id}")
 
     # Form HTML body from email data
     body_html = ""
@@ -162,20 +181,33 @@ def reschedule_email_notification():
         notification_ref.update({"time_to_send": new_time_to_send})
     
     # Schedule new email to be sent
-    send_email_task.apply_async((recipient, subject, body_text, body_html, new_notification_ref), eta=datetime.fromisoformat(new_time_to_send), task_id=notification_id)
+    scheduler.add_job(
+        func=sendgrid_send_email_task,
+        trigger="date",
+        next_run_time=datetime.fromisoformat(new_time_to_send),
+        args=[recipient, subject, body_text, body_html, SENDGRID_API_KEY],
+        id=notification_id,
+        replace_existing=True
+    )
+
+    return jsonify({'message': 'Email rescheduled successfully!'}), 201
 
 @app.route('/remove_email_notification', methods=['DELETE'])
 def remove_email_notification():
-    # Get the json body
     data = request.json
-    # From the json body:
     notification_id = data.get("notification_id")
 
     # Delete the scheduled task
-    celery.control.revoke(notification_id, terminate=True)
+    try:
+        scheduler.remove_job(notification_id)
+    except Exception as e:
+        print("Could not remove job because notification id (" + notification_id + ") was not found.")
+        return
 
     # Delete the document in firebase
     db.collection("EmailNotifications").document(notification_id).delete()
+
+    return jsonify({'message': 'Email notification removed successfully!'}), 201
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False, port=4000)

@@ -27,7 +27,8 @@ interface TaskViewProps {
 
 const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
-  const controller = new TaskViewController(task);
+  const controllerRef = useRef(new TaskViewController(task));
+  const controller = controllerRef.current;
   const mainController = MainController.getInstance();
   const [viewUsers, setViewUsers] = useState(false)
   const [isMovable, setIsMovable] = useState(task.isMovable)
@@ -170,6 +171,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setText(newText);
     task.notes = newText.valueOf().toString()
+    controller.handle_notes_change(task.notes, mainController.getUser().getValue()!)
     mainController.saveEditToTask(task)
   };
 
@@ -611,6 +613,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeTitle = (newText: React.SetStateAction<string>) => {
     setTitle(newText);
     task.title = newText.toString()
+    controller.handle_title_change(task.title, mainController.getUser().getValue()!)
     mainController.saveEditToTask(task)
   }
 
@@ -709,7 +712,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         source={require('../../assets/calendar_icon.png')}
                                         resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                     />
-                                    <TouchableOpacity onPress={()=>setStartNotify(!startNotify)}>
+                                    <TouchableOpacity onPress={()=>{
+                                        controller.handle_toggle_notifications(!startNotify, mainController.getUser().getValue()!, 'start_task')
+                                        setStartNotify(!startNotify)
+                                        }}>
                                         <Image
                                             style={{width: 20, height: 20, marginRight: 10, opacity: startNotify ? 1 : 0.3, transform: startNotify ? 'rotate(45deg)' : 'rotate(0deg)'}}
                                             source={require('../../assets/bell-icon.png')}
@@ -733,7 +739,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     source={require('../../assets/calendar_icon.png')}
                                     resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                 />
-                                <TouchableOpacity onPress={()=>setEndNotify(!endNotify)}>
+                                <TouchableOpacity onPress={()=>{
+                                        controller.handle_toggle_notifications(!endNotify, mainController.getUser().getValue()!, 'end_task')
+                                        setEndNotify(!endNotify)
+                                        }}>
                                     <Image
                                         style={{width: 20, height: 20, marginRight: 10, opacity: endNotify ? 1 : 0.3, transform: endNotify ? 'rotate(45deg)' : 'rotate(0deg)'}}
                                         source={require('../../assets/bell-icon.png')}

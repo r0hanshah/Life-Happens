@@ -1,6 +1,7 @@
 import { DocumentPickerAsset } from "expo-document-picker"
 import uuid from 'react-native-uuid';
 import UserModel from "./UserModel";
+import { TaskData } from "../services/taskServices";
 
 class TaskModel
 {
@@ -104,6 +105,49 @@ class TaskModel
     getPercentCompleteness():number {
         var percentCompleteness = this.traverse(this)
         return percentCompleteness
+    }
+
+    updateStartDateTime(year:number, month:number, day:number, hour:number, minute:number):void {
+        this.startDate.setFullYear(year)
+        this.startDate.setMonth(month)
+        this.startDate.setDate(day)
+        this.startDate.setHours(hour)
+        this.startDate.setMinutes(minute)
+    }
+
+    updateEndDateTime(year:number, month:number, day:number, hour:number, minute:number):void {
+        this.endDate.setFullYear(year)
+        this.endDate.setMonth(month)
+        this.endDate.setDate(day)
+        this.endDate.setHours(hour)
+        this.endDate.setMinutes(minute)
+    }
+
+    toTaskData():TaskData {
+        const taskData:TaskData = {
+            Color:this.color,
+            Ancestors: this.ancestors.map(task => task.id),
+            Children: this.children.map(task => task.id),
+            Content: this.content,
+            ContextFiles: this.contextFiles.map(doc => doc.name),
+            UnobservedFiles: this.unobservedFiles.map(doc => doc.name),
+            ContextText: this.contextText,
+            CreatorID: this.creatorId,
+            EndDate: this.endDate.toISOString(),
+            ExtraMedia: this.extraMedia,
+            ID: this.id,
+            InvitedUsers: this.invitedUsers,
+            IsMovable: this.isMovable,
+            StartNotify: this.startNotify,
+            EndNotify: this.endNotify,
+            Notes: this.notes,
+            StartDate: this.startDate.toISOString(),
+            Title: this.title,
+            Users: this.users.map(user => user.id),
+            IsRoot: this.isRoot,
+            Completeness: this.completeness,
+        }
+        return taskData
     }
 
     private traverse(task:TaskModel):number {

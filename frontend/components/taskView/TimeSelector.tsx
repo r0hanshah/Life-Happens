@@ -3,9 +3,13 @@ import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal,
 import moment, { Duration } from 'moment';
 import TaskModel from '../../models/TaskModel';
 import MainController from '../../controllers/main/MainController';
+import { request_email_notification } from '../../services/taskServices';
+import TaskViewController from '../../controllers/taskView/TaskViewController';
 
 
 const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string) => void>, updateServer:boolean}) => {
+    const mainController = MainController.getInstance();
+    const taskController = new TaskViewController(task)
 
     const [isSquareVisible, setIsSquareVisible] = useState(false);
     const [hours, setHours] = useState<string>(modStartDate ? (task.startDate.getHours() > 12 ? task.startDate.getHours() - 12 : task.startDate.getHours()).toString() :(task.endDate.getHours() > 12 ? task.endDate.getHours() - 12 : task.endDate.getHours()).toString());
@@ -16,7 +20,6 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
     const [minInts, setMinInts] = useState<number>(parseInt(minutes))
     const [isPM, setIsPM] = useState<boolean>((modStartDate ? task.startDate.getHours() > 12 : task.endDate.getHours() > 12));
 
-    const mainController = MainController.getInstance();
 
     useEffect(()=>{
       const popupListener = mainController.getToggledPopupKey();
@@ -98,8 +101,8 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
         setHours(hour.toString());
         setMinutes(minutes.toString().length <= 1 ? ('00'+minutes.toString()).slice(-2) : minutes.toString());
 
-        (modStartDate ? task.startDate : task.endDate).setHours(hour + (isPM ? 12 : 0));
-        (modStartDate ? task.startDate : task.endDate).setMinutes(minute);
+        taskController.handle_datetime_changes(task.startDate.getFullYear(), task.startDate.getMonth(), task.startDate.getDate(), hour + (isPM && hour != 12 ? 12 : 0), minute, modStartDate ? "start" : "end", mainController.getUser().getValue()!)
+
         for(const parent of task.ancestors)
         {
           if(modStartDate ? parent.endDate < task.endDate : parent.startDate > task.startDate)

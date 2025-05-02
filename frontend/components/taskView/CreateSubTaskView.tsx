@@ -9,6 +9,7 @@ import MainController from '../../controllers/main/MainController';
 
 import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
+import { remove_email_notification } from '../../services/taskServices';
 
 interface CreateSubTaskViewProps {
   parentTask: TaskModel;
@@ -50,6 +51,10 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
   const handleAddTask = () => {
     const mainController = MainController.getInstance();
+
+    // Remove notifications for parent task
+    remove_email_notification(mainController.getUser().getValue()!.id, parentTask.id, "start_task")
+    remove_email_notification(mainController.getUser().getValue()!.id, parentTask.id, "end_task")
 
     parentTask.children.push(task)
     for(const parent of task.ancestors)
