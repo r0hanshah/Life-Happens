@@ -36,8 +36,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
 
   const [viewTree, setViewTree] = useState(false);
 
-  const [startNotify, setStartNotify] = useState(mainController.getUser().getValue()!.settings["allow_start_time_email_notif"])
-  const [endNotify, setEndNotify] = useState(mainController.getUser().getValue()!.settings["allow_end_time_email_notif"])
+  const [startNotify, setStartNotify] = useState(task.startNotify)
+  const [endNotify, setEndNotify] = useState(task.endNotify)
+
+  useEffect(()=>{setStartNotify(task.startNotify); setEndNotify(task.endNotify)},[task])
 
   let windowHeight = useWindowDimensions().height;
   let windowWidth = useWindowDimensions().width;
@@ -171,8 +173,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setText(newText);
     task.notes = newText.valueOf().toString()
-    controller.handle_notes_change(task.notes, mainController.getUser().getValue()!)
-    mainController.saveEditToTask(task)
+    controller.handle_notes_change(task.notes, mainController)
   };
 
   const onSubmitEditing = () => {
@@ -435,8 +436,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         {task.completeness == 1 && task.children.length == 0 &&
                                             <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'black', borderColor:'white', borderWidth:2, margin:10, marginTop:20}} onPress={()=>{
                                                 task.completeness = 0
+                                                const subTaskController = new TaskViewController(task)
                                                 console.log("clicked", rerender)
                                                 setRerender(rerender? false : true)
+                                                subTaskController.handle_complete_toggle(0, mainController)
                                             }}>
                                                 <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Incomplete...</Text>
                                             </TouchableOpacity>
@@ -444,8 +447,10 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         {task.completeness == 0 && task.children.length == 0 &&
                                             <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:40, width:"100%", borderRadius:10, backgroundColor:'#86C28B', margin:10, marginTop:20}} onPress={()=>{
                                                 task.completeness = 1
+                                                const subTaskController = new TaskViewController(task)
                                                 console.log("clicked", rerender)
                                                 setRerender(rerender? false : true)
+                                                subTaskController.handle_complete_toggle(1, mainController)
                                             }}>
                                                 <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
                                                 <Image
@@ -502,18 +507,18 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
             <View style={{alignItems: isLeft ? 'flex-start': 'flex-end'}}>
                 {task.completeness == 1 && task.children.length == 0 &&
                     <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'black', borderColor:'white', borderWidth:2, margin:10}} onPress={()=>{
-                        task.completeness = 0
                         setCompletion(0)
                         setRerender(rerender? false : true)
+                        controller.handle_complete_toggle(0, mainController)
                     }}>
                         <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Incomplete...</Text>
                     </TouchableOpacity>
                 }
                 {task.completeness == 0 && task.children.length == 0 &&
                     <TouchableOpacity style={{flexDirection:'row', justifyContent:'center', alignItems:'center', height:50, width:"90%", borderRadius:10, backgroundColor:'#86C28B', margin:10}} onPress={()=>{
-                        task.completeness = 1
                         setCompletion(1)
                         setRerender(rerender? false : true)
+                        controller.handle_complete_toggle(1, mainController)
                     }}>
                         <Text style={{fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', color:'white'}}>Mark as Complete</Text>
                         <Image
@@ -613,8 +618,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
   const onChangeTitle = (newText: React.SetStateAction<string>) => {
     setTitle(newText);
     task.title = newText.toString()
-    controller.handle_title_change(task.title, mainController.getUser().getValue()!)
-    mainController.saveEditToTask(task)
+    controller.handle_title_change(task.title, mainController)
   }
 
   // For changes in task
@@ -713,7 +717,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                         resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                     />
                                     <TouchableOpacity onPress={()=>{
-                                        controller.handle_toggle_notifications(!startNotify, mainController.getUser().getValue()!, 'start_task')
+                                        controller.handle_toggle_notifications(!startNotify, mainController, 'start_task')
                                         setStartNotify(!startNotify)
                                         }}>
                                         <Image
@@ -740,7 +744,7 @@ const TaskView: React.FC<TaskViewProps> = ({ task, isLeft, onPress }) => {
                                     resizeMode="cover" // or "contain", "stretch", "repeat", "center"
                                 />
                                 <TouchableOpacity onPress={()=>{
-                                        controller.handle_toggle_notifications(!endNotify, mainController.getUser().getValue()!, 'end_task')
+                                        controller.handle_toggle_notifications(!endNotify, mainController, 'end_task')
                                         setEndNotify(!endNotify)
                                         }}>
                                     <Image

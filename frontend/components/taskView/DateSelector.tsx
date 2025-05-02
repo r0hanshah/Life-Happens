@@ -134,19 +134,13 @@ const DateSelector = ({task, modStartDate, updateFunctions, updateServer} : {tas
         setFormattedDate(formattedDate);
 
         // Update task date
-        taskController.handle_datetime_changes(year, month-1, day, task.startDate.getHours(), task.startDate.getMinutes(), modStartDate ? 'start' : 'end', mainController.getUser().getValue()!)
+        taskController.handle_datetime_changes(year, month-1, day, task.startDate.getHours(), task.startDate.getMinutes(), modStartDate ? 'start' : 'end', mainController, updateServer)
 
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
         updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
 
         // Refresh main view
-        mainController.setMoment(moment(date))
-
-        if(updateServer)
-        {
-          mainController.saveEditToTask(task)
-        }
-        
+        mainController.setMoment(moment(date))   
       }
      
     }

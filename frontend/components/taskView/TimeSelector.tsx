@@ -101,7 +101,7 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
         setHours(hour.toString());
         setMinutes(minutes.toString().length <= 1 ? ('00'+minutes.toString()).slice(-2) : minutes.toString());
 
-        taskController.handle_datetime_changes(task.startDate.getFullYear(), task.startDate.getMonth(), task.startDate.getDate(), hour + (isPM && hour != 12 ? 12 : 0), minute, modStartDate ? "start" : "end", mainController.getUser().getValue()!)
+        taskController.handle_datetime_changes(task.startDate.getFullYear(), task.startDate.getMonth(), task.startDate.getDate(), hour + (isPM && hour != 12 ? 12 : 0), minute, modStartDate ? "start" : "end", mainController, updateServer)
 
         for(const parent of task.ancestors)
         {
@@ -111,12 +111,7 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
             
         }
         updateFunctions.at(0)!(calculateDuration(task.startDate, task.endDate))
-        updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))
-        if(updateServer)
-        {
-          MainController.getInstance().saveEditToTask(task)
-        }
-        
+        updateFunctions.at(1)!(calculateDuration(new Date(), task.endDate))      
         mainController.setToggledPopupKey('')
         setIsSquareVisible(false);
       }

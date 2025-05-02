@@ -2,6 +2,7 @@ import PropertyListener from "../Listener";
 import TaskModel from "../../models/TaskModel";
 import UserModel from "../../models/UserModel";
 import { remove_email_notification, request_email_notification } from "../../services/taskServices";
+import MainController from "../main/MainController";
 
 // This will control anything that happens inside Task view
 
@@ -12,12 +13,9 @@ class TaskViewController {
 
     // Spam preventions
     private start_toggle_lock:boolean = false
-    private start_last_set:boolean = false
     private end_toggle_lock:boolean = false
-    private end_last_set:boolean = false
 
     private complete_toggle_lock:boolean = false
-    private complete_last_set:boolean = false
 
     private last_end_datetime_logged:null | Date = null
     private end_datetime_lock:boolean = false
@@ -40,11 +38,12 @@ class TaskViewController {
     }
 
     // Manages when notifications are sent out
-    public handle_toggle_notifications(set:boolean, user:UserModel, type: 'start_task' | 'end_task'): void {
+    public handle_toggle_notifications(set:boolean, main:MainController, type: 'start_task' | 'end_task'): void {
       // Acquire lock
+      const user = main.getUser().getValue()!
       if(type == 'start_task')
       {
-        this.start_last_set = set
+        this.task.startNotify = set
         if(this.start_toggle_lock)
           return
         else
@@ -53,7 +52,7 @@ class TaskViewController {
       
       if(type == 'end_task')
       {
-        this.end_last_set = set
+        this.task.endNotify = set
         if(this.end_toggle_lock) 
           return
         else
@@ -61,7 +60,8 @@ class TaskViewController {
       }      
       
       setTimeout(() =>{
-        if (type == 'start_task' ? this.start_last_set : this.end_last_set)
+        main.saveEditToTask(this.task)
+        if (type == 'start_task' ? this.task.startNotify : this.task.endNotify)
         {
           request_email_notification(this.task.toTaskData(), user, type)
         }
@@ -79,15 +79,18 @@ class TaskViewController {
       }, 5000) // Trigger after 5 seconds
     }
 
-    public handle_complete_toggle(set:boolean, user:UserModel): void {
-      this.complete_last_set = set
+    public handle_complete_toggle(set:number, main:MainController): void {
+      this.task.completeness = set
+      const user = main.getUser().getValue()!
       if(this.complete_toggle_lock)
         return
       else
         this.complete_toggle_lock = true
 
         setTimeout(()=>{
-          if(this.complete_last_set)
+          main.saveEditToTask(this.task)
+          
+          if(this.task.completeness)
           {
             remove_email_notification(user.id, this.task.id, 'start_task')
             remove_email_notification(user.id, this.task.id, 'end_task')
@@ -95,8 +98,9 @@ class TaskViewController {
         }, 5000)
     }
 
-    public handle_notes_change(notes:string, user:UserModel) {
+    public handle_notes_change(notes:string, main:MainController) {
       this.notes_state = notes
+      const user = main.getUser().getValue()!
       if(this.notes_lock)
         return
       else
@@ -108,19 +112,21 @@ class TaskViewController {
         this.notes_lock = false
         if (this.notes_state == this.last_notes_logged)
         {
+          main.saveEditToTask(this.task)
           request_email_notification(this.task.toTaskData(), user, 'start_task', true)
           request_email_notification(this.task.toTaskData(), user, 'end_task', true)
         }
         else
         {
           this.last_notes_logged = this.notes_state
-          this.handle_notes_change(notes, user)
+          this.handle_notes_change(notes, main)
         }
       },5000)
     }
 
-    public handle_title_change(title:string, user:UserModel) {
+    public handle_title_change(title:string, main:MainController) {
       this.title_state = title
+      const user = main.getUser().getValue()!
       if(this.title_lock)
         return
       else
@@ -132,19 +138,21 @@ class TaskViewController {
         this.title_lock = false
         if (this.title_state == this.last_title_logged)
         {
+          main.saveEditToTask(this.task)
           request_email_notification(this.task.toTaskData(), user, 'start_task', true)
           request_email_notification(this.task.toTaskData(), user, 'end_task', true)
         }
         else
         {
           this.last_title_logged = this.title_state
-          this.handle_title_change(title, user)
+          this.handle_title_change(title, main)
         }
       },5000)
     }
 
-    public handle_datetime_changes(year:number, month:number, day:number, hour:number, minute:number, which:'start' | 'end', user:UserModel)
+    public handle_datetime_changes(year:number, month:number, day:number, hour:number, minute:number, which:'start' | 'end', main:MainController, save_changes:boolean = true)
     {
+      const user = main.getUser().getValue()!
       if (which == 'start')
       {
         this.task.startDate.setFullYear(year)
@@ -179,10 +187,13 @@ class TaskViewController {
           if(this.last_start_datetime_logged == null || this.last_start_datetime_logged.getTime() != this.task.startDate.getTime())
           {
             this.last_start_datetime_logged = this.task.startDate
-            this.handle_datetime_changes(year, month, day, hour, minute, 'start', user)
+            this.handle_datetime_changes(year, month, day, hour, minute, 'start', main)
           }
           else
           {
+            if (save_changes)
+              main.saveEditToTask(this.task)
+
             request_email_notification(this.task.toTaskData(), user, "start_task", true)
           }
         }
@@ -192,10 +203,13 @@ class TaskViewController {
           if(this.last_end_datetime_logged == null || this.last_end_datetime_logged.getTime() != this.task.endDate.getTime())
           {
             this.last_end_datetime_logged = this.task.endDate
-            this.handle_datetime_changes(year, month, day, hour, minute, 'end', user)
+            this.handle_datetime_changes(year, month, day, hour, minute, 'end', main)
           }
           else
           {
+            if (save_changes)
+              main.saveEditToTask(this.task)
+
             request_email_notification(this.task.toTaskData(), user, "end_task", true)
           }
         }
