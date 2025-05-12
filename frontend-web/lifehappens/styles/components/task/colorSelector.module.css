@@ -1,0 +1,106 @@
+.container{
+    width:80;
+    justify-content: 'center';
+  }
+  .pickerContainer{
+    width:80;
+    justify-content: 'center';
+    align-items: 'center';
+    z-index:1
+  }
+  .square{
+    width: 200;
+    height: 300;
+    position:'absolute';
+    background-color: 'rgba(30;30;30;1)';
+    margin-top:380;
+    margin-right:0;
+    z-index:1;
+    justify-content:'center';
+    align-items:'center';
+    border-radius: 20;
+  }
+  .dropdownContainer{
+    flex-direction: 'row';
+    justify-content: 'space-between';
+    align-items: 'center';
+    padding-inline: 10;
+    min-width:100
+  }
+  .calendarContainer{
+    flex-direction: 'row';
+    flex-wrap: 'wrap';
+    justify-content: 'space-between';
+    width: '100%';
+    padding: 10;
+  }
+  .yearDropdown{
+    position: 'absolute';
+    top:'100%';
+    left: 0;
+    right: 0;
+    background-color: '#fff';
+    border-color: 'white';
+    border-width: 1;
+    height:100
+  }
+  .dayColumn{
+    width: '14%';
+    align-items: 'center';
+  }
+  .dayCell{
+    width: 40;
+    height: 40;
+    justify-content: 'center';
+    align-items: 'center';
+    border-radius: 40;
+  }
+  .disabledDay{
+    background-color: '#ddd';
+  }
+  .today{
+    background-color: 'lightblue';
+  }
+  .timeInput{
+    flex-direction: 'row';
+    align-items: 'center';
+    justify-content: 'flex-start'
+  }
+  .input{
+    width: 80;
+    height: 40;
+    padding: 10;
+    margin-right: 5;
+    font-size: 16;
+    color:'white';
+  }
+  .separator{
+    font-size: 20;
+    margin-right:5
+  }
+  .period{
+    font-size: 16;
+    margin-left: 5;
+    color:'gray'
+  }
+  .timezone{
+    margin-top: 10;
+    font-size: 14;
+    color: 'gray';
+  }
+  .modalContainer{
+    flex: 1;
+    justify-content: 'center';
+    align-items: 'center';
+  }
+  .timeZoneItem{
+    padding-block: 10;
+    border-bottom-width: 1;
+    border-bottom-color: '#ccc';
+  }
+  .closeButton{
+    margin-top: 20;
+    color: 'blue';
+    font-size: 16;
+    text-decoration-line: 'underline';
+  }

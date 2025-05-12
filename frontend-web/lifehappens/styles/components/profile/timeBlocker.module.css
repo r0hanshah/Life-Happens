@@ -1,0 +1,13 @@
+.container{
+    width:'100%';
+    flex-direction: 'column';
+    justify-content: 'center';
+    align-items: 'center';
+}
+.row{
+    flex-direction: 'row';
+}
+.cell{
+    height: 15;
+    margin: 2;
+}

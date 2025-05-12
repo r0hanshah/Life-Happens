@@ -3,7 +3,6 @@ import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from 
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from "../landing/NavBar";
 
-import UserProfilePopup from "../landing/UserProfilePopup";
 import MainController from '../../controllers/main/MainController';
 import UserModel from '../../models/UserModel';
 

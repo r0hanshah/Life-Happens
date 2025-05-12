@@ -1,0 +1,31 @@
+.gradientOverlayL{
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    overflow: 'hidden';
+}
+.gradientOverlayR{
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    overflow: 'hidden';
+}
+.gradient{
+    flex: 1;
+}
+.container{
+    background-color: "#151515";
+    z-index: 1; 
+    min-width: '95%';
+    min-height: '100%'
+}
+.containerL{
+    flex-direction: 'row';
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    margin-right: 3
+}
+.containerR{
+    flex-direction: 'row-reverse';
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin-left: 3
+}

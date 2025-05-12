@@ -1,0 +1,123 @@
+.container{
+    flex: 1;
+    background-color: '#151515';
+    align-items: 'center';
+    width: '100%';
+}
+.textContainer{
+    flex: 1;
+    flex-direction: 'column';
+    align-items: 'center';
+    justify-content: 'space-around';
+    background-color: '#383838';
+    padding: 20;
+    border-radius: 8;
+    width: '25%';
+    margin-inline: 20;
+}
+.contentContainer{
+    flex: 1;
+    width: '100%';
+    align-items: 'center';
+}
+.title{
+    font-size: 48;
+    font-weight: 'bold';
+    margin-bottom: 24;
+    color: '#FFFFFF'
+}
+.h1{
+    font-size: 24;
+    font-weight: 'normal';
+    margin-top: 8;
+    color: '#FFFFFF';
+    flex: 1; 
+    align-self: 'stretch'; 
+    text-align: 'center';
+}
+.h2{
+    font-size: 18;
+    font-weight: 'normal';
+    color: '#FFFFFF';
+    flex: 4;
+ }
+.h3{
+    font-size: 18;
+    font-weight: 'normal';
+    color: '#FFFFFF';
+}
+.button{
+    background-color: '#007AFF';
+    padding: 10;
+    border-radius: 8;
+    flex-direction: 'row';
+    align-items: 'center';
+    margin-bottom: 32;
+    justify-content: 'center';
+    width: 250
+}
+.buttonText{
+    color: 'white';
+    text-align: 'center';
+    font-weight: 'bold';
+    margin-left: 8;
+}
+.topContainer{
+    flex: 2;
+    justify-content: 'center';
+    align-items: 'center';
+}
+.middleContainer{
+    flex: 3;
+    flex-direction: 'row';
+    justify-content: 'space-around';
+    align-items: 'stretch';
+    margin-inline: 40;
+    padding: 20;
+
+}
+.toLoginLink{
+    margin-top: 16;
+    color: '#007AFF';
+}
+
+.profileContainer{
+    padding-top: 12;
+    height: '100%';
+    width: '25%';
+    background-color:'#383838';
+    margin-left: 'auto';
+}
+
+.profileTitle{
+    font-size: 32;
+    text-align: "center";
+    font-weight: 'bold';
+    margin-top: 20;
+    margin-bottom: 18;
+    color: 'white';
+}
+
+.profileItem{
+    flex-direction: 'column';
+    justify-content: 'center';
+    align-items: 'center';
+    padding-block: 8;
+    margin-block: 25;
+    margin-inline: 5;
+}
+.profileText{
+    color: '#fff';
+    font-size: 16;
+}
+.profileClose{
+    background-color: '#007AFF';
+    border-radius: 8;
+    flex-direction: 'row';
+    align-items: 'center';
+    justify-content: 'center';
+    width: 150;
+    padding: 5;
+    margin-block: 30;
+    margin-inline: 120;
+}

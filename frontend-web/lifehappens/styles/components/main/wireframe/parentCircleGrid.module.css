@@ -1,0 +1,9 @@
+  .grid{
+    flex: 1;
+    position: 'absolute';
+  }
+  .row{
+    flex-direction: 'row';
+    align-items: 'flex-end';
+    justify-content: 'space-around';
+  }

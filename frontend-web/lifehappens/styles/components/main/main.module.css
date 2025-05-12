@@ -1,0 +1,17 @@
+.slideInView{
+    position: 'absolute';
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+}
+.container{
+    max-width: 'auto';
+    background-color: '#151515';
+    align-items: 'center';
+    justify-content: 'center';
+}
+.hstack {
+    display: 'flex';
+    flex-direction: 'row';
+    align-items: 'center';
+}

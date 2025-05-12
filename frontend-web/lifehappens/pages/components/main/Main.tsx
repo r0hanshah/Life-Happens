@@ -1,0 +1,514 @@
+import React, { useEffect, useState, useRef } from 'react';
+import WireFrame from './wireframe/WireFrame';
+import TaskModel from '@/models/TaskModel';
+import moment from 'moment';
+import { Inter_900Black } from 'next/font/google';
+import RootTaskList from './rootTaskList/RootTaskList';
+import TaskView from '../taskView/TaskView';
+import ProfileView from '../profileView/ProfileView';
+
+import MainController from '@/controllers/main/MainController';
+import UserModel from '@/models/UserModel';
+
+import { BlurView } from 'expo-blur';
+import DeleteAccount from './deleteAccount/DeleteAccount';
+import EditAccount from './editAccount/EditAccount';
+
+interface Tasks {
+    rootTasks: TaskModel[]; // Only root tasks
+    signOut: ()=>void;
+}
+
+const DEBUG = false
+
+const Main: React.FC<Tasks> = ({signOut}) => {
+
+  const windowWidth = useWindowDimensions().width;
+  const tempUser = new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu")
+
+  const controller = MainController.getInstance();
+  var selectedTask = controller.getSelectedTask();
+
+  const [blurVisible, setBlurVisible] = useState(false);
+  const [editAccount, setEditAccount] = useState(false);
+
+  const [reRender, setReRender] = useState<boolean>(false)
+
+  const [task, setTask] = useState<TaskModel | null>(null);
+  const [slideAnimation] = useState(new Animated.Value(0));
+
+  const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
+  const [profileClicked, setProfileClicked] = useState(false);
+
+  const [displayType, setDisplayType] = useState(0);
+
+  // Update display type
+  useEffect(()=>{
+    const displayListener = controller.getDisplay();
+
+    const listener = (display: number) => {
+      setDisplayType(display);
+    };
+
+    displayListener.addListener(listener)
+
+    return () => {
+      displayListener.removeListener(listener);
+    };
+  }, [controller])
+
+  // Load in tasks on appear
+  useEffect(() => {
+    console.log('Number of tasks', controller.getTasks().getValue().length)
+    if (DEBUG) {
+      controller.setUser(tempUser)
+      setRootTasks([])
+    }
+    else{
+      loadRootTasks()
+    }
+  }, [controller])
+
+  // Load in tasks
+  const loadRootTasks = () =>
+  {
+    const tasks: TaskModel[] = controller.getTasks().getValue()
+    setRootTasks(tasks)
+    // Load based off the month
+    //TODO: Filter out the tasks that match the month and year
+  }
+
+  // Animation
+  const slideFromLeft = slideAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, windowWidth*0.49],
+  });
+
+  // Update tasks array
+  useEffect(()=>{
+    const taskListener = controller.getTasks();
+
+    const listener = (tasks: TaskModel[]) => {
+      setRootTasks(tasks);
+    };
+
+    taskListener.addListener(listener)
+
+    return () => {
+      taskListener.removeListener(listener);
+    };
+  }, [controller])
+
+  // Update counter state when counterProperty changes
+  useEffect(() => {
+    const taskListener = controller.getSelectedTask();
+
+    const listener = (task: TaskModel | null) => {
+      setTask(task);
+    };
+
+    taskListener.addListener(listener)
+
+    return () => {
+      taskListener.removeListener(listener);
+    };
+  }, [controller]);
+
+  // Rerender the page
+  useEffect(() => {
+    const renderListener = controller.getReRender();
+
+    const listener = (bool: boolean) => {
+      setReRender(bool);
+    };
+
+    renderListener.addListener(listener)
+
+    return () => {
+      renderListener.removeListener(listener);
+    };
+  }, [controller]);
+
+  useEffect(() => {
+    console.log("Running from rerender")
+    const orderedMaps = getAllLeafNodes(rootTasks)
+    setLeafNodesMap(orderedMaps[0]);
+    setRootTaskMap(orderedMaps[1])
+  }, [reRender])
+
+  const windowHeight = useWindowDimensions().height;
+  const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
+  const [rootTaskMap, setRootTaskMap] = useState<{[key:string]:TaskModel[]}>({ // O for left bound root tasks and 1 for right bound root tasks
+    "0":[],
+    "1":[]
+  });
+
+  const [currentMonth, setCurrentMonth] = useState(moment());
+
+  useEffect(()=>{
+    const momentListener = controller.getMoment();
+
+    const listener = (moment: moment.Moment) => {
+      setCurrentMonth(moment);
+    };
+
+    momentListener.addListener(listener)
+
+    return () => {
+      momentListener.removeListener(listener);
+    };
+  },[controller])
+
+  const [weekNumber, setWeekNumber] = useState(1);
+  
+  useEffect(()=>{
+    const firstDayOfDisplay = currentMonth.clone().startOf('month').startOf('week');
+    const lastDayOfCurrentWeek = currentMonth.clone().endOf('week')
+    const diff = lastDayOfCurrentWeek.diff(firstDayOfDisplay, 'days') + 1
+
+    setWeekNumber(diff/7)
+
+  },[currentMonth])
+
+  let [fontsLoaded] = useFonts({
+      Inter_900Black
+    });
+    
+    // Extract leaf nodes from root tasks with breadth first search
+    const getAllLeafNodes=(rootTasks:TaskModel[]):[{ [key: string]: TaskModel[]}, { [key: string]: TaskModel[]}] =>
+    {
+      var allLeafNodes:{[key:string]:TaskModel[]} = {}
+      var sidedRootTasks:{ [key: string]: TaskModel[]} = {
+        "0":[],
+        "1":[]
+      }
+
+      for(var rootTask of rootTasks)
+      {
+        const leafNodes:TaskModel[] = bfsTree(rootTask)
+
+        const key = (leafNodes:TaskModel[], parentId:string): string =>
+        {
+          var sum:number = 0
+          var count:number = 0
+          for(const node of leafNodes)
+          {
+            sum += node.startDate.getDay()
+            count += 1
+          }
+          const average = sum / count
+          rootTask.isLeft = average <= 3
+          sidedRootTasks[average > 3 ? "0":"1"].push(rootTask)
+          return parentId + ":::" + (average > 3 ? "0":"1")
+        }
+
+        allLeafNodes[key(leafNodes, rootTask.id)] = leafNodes
+      }
+
+      return [allLeafNodes, sidedRootTasks]
+    }
+
+    const bfsTree=(root:TaskModel):TaskModel[] =>
+    {
+      var q:TaskModel[] = []
+      var leafNodes:TaskModel[] = []
+
+      q.push(root)
+
+      while(q.length != 0)
+      {
+        var observedNode:TaskModel = q[0]
+        if(observedNode.children.length == 0)
+        {
+          leafNodes.push(observedNode)
+        }
+        else
+        {
+          for(const child of observedNode.children)
+          {
+            q.push(child)
+          }
+        }
+        q.shift()
+      }
+
+      return leafNodes
+    }
+
+    function getOrdinalSuffix(day: number): string {
+      if (day > 3 && day < 21) return 'th'; // for 11th to 20th
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    }
+    
+    function formatDate(date: Date): string {
+      const day = date.getDate();
+      const dayWithSuffix = day + getOrdinalSuffix(day);
+      
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long', // e.g., Monday
+        month: 'short',  // e.g., Sep
+        year: 'numeric', // e.g., 2024
+      };
+      
+      const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+      
+      // Construct the final formatted string
+      return `${formattedDate.split(",")[0]} ${dayWithSuffix}, ${formattedDate.split(",")[1].trim()}`;
+    }
+
+    // Set all leaf nodes
+    useEffect(() => {
+      console.log("Running use effect")
+      const orderedMaps = getAllLeafNodes(rootTasks)
+      setLeafNodesMap(orderedMaps[0]);
+      setRootTaskMap(orderedMaps[1])
+    }, [rootTasks]);
+
+    const animationRef = useRef(new Animated.Value(task ? 0 : windowWidth*0.49)).current;
+    const animationProfileRef = useRef(new Animated.Value(profileClicked ? 0 : 222)).current;
+
+    useEffect(() => {
+      if (task) {
+        Animated.timing(animationRef, {
+          toValue: windowWidth * 0.49,
+          delay: 100,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      } else {
+        Animated.timing(animationRef, {
+          toValue:0,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+      }
+    }, [task]);
+
+    useEffect(() => {
+      if (profileClicked) {
+        Animated.timing(animationProfileRef, {
+          toValue: windowWidth * 0.49,
+          delay: 100,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      } else {
+        Animated.timing(animationProfileRef, {
+          toValue:0,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+      }
+    }, [profileClicked]);
+
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    return (
+      <View style={{flex: 1, width:'100%'}}>
+        
+            <Animated.View
+              style={[
+                styles.slideInView,
+                { transform: [{ translateX: slideFromLeft }], width: animationRef },
+                task && task.isLeftBound() ? {right: 0} : {left:0}
+              ]}
+              >
+                {/* Content of the sliding view */}
+                {task && <TaskView task={task} isLeft={!task.isLeftBound()} onPress={()=>{controller.setSelectedTask(null)}}/>}
+
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                styles.slideInView,
+                { transform: [{ translateX: slideFromLeft }], width: animationProfileRef },
+                {left: 0}
+              ]}
+              >
+                {/* Content of the sliding view */}
+                {profileClicked && 
+                <ProfileView 
+                  user={controller.getUser().getValue()!} 
+                  onPress={()=>{setProfileClicked(false)}} 
+                  signOut={()=>{
+                  localStorage.removeItem('authToken');
+                    signOut();
+                  }} 
+                  deletAccount={()=>{setBlurVisible(true)}} 
+                  editAccount={()=>{setEditAccount(true)}}
+                />}
+
+            </Animated.View>
+
+            {blurVisible && (
+              <View style={{
+                position: 'absolute',
+                zIndex: 999,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                justifyContent:'center',
+                alignItems:'center'
+                }}>
+
+                <BlurView
+                  intensity={50}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                  tint="dark"
+                />
+                <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
+
+              </View>
+              
+            )}
+
+            {editAccount && (
+              <View style={{
+                position: 'absolute',
+                zIndex: 999,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                justifyContent:'center',
+                alignItems:'center'
+                }}>
+
+                <BlurView
+                  intensity={50}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                  tint="dark"
+                />
+                <EditAccount cancel={()=>{setEditAccount(false)}} user={controller.getUser().getValue()!} saveChanges={signOut}/>
+
+              </View>
+              
+            )}
+          
+        <Animated.ScrollView style={{width:"100%", paddingBottom:80}}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+        >
+          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
+            <View style={styles.hstack}>
+
+              {displayType > 0 ? 
+              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+                controller.setDisplay(0)
+                }}>
+                <Image source={require('../../assets/calendar_icon.png')} style={{
+                  width:30, height:30, opacity: 0.5
+                }}/>
+              </TouchableOpacity>
+              : <View style={{display:'none'}}/>}
+
+              {displayType > 1 ? 
+              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+                controller.setMoment(currentMonth.clone().endOf('week'))
+                controller.setDisplay(1)
+                }}>
+                <Image source={require('../../assets/week_icon.png')} style={{
+                  width:30, height:30, opacity: 0.5
+                }}/>
+              </TouchableOpacity>
+              : <View style={{display:'none'}}/>}
+
+              {/* Month displayed here */}
+
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
+                }}>
+                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
+              </TouchableOpacity>
+              
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>
+                {currentMonth.format( displayType == 1 ? 'MMM YYYY' : displayType == 2? 'dddd Do, MMM YYYY' :  'MMMM YYYY')}
+                {displayType == 1 ? ' - Week ' + weekNumber : ''}
+              </Text>
+
+              <TouchableOpacity onPress={()=>{
+                controller.setMoment(moment(currentMonth).add(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
+                controller.setReRender(controller.getReRender().getValue() ? false : true)
+                }}>
+                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, alignItems:'center', justifyContent:'center', marginLeft:20}} onPress={
+                ()=>{
+                  controller.setMoment(displayType==1? moment(new Date()).endOf('week') : moment(new Date()))
+                  controller.setReRender(controller.getReRender().getValue() ? false: true)
+                }
+              }>
+                <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20}}>Today</Text>
+              </TouchableOpacity>
+            </View>
+            
+
+            <TouchableOpacity style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50}}
+            onPress={()=>{// Display user data
+              setProfileClicked(profileClicked ? false :true)
+              controller.setSelectedTask(null)
+            }}
+            >
+              <Text style={{color:'white', fontSize:40}}>{controller.getUser().getValue()?.name.at(0)}</Text>
+            </TouchableOpacity>
+          </View>          
+          
+          {/* Calendar */}
+          <View style={[styles.container, {marginTop:20}]}>
+            <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth} scrollY={scrollY}/>
+          </View>
+
+          {/* Root task list */}
+          <View style={{width:controller.getDisplay().getValue() == 2 ? "95%" : "100%", alignSelf:'center'}}>
+            <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
+              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+
+              <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
+              onPress={() => {
+                if(controller.getSelectedTask().getValue() === null)
+                  controller.createNewTask()
+                  if(controller.getDisplay().getValue() != 0)
+                    console.log(controller.getReRender().getValue())
+                    controller.setReRender(controller.getReRender().getValue()? false : true)
+                    console.log(controller.getReRender().getValue())
+              }}
+              >
+                <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={{maxWidth: "auto", alignItems:"center"}}>
+              <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
+            </View>
+          </View>
+          
+          
+        </Animated.ScrollView>
+      </View>
+      );
+}
+
+export default Main

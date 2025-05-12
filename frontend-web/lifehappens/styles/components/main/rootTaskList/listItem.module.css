@@ -1,0 +1,13 @@
+.container{
+    flex-direction: 'row';
+    background-color: '#383838';
+    align-items: 'center';
+    border-radius: 25;
+    height: 50
+}
+.circle{
+    width: 15;
+    height: 15;
+    border-radius: 20;
+    margin-inline: 20
+}

@@ -1,0 +1,6 @@
+.container{
+    align-items: 'center';
+    justify-content: 'center';
+    margin-right:10;
+    transform: 'rotate(-90deg)'
+  }

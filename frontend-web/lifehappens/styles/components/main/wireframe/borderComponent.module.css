@@ -1,0 +1,30 @@
+  .HLContainer{
+    position: 'absolute';
+    justify-content: 'center';
+    align-items: 'flex-start';
+  }
+  .HRContainer{
+    position: 'absolute';
+    justify-content: 'center';
+    align-items: 'flex-end'
+  }
+  .VContainer{
+    position: 'absolute';
+    justify-content: 'center';
+  }
+  .container{
+    position: 'relative';
+    justify-content: 'center';
+    align-items: 'center';
+  }
+  .border{
+    flex: 1;
+  }
+  .horizontalBorder{
+    top: 48.5;
+    height: 1;
+  }
+  .verticalBorder{
+    width: 1;
+    min-height: 50;
+  }

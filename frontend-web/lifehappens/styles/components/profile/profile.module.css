@@ -1,0 +1,53 @@
+.h1{
+    color:"white"; 
+    font-family: 'Inter_900Black'; 
+    font-size:40; 
+    margin-block:30
+}
+.h2{
+    color:"white"; 
+    font-family: 'Inter_900Black'; 
+    font-size:30; 
+    margin-block:20
+}
+.p{
+    color:"white"; 
+    font-family: 'Arial'; 
+    font-size:15; 
+}
+.p_sub{
+    color:"#505050"; 
+    font-family: 'Arial'; 
+    font-size:15; 
+}
+.gradientOverlayL{
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    overflow: 'hidden';
+}
+.gradientOverlayR{
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    overflow: 'hidden';
+}
+.gradient{
+    flex: 1;
+}
+.container{
+    background-color: "#151515";
+    z-index: 1; 
+    min-width: '95%';
+    min-height: '100%'
+}
+.containerL{
+    flex-direction: 'row';
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    margin-right: 3
+}
+.containerR{
+    flex-direction: 'row-reverse';
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin-left: 3
+}
