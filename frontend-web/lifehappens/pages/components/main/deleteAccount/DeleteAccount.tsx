@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Button, TouchableOpacity } from 'react-native';
-import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
-import { deleteUser } from '../../../services/taskServices';
-import MainController from '../../../controllers/main/MainController';
-import UserModel from '../../../models/UserModel';
+import TouchableOpacity from '@/pages/native/TouchableOpacity';
+import { Inter } from 'next/font/google'
+
+import { deleteUser } from '@/services/taskServices';
+import MainController from '@/controllers/main/MainController';
+import UserModel from '@/models/UserModel';
 
 interface DeleteAccountProps {
   cancel: () => void
@@ -15,37 +16,37 @@ const DeleteAccount: React.FC<DeleteAccountProps> = ({cancel, deleteAccount, use
 
   const controller = MainController.getInstance();
 
-  let [fontsLoaded] = useFonts({
-    Inter_900Black
-  });
+  const Inter_900 = Inter({
+    weight: "900"
+  })
 
   return( 
-    <View style={{width:500, padding:30, justifyContent:'space-around', backgroundColor:'#151515', borderRadius:20}}>
-        <Text style={{fontFamily:'Inter_900Black', color:'white', textAlign:'center', fontSize:30}}>Are you sure you want to delete your account?</Text>
-        <Text style={{color:'#aaaaaa', margin:10, textAlign:'center'}}>Deleting your account is permanent and can not be undone. All your private documents and tasks will be deleted and will not be recoverable.</Text>
-        <View style={{flexDirection:'row', justifyContent:'space-around', margin:10}}>
-            <TouchableOpacity onPress={cancel} style={{
+    <div style={{width:500, padding:30, justifyContent:'space-around', backgroundColor:'#151515', borderRadius:20}}>
+        <p className={Inter_900.className} style={{ color:'white', textAlign:'center', fontSize:30}}>Are you sure you want to delete your account?</p>
+        <p style={{color:'#aaaaaa', margin:10, textAlign:'center'}}>Deleting your account is permanent and can not be undone. All your private documents and tasks will be deleted and will not be recoverable.</p>
+        <div style={{flexDirection:'row', justifyContent:'space-around', margin:10}}>
+            <TouchableOpacity onClick={cancel} style={{
                 padding:10,
-                paddingHorizontal:20,
+                paddingInline:20,
                 backgroundColor:'#303030',
                 borderRadius:20
             }}>
-                <Text style={{color:'gray'}}>Cancel</Text>
+                <p style={{color:'gray'}}>Cancel</p>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{
+            <TouchableOpacity onClick={()=>{
                 handleDeleteUser(user.id)
                 localStorage.removeItem('authToken')
                 deleteAccount()
             }} style={{
                 padding:10,
-                paddingHorizontal:20,
+                paddingInline:20,
                 backgroundColor:'#303030',
                 borderRadius:20
             }}>
-                <Text style={{color:'red'}}>Delete</Text>
+                <p style={{color:'red'}}>Delete</p>
             </TouchableOpacity>
-        </View>
-    </View>
+        </div>
+    </div>
   );
 };
 

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View, ViewStyle, useWindowDimensions, Text, TouchableHighlight, Button, TouchableOpacity, TextInput, Image } from 'react-native';
-import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
-import { deleteUser } from '../../../services/taskServices';
-import MainController from '../../../controllers/main/MainController';
-import UserModel from '../../../models/UserModel';
-import * as DocumentPicker from 'expo-document-picker';
-import { updateUser } from '../../../services/taskServices';
+import TouchableOpacity from '@/pages/native/TouchableOpacity';
+
+import { Inter } from 'next/font/google'
+import MainController from '@/controllers/main/MainController';
+import UserModel from '@/models/UserModel';
+import { updateUser } from '@/services/taskServices';
 
 
 interface EditAccountProps {
@@ -19,83 +18,86 @@ const EditAccount: React.FC<EditAccountProps> = ({cancel, saveChanges, user}) =>
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
 
-  const [profilePicture, setProfilePicture] = useState<DocumentPicker.DocumentPickerAsset | null>(null)
+  const Inter_900 = Inter({
+    weight: "900"
+  })
+  
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
-  let [fontsLoaded] = useFonts({
-    Inter_900Black
-  });
-
-   // Function to handle file selection
-   const handlePhotoSelection = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({ type: '*/*.png' });
-
-      if (result && result.assets) {
-        const doc = result.assets.at(0)!
-        const file = {
-            name: doc.name,
-            size: doc.size,
-            type: doc.mimeType!,
-            uri: doc.uri,
-        }
-        // Add the selected file to the files array
-        setProfilePicture(result.assets.at(0)!);
-      }
-    } catch (error) {
-      console.log('Error selecting file:', error);
+  const handlePhotoSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setProfilePicture(file);
+      console.log('Selected file:', file);
     }
   };
 
   return( 
-    <View style={{width:700, padding:30, justifyContent:'center', alignItems:'center',backgroundColor:'#151515', borderRadius:20}}>
-        <Text style={{fontFamily:'Inter_900Black', color:'white', textAlign:'center', fontSize:30}}>Editing Account</Text>
+    <div style={{width:700, padding:30, justifyContent:'center', alignItems:'center',backgroundColor:'#151515', borderRadius:20}}>
+        <p style={{fontFamily:'Inter_900Black', color:'white', textAlign:'center', fontSize:30}}>Editing Account</p>
 
-        <View style={{flexDirection:'row'}}>
+        <div style={{flexDirection:'row'}}>
           {profilePicture ? (
-            <TouchableOpacity style={{ borderRadius:20, height:300, width:300, marginVertical:30}} onPress={handlePhotoSelection}>
-                <Image source={{ uri: profilePicture.uri }} style={{borderRadius:20, height:300, width:300}}/>
+            <TouchableOpacity style={{ borderRadius:20, height:300, width:300, marginBlock:30}}>
+              <label htmlFor="fileUpload" style={{ cursor: 'pointer' }}>
+                <img
+                  src={URL.createObjectURL(profilePicture)}
+                  style={{ borderRadius: 20, height: 300, width: 300 }}
+                  alt="Profile preview"
+                />
+              </label>
+              <input
+                id="fileUpload"
+                type="file"
+                accept="image/png"
+                onChange={handlePhotoSelection}
+                style={{ display: 'none' }}
+              />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={{justifyContent:'center', alignItems:'center', backgroundColor:'#303030', borderRadius:20, height:300, width:300, marginVertical:30}} onPress={handlePhotoSelection}>
-
-            <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20, textAlign:'center'}}>Upload profile photo (.png)</Text>
-
+            <TouchableOpacity style={{justifyContent:'center', alignItems:'center', backgroundColor:'#303030', borderRadius:20, height:300, width:300, marginBlock:30}}>
+              <label htmlFor="fileUpload" style={{ cursor: 'pointer' }}>
+                <p style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20, textAlign:'center'}}>Upload profile photo (.png)</p>
+              </label>
+              <input
+                id="fileUpload"
+                type="file"
+                accept="image/png"
+                onChange={handlePhotoSelection}
+                style={{ display: 'none' }}
+              />
           </TouchableOpacity>
           )}
 
-          <View style={{marginLeft:20, marginTop:30}}>
-            <Text style={{fontFamily:'Inter_900Black', color:'white', textAlign:'left', fontSize:25, width:300}}>Name</Text>
+          <div style={{marginLeft:20, marginTop:30}}>
+            <p style={{fontFamily:'Inter_900Black', color:'white', textAlign:'left', fontSize:25, width:300}}>Name</p>
 
-            <TextInput
-            style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignVertical:'bottom', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
-            scrollEnabled={false}
-            onChangeText={setName}
-            value={name}
-            multiline={true}
-            placeholder='Full Name...'
+            <input
+              style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignLast:'end', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+              placeholder='Full Name...'
             />
 
-            <Text style={{fontFamily:'Inter_900Black', color:'white', textAlign: 'left', fontSize:25, width:300}}>Email</Text>
+            <p style={{fontFamily:'Inter_900Black', color:'white', textAlign: 'left', fontSize:25, width:300}}>Email</p>
 
-            <TextInput
-            style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignVertical:'bottom', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
-            scrollEnabled={false}
-            onChangeText={setEmail}
-            value={email}
-            multiline={true}
-            placeholder='user@example.com'
+            <input
+              style={{color:'#717171', fontFamily: 'Arial', fontSize:20, textAlign:'left', textAlignLast:'end', minWidth:'70%', height:40, width:300, alignContent:'center', marginBottom:20}}
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              placeholder='user@example.com'
             />
 
-            <View style={{width:300, flexDirection:'row', justifyContent:'space-around', margin:10}}>
-                <TouchableOpacity onPress={cancel} style={{
+            <div style={{width:300, flexDirection:'row', justifyContent:'space-around', margin:10}}>
+                <TouchableOpacity onClick={cancel} style={{
                     padding:10,
-                    paddingHorizontal:20,
+                    paddingInline:20,
                     backgroundColor:'#303030',
                     borderRadius:20
                 }}>
-                    <Text style={{color:'gray'}}>Cancel</Text>
+                    <p style={{color:'gray'}}>Cancel</p>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity onClick={()=>{
                     // handle saving changes to user's profile
                     // saveChanges()
                     user.name = name
@@ -108,26 +110,26 @@ const EditAccount: React.FC<EditAccountProps> = ({cancel, saveChanges, user}) =>
                       ProfilePicture: "",
                       Settings: {},
                       SharedTaskTrees: [],
-                      TaskTreeRoots: [],
+                      TaskTreeNodes: [],
                       WeeklyAITimesAllowed: 3})
                     cancel()
                 }} style={{
                     padding:10,
-                    paddingHorizontal:20,
+                    paddingInline:20,
                     backgroundColor:'#303030',
                     borderRadius:20
                 }}>
-                    <Text style={{color:'white'}}>Save</Text>
+                    <p style={{color:'white'}}>Save</p>
                 </TouchableOpacity>
-            </View>
-          </View>
+            </div>
+          </div>
 
-        </View>
+        </div>
         
         
 
         
-    </View>
+    </div>
   );
 };
 

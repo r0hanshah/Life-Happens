@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, useWindowDimensions } from 'react-native';
-import TaskModel from '../../../models/TaskModel';
+import React from 'react';
+import TaskModel from '@/models/TaskModel';
 import ListItem from './ListItem';
 import moment from 'moment';
-import MainController from '../../../controllers/main/MainController';
+import MainController from '@/controllers/main/MainController';
+
+import style from '@/styles/components/main/rootTaskList/rootTaskList.module.css'
 
 interface RootTaskListProps
 {
@@ -15,7 +16,7 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
 {
     const controller = MainController.getInstance()
 
-    const windowWidth = useWindowDimensions().width;
+    const windowWidth = window.global.innerWidth;
     const firstDayOfMonth = inMoment.clone().startOf('month');
     let startDay = firstDayOfMonth.clone().startOf('week');
     let endDay = firstDayOfMonth.clone().endOf('month').endOf('week');
@@ -103,35 +104,26 @@ const RootTaskList: React.FC<RootTaskListProps> = ({ rootTasksMap, inMoment }) =
         }
 
         const lists = display == 2 ? [
-            <View key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
+            <div key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
                 {leftBoundTasks}
-            </View>
+            </div>
         ] : [
-            <View key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
+            <div key={"leftList"} style={{flex: 1, alignItems: "flex-start"}}>
                 {leftBoundTasks}
-            </View>,
-            <View key={"rightList"} style={{flex: 1, alignItems: "flex-end"}}>
+            </div>,
+            <div key={"rightList"} style={{flex: 1, alignItems: "flex-end"}}>
                 {rightBoundTasks}
-            </View>
+            </div>
         ]
     
         return lists;
       };
 
     return (
-        <View style={[styles.container, {width: windowWidth * 0.83 + 14}, display == 2 ? {marginLeft: 50} : {}]}>
+        <div className={style.container} style={{width: windowWidth * 0.83 + 14, ...(display == 2 ? {marginLeft: 50} : {})}}>
             {renderLists(rootTasksMap)}
-        </View>
+        </div>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-      width: "100%",
-      alignItems: 'flex-start',
-      justifyContent: "center",
-      flexDirection: "row"
-    },
-  }); 
 
 export default RootTaskList
