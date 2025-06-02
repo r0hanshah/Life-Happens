@@ -1,11 +1,10 @@
-import { DocumentPickerAsset } from "expo-document-picker"
-import uuid from 'react-native-uuid';
+import { v4 } from "uuid";
 import UserModel from "./UserModel";
 import { TaskData } from "../services/taskServices";
 
 class TaskModel
 {
-    constructor(id:string = uuid.v4().toString(), creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[] = [], title:string, color:string, ancestors:TaskModel[], children:TaskModel[] = [], startDate:string, endDate:string, isMovable:boolean,startNotify:boolean = false, endNotify:boolean = false, content:{[key:string]:any} = {}, notes:string = "", extraMedia:string[] = [], isRoot:boolean = false, contextText:string = "", contextFiles:DocumentPickerAsset[] = [], unobservedFiles:DocumentPickerAsset[] = [])
+    constructor(id:string = v4().toString(), creatorId:string, rootId:string, users:UserModel[], invitedUsers:string[] = [], title:string, color:string, ancestors:TaskModel[], children:TaskModel[] = [], startDate:string, endDate:string, isMovable:boolean,startNotify:boolean = false, endNotify:boolean = false, content:{[key:string]:any} = {}, notes:string = "", extraMedia:string[] = [], isRoot:boolean = false, contextText:string = "", contextFiles:File[] = [], unobservedFiles:File[] = [])
     {
         this.id = id
         this.creatorId = creatorId
@@ -59,8 +58,8 @@ class TaskModel
     isRoot:boolean
 
     contextText:string
-    contextFiles:DocumentPickerAsset[]
-    unobservedFiles:DocumentPickerAsset[]
+    contextFiles:File[]
+    unobservedFiles:File[]
 
     isLeft:boolean = false
     completeness:number = 0

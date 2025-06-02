@@ -1,5 +1,5 @@
 import React from "react";
-import TouchableOpacity from "../native";
+import TouchableOpacity from "../../native/TouchableOpacity";
 
 import styles from '@/styles/components/landing/NavBar.module.css'
 

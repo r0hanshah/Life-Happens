@@ -1,0 +1,13 @@
+.hourStyle {
+    color:'#717171';
+    text-align:'right';
+    margin-bottom:23;
+    background-color:'#151515';
+    padding-right:15;
+    width:'auto';
+    height: 10
+}
+
+.nonKeyHourStyle {
+    width: 35
+}

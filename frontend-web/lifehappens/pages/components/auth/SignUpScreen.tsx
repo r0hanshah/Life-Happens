@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import TouchableOpacity from '../native';
+import TouchableOpacity from '../../native/TouchableOpacity';
 
 import styles from '@/styles/components/auth/SignUpScreen.module.css'
 import MainController from '@/controllers/main/MainController';

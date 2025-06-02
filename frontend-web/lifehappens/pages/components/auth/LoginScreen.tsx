@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styles from '@/styles/components/auth/LoginScreen.module.css'
-import TouchableOpacity from '@/pages/components/native'
+import TouchableOpacity from '@/pages/native/TouchableOpacity'
 
 import AuthController from '@/controllers/auth/authController';
 

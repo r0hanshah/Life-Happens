@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import TouchableOpacity from "../native";
+import React from "react";
+import TouchableOpacity from "../../native/TouchableOpacity";
 import NavBar from "./NavBar";
 
 import styles from '@/styles/components/landing/LandingScreen.module.css'

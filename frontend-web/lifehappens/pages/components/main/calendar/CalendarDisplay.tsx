@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, useWindowDimensions, TouchableOpacity, Modal, Button, Animated } from 'react-native';
+import TouchableOpacity from "../../../native/TouchableOpacity"
 import DayNode from './DayNode';
 import moment from 'moment';
-import TaskModel from '../../../models/TaskModel';
-import MainController from '../../../controllers/main/MainController';
+import TaskModel from '@/models/TaskModel';
+import MainController from '@/controllers/main/MainController';
 import WeekDisplay from './WeekDisplay';
 import DayDisplay from './DayDisplay';
+import styles from '@/styles/components/main/calendar/calendarDisplay.module.css'
 
 interface CalendarProps {
   offset: number;
   leafNodesMap: { [key:number] : TaskModel[]}; // row,column,color
   inMoment: moment.Moment;
-  scrollY: Animated.Value
+  scrollY: number
 }
 
 const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMoment, scrollY }) => {
 
-  const windowWidth = useWindowDimensions().width;
-  const windowHeight = useWindowDimensions().height;
+  const windowWidth = window.global.innerWidth;
+  const windowHeight = window.global.innerHeight;
 
   const mainController = MainController.getInstance()
 
@@ -107,16 +108,16 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
     for(let i = 0; i < calendarDays.length; i+=7)
     {
         calendarDisplay.push(
-            <View key={`row${i/7}`} style={[styles.row, { height: 95, paddingTop: 40}]}>
+            <div key={`row${i/7}`} className={styles.row} style={{height: 95, paddingTop: 40}}>
                 {calendarDays.slice(i,i+7)}
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity onClick={() => {
                   setWeekDays(calendarDays.slice(i,i+7))
                   mainController.setDisplay(1)
                   mainController.setMoment(startDay.clone().add(i+7-1, 'days'))
                   }}>
-                  <View style={{position: 'absolute', width:10, height:10, borderRadius: 10, backgroundColor:'#717171', right:-20, marginVertical:15}}></View>
+                  <div style={{position: 'absolute', width:10, height:10, borderRadius: 10, backgroundColor:'#717171', right:-20, marginBlock:15}}></div>
                 </TouchableOpacity>
-            </View>
+            </div>
         )
     }
 
@@ -124,35 +125,23 @@ const CalendarDisplay: React.FC<CalendarProps> = ({ offset, leafNodesMap, inMome
   };
 
   return (
-    <View style={[styles.grid, { width: windowWidth * 0.84}]}>
+    <div className={styles.grid} style={{ width: windowWidth * 0.84}}>
       {mainController.getDisplay().getValue() == 1 ? <WeekDisplay dayNodes={weekDays} scrollY={scrollY}/> : mainController.getDisplay().getValue() == 2 && day ? <DayDisplay dayNode={day} scrollY={scrollY}/> : renderCalendar() }
 
       {mainController.getDisplay().getValue() < 2 &&
-        <View style={[styles.row, { height: 40}]}>
-          <Text style={{color:'#717171'}}>Su</Text>
-          <Text style={{color:'#717171'}}>M</Text>
-          <Text style={{color:'#717171'}}>T</Text>
-          <Text style={{color:'#717171'}}>W</Text>
-          <Text style={{color:'#717171'}}>Th</Text>
-          <Text style={{color:'#717171'}}>F</Text>
-          <Text style={{color:'#717171'}}>S</Text>
-        </View>
+        <div className={styles.row} style={{ height: 40}}>
+          <p style={{color:'#717171'}}>Su</p>
+          <p style={{color:'#717171'}}>M</p>
+          <p style={{color:'#717171'}}>T</p>
+          <p style={{color:'#717171'}}>W</p>
+          <p style={{color:'#717171'}}>Th</p>
+          <p style={{color:'#717171'}}>F</p>
+          <p style={{color:'#717171'}}>S</p>
+        </div>
       }
-      </View>
+      </div>
       
   );
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flex: 1,
-    // position: 'absolute',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-around',
-  },
-});
 
 export default CalendarDisplay;
