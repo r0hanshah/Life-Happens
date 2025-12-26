@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import TaskModel from '../../../models/TaskModel';
+import TaskModel from '@/models/TaskModel';
 import TreeNode from './TreeNode';
-import MainController from '../../../controllers/main/MainController';
-
-const { width, height } = Dimensions.get('window');
+import MainController from '@/controllers/main/MainController';
 
 const XOFFSET = 230
 const YOFFSET = 120
@@ -185,16 +180,15 @@ function reingoldTilford(root: TaskModel): void {
   // Example of rendering the tree nodes in React
   const renderTree = () => {
     // Start from the root task and do BFS and push elements into an array that will be displayed with their offset determined by their level and the amount of nodes on the level
-    const nodes: JSX.Element[] = [];
+    const nodes: React.ReactNode[] = [];
     const queue: { task: TaskModel; level: number }[] = [{ task: rootTask, level: 0 }];
-    const xOffsetMap: Map<number, number> = new Map([[0,width/2]])
     const selectedTask = controller.getSelectedTask().getValue()
 
     while (queue.length > 0) {
       const { task, level } = queue.shift()!;
       console.log(task.title, level, task.x)
 
-      const inPath = selectedTask?.ancestors.some(ancestor => ancestor.id == task.id) || task.id == selectedTask?.id
+      const inPath = selectedTask?.ancestors.some((ancestor: TaskModel) => ancestor.id == task.id) || task.id == selectedTask?.id
 
       nodes.push(
         <TreeNode
@@ -205,7 +199,7 @@ function reingoldTilford(root: TaskModel): void {
         />
       );
 
-      task.children?.forEach((child) => {
+      task.children?.forEach((child: TaskModel) => {
         queue.push({ task: child, level: level + 1 });
       });
     }
@@ -215,8 +209,31 @@ function reingoldTilford(root: TaskModel): void {
   }
 
   return (
-    renderTree()
+    <div style={styles.container}>
+      <div style={styles.canvasContainer}>
+        {renderTree()}
+      </div>
+    </div>
   );
+};
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    flex: 1 as any,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+  } as React.CSSProperties,
+  canvasContainer: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  } as React.CSSProperties,
 };
 
 export default Tree_RTA;

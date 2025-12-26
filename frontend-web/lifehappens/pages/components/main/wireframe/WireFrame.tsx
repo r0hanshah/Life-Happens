@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
 import GridComponent from './GridComponent';
 import ParentNodeGridComponent from './ParentCircleGrid';
 import CalendarDisplay from '../calendar/CalendarDisplay';
-import TaskModel from '../../../models/TaskModel';
+import TaskModel from '@/models/TaskModel';
 import moment from 'moment';
-import MainController from '../../../controllers/main/MainController';
+import MainController from '@/controllers/main/MainController';
 
 
 
@@ -13,7 +12,7 @@ interface WireFrameProps {
     leafNodesMap: {[key:string]:TaskModel[]};
     sidedRootTasksMap: {[key:string]:TaskModel[]};
     inMoment: moment.Moment;
-    scrollY:Animated.Value
+    scrollY?: number
 }
 
 const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, inMoment, scrollY }) => {
@@ -119,7 +118,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                         {
                             const children = leafNode.ancestors[0].children
                             console.log("gettting parent indexes")
-                            const latestChild = children.reduce((max, child) => (child.startDate.toISOString() >= max.startDate.toISOString() ? child : max), children[0]);
+                            const latestChild = children.reduce((max: TaskModel, child: TaskModel) => (child.startDate.toISOString() >= max.startDate.toISOString() ? child : max), children[0]);
 
                             
                             const momentOfLatestStatrDate = moment(latestChild.startDate)
@@ -184,7 +183,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
       }, [leafNodesMap])
 
     return (
-        <View style={styles.container}>
+        <div style={{flex: 1, backgroundColor: 'rgba(0,0,0,0)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 
             {mainController.getDisplay().getValue() == 0 &&
                 <>
@@ -195,7 +194,7 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
             }
             
 
-            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment} scrollY={scrollY}/>
+            <CalendarDisplay offset={0} leafNodesMap={leafTaskByIndex} inMoment={inMoment} scrollY={scrollY || 0}/>
 
             {mainController.getDisplay().getValue() == 0 &&
                 <>
@@ -204,17 +203,8 @@ const WireFrame: React.FC<WireFrameProps> = ({ leafNodesMap, sidedRootTasksMap, 
                     <ParentNodeGridComponent offset={2} parentNodeIds={parentNodeIds.hasOwnProperty(2) ? parentNodeIds[2]: []} parentTasks={parentTaskByWireFrame.hasOwnProperty(2) ? parentTaskByWireFrame[2] : [] } inMoment={inMoment}/>
                 </>
             }
-        </View>
+        </div>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#rgba(0,0,0,0)',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  });
 
 export default WireFrame

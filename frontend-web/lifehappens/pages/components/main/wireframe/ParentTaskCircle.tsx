@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, ViewStyle } from 'react-native';
 
 interface CircleProps {
   diameter: number;
@@ -7,15 +6,16 @@ interface CircleProps {
 }
 
 const Circle: React.FC<CircleProps> = ({ diameter, color }) => {
-  const circleStyle: ViewStyle = {
+  const circleStyle: React.CSSProperties = {
     width: diameter,
     height: diameter,
     borderRadius: diameter / 2, // Make it a circle
     borderWidth: 2,
     borderColor: color,
+    backgroundColor: color === 'rgba(0,0,0,0)' ? color : 'black'
   };
 
-  return <View style={[circleStyle, {backgroundColor: color == 'rgba(0,0,0,0)' ? color : 'black'}]} />;
+  return <div style={circleStyle} />;
 };
 
 export default Circle;

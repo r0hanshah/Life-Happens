@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import WireFrame from './wireframe/WireFrame';
 import TaskModel from '@/models/TaskModel';
 import moment from 'moment';
-import { Inter_900Black } from 'next/font/google';
 import RootTaskList from './rootTaskList/RootTaskList';
 import TaskView from '../taskView/TaskView';
 import ProfileView from '../profileView/ProfileView';
@@ -10,7 +9,6 @@ import ProfileView from '../profileView/ProfileView';
 import MainController from '@/controllers/main/MainController';
 import UserModel from '@/models/UserModel';
 
-import { BlurView } from 'expo-blur';
 import DeleteAccount from './deleteAccount/DeleteAccount';
 import EditAccount from './editAccount/EditAccount';
 
@@ -23,7 +21,8 @@ const DEBUG = false
 
 const Main: React.FC<Tasks> = ({signOut}) => {
 
-  const windowWidth = useWindowDimensions().width;
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+  const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 768;
   const tempUser = new UserModel("guy", "Super Guy", "", "superGuy@ufl.edu")
 
   const controller = MainController.getInstance();
@@ -35,7 +34,8 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   const [reRender, setReRender] = useState<boolean>(false)
 
   const [task, setTask] = useState<TaskModel | null>(null);
-  const [slideAnimation] = useState(new Animated.Value(0));
+  const [slideTranslateX, setSlideTranslateX] = useState(0);
+  const [slideProfileTranslateX, setSlideProfileTranslateX] = useState(0);
 
   const [rootTasks, setRootTasks] = useState<TaskModel[]>([]);
   const [profileClicked, setProfileClicked] = useState(false);
@@ -79,10 +79,7 @@ const Main: React.FC<Tasks> = ({signOut}) => {
   }
 
   // Animation
-  const slideFromLeft = slideAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, windowWidth*0.49],
-  });
+  const slideFromLeft = slideTranslateX;
 
   // Update tasks array
   useEffect(()=>{
@@ -136,7 +133,6 @@ const Main: React.FC<Tasks> = ({signOut}) => {
     setRootTaskMap(orderedMaps[1])
   }, [reRender])
 
-  const windowHeight = useWindowDimensions().height;
   const [leafNodesMap, setLeafNodesMap] = useState<{[key:string]:TaskModel[]}>({});
   const [rootTaskMap, setRootTaskMap] = useState<{[key:string]:TaskModel[]}>({ // O for left bound root tasks and 1 for right bound root tasks
     "0":[],
@@ -170,11 +166,9 @@ const Main: React.FC<Tasks> = ({signOut}) => {
 
   },[currentMonth])
 
-  let [fontsLoaded] = useFonts({
-      Inter_900Black
-    });
+  const fontsLoaded = true; // Fonts are loaded by Next.js automatically
     
-    // Extract leaf nodes from root tasks with breadth first search
+  // Extract leaf nodes from root tasks with breadth first search
     const getAllLeafNodes=(rootTasks:TaskModel[]):[{ [key: string]: TaskModel[]}, { [key: string]: TaskModel[]}] =>
     {
       var allLeafNodes:{[key:string]:TaskModel[]} = {}
@@ -269,225 +263,186 @@ const Main: React.FC<Tasks> = ({signOut}) => {
       setRootTaskMap(orderedMaps[1])
     }, [rootTasks]);
 
-    const animationRef = useRef(new Animated.Value(task ? 0 : windowWidth*0.49)).current;
-    const animationProfileRef = useRef(new Animated.Value(profileClicked ? 0 : 222)).current;
-
     useEffect(() => {
       if (task) {
-        Animated.timing(animationRef, {
-          toValue: windowWidth * 0.49,
-          delay: 100,
-          duration: 200,
-          useNativeDriver: true
-        }).start();
+        setSlideTranslateX(windowWidth * 0.49);
       } else {
-        Animated.timing(animationRef, {
-          toValue:0,
-          duration: 500,
-          useNativeDriver: true
-        }).start();
+        setSlideTranslateX(0);
       }
-    }, [task]);
+    }, [task, windowWidth]);
 
     useEffect(() => {
       if (profileClicked) {
-        Animated.timing(animationProfileRef, {
-          toValue: windowWidth * 0.49,
-          delay: 100,
-          duration: 200,
-          useNativeDriver: true
-        }).start();
+        setSlideProfileTranslateX(windowWidth * 0.49);
       } else {
-        Animated.timing(animationProfileRef, {
-          toValue:0,
-          duration: 500,
-          useNativeDriver: true
-        }).start();
+        setSlideProfileTranslateX(0);
       }
-    }, [profileClicked]);
+    }, [profileClicked, windowWidth]);
 
-    const scrollY = useRef(new Animated.Value(0)).current;
+    const scrollY = 0; // Simple scroll state for React web
 
     return (
-      <View style={{flex: 1, width:'100%'}}>
+      <div style={{flex: '1', width:'100%', display: 'flex', flexDirection: 'column', position: 'relative'}}>
         
-            <Animated.View
-              style={[
-                styles.slideInView,
-                { transform: [{ translateX: slideFromLeft }], width: animationRef },
-                task && task.isLeftBound() ? {right: 0} : {left:0}
-              ]}
-              >
-                {/* Content of the sliding view */}
-                {task && <TaskView task={task} isLeft={!task.isLeftBound()} onPress={()=>{controller.setSelectedTask(null)}}/>}
-
-            </Animated.View>
-
-            <Animated.View
-              style={[
-                styles.slideInView,
-                { transform: [{ translateX: slideFromLeft }], width: animationProfileRef },
-                {left: 0}
-              ]}
-              >
-                {/* Content of the sliding view */}
-                {profileClicked && 
-                <ProfileView 
-                  user={controller.getUser().getValue()!} 
-                  onPress={()=>{setProfileClicked(false)}} 
-                  signOut={()=>{
-                  localStorage.removeItem('authToken');
-                    signOut();
-                  }} 
-                  deletAccount={()=>{setBlurVisible(true)}} 
-                  editAccount={()=>{setEditAccount(true)}}
-                />}
-
-            </Animated.View>
-
-            {blurVisible && (
-              <View style={{
-                position: 'absolute',
-                zIndex: 999,
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                justifyContent:'center',
-                alignItems:'center'
-                }}>
-
-                <BlurView
-                  intensity={50}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                  }}
-                  tint="dark"
-                />
-                <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
-
-              </View>
-              
-            )}
-
-            {editAccount && (
-              <View style={{
-                position: 'absolute',
-                zIndex: 999,
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                justifyContent:'center',
-                alignItems:'center'
-                }}>
-
-                <BlurView
-                  intensity={50}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                  }}
-                  tint="dark"
-                />
-                <EditAccount cancel={()=>{setEditAccount(false)}} user={controller.getUser().getValue()!} saveChanges={signOut}/>
-
-              </View>
-              
-            )}
-          
-        <Animated.ScrollView style={{width:"100%", paddingBottom:80}}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
+        {/* Slide in view for task */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            height: '100vh',
+            width: task ? windowWidth * 0.49 : 0,
+            [task && task.isLeftBound() ? 'right' : 'left']: 0,
+            backgroundColor: 'white',
+            overflow: 'auto',
+            transition: 'width 0.3s ease',
+            zIndex: 100
+          }}
         >
-          <View style={[styles.hstack, { marginHorizontal:'9%', paddingTop: 80, justifyContent:'space-between', zIndex:99}]}>
-            <View style={styles.hstack}>
+          {task && <TaskView task={task} isLeft={!task.isLeftBound()} onPress={()=>{controller.setSelectedTask(null)}}/>}
+        </div>
+
+        {/* Slide in view for profile */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            height: '100vh',
+            width: profileClicked ? windowWidth * 0.49 : 0,
+            backgroundColor: 'white',
+            overflow: 'auto',
+            transition: 'width 0.3s ease',
+            zIndex: 100
+          }}
+        >
+          {profileClicked && 
+          <ProfileView 
+            user={controller.getUser().getValue()!} 
+            onPress={()=>{setProfileClicked(false)}} 
+            signOut={()=>{
+            localStorage.removeItem('authToken');
+              signOut();
+            }} 
+            deletAccount={()=>{setBlurVisible(true)}} 
+            editAccount={()=>{setEditAccount(true)}}
+          />}
+        </div>
+
+        {/* Blur overlay for delete account */}
+        {blurVisible && (
+          <div style={{
+            position: 'fixed',
+            zIndex: 999,
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          }}>
+            <DeleteAccount cancel={()=>{setBlurVisible(false)}} user={controller.getUser().getValue()!} deleteAccount={signOut}/>
+          </div>
+        )}
+
+        {/* Blur overlay for edit account */}
+        {editAccount && (
+          <div style={{
+            position: 'fixed',
+            zIndex: 999,
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          }}>
+            <EditAccount cancel={()=>{setEditAccount(false)}} user={controller.getUser().getValue()!} saveChanges={signOut}/>
+          </div>
+        )}
+        
+        <div style={{width:"100%", paddingBottom:'80px', overflow: 'auto', flex: 1}}>
+          <div style={{display: 'flex', flexDirection: 'row', marginLeft:'9%', marginRight: '9%', paddingTop: 80, justifyContent:'space-between', zIndex:99, alignItems: 'center'}}>
+            <div style={{display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center'}}>
 
               {displayType > 0 ? 
-              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+              <button style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, display: 'flex', justifyContent:'center', alignItems:'center', marginRight:10, border: 'none', cursor: 'pointer'}} onClick={()=>{
                 controller.setDisplay(0)
                 }}>
-                <Image source={require('../../assets/calendar_icon.png')} style={{
+                <img src={require('../../assets/calendar_icon.png').default || require('../../assets/calendar_icon.png')} style={{
                   width:30, height:30, opacity: 0.5
                 }}/>
-              </TouchableOpacity>
-              : <View style={{display:'none'}}/>}
+              </button>
+              : null}
 
               {displayType > 1 ? 
-              <TouchableOpacity style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, justifyContent:'center', alignItems:'center', marginRight:10}} onPress={()=>{
+              <button style={{ backgroundColor:'#303030', width:50, height:50, borderRadius:40, display: 'flex', justifyContent:'center', alignItems:'center', marginRight:10, border: 'none', cursor: 'pointer'}} onClick={()=>{
                 controller.setMoment(currentMonth.clone().endOf('week'))
                 controller.setDisplay(1)
                 }}>
-                <Image source={require('../../assets/week_icon.png')} style={{
+                <img src={require('../../assets/week_icon.png').default || require('../../assets/week_icon.png')} style={{
                   width:30, height:30, opacity: 0.5
                 }}/>
-              </TouchableOpacity>
-              : <View style={{display:'none'}}/>}
+              </button>
+              : null}
 
-              {/* Month displayed here */}
+              {/* Month navigation */}
 
-              <TouchableOpacity onPress={()=>{
+              <button onClick={()=>{
                 controller.setMoment(moment(currentMonth).subtract(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
                 controller.setReRender(controller.getReRender().getValue() ? false : true)
-                }}>
-                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '90deg'}]}}></Image>
-              </TouchableOpacity>
+                }} style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer'}}>
+                <img src={require('../../assets/chev_white.png').default || require('../../assets/chev_white.png')} style={{width:30, height:20, transform:'rotate(90deg)'}}/>
+              </button>
               
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:20}}>
+              <h1 style={{color:'white', fontSize:60, marginLeft: 20, marginRight: 20, margin: '0 20px', fontWeight: 900}}>
                 {currentMonth.format( displayType == 1 ? 'MMM YYYY' : displayType == 2? 'dddd Do, MMM YYYY' :  'MMMM YYYY')}
                 {displayType == 1 ? ' - Week ' + weekNumber : ''}
-              </Text>
+              </h1>
 
-              <TouchableOpacity onPress={()=>{
+              <button onClick={()=>{
                 controller.setMoment(moment(currentMonth).add(1, displayType == 1 ? 'weeks' : displayType == 2 ? 'days' : 'months'));
                 controller.setReRender(controller.getReRender().getValue() ? false : true)
-                }}>
-                <Image source={require('../../assets/chev_white.png')} style={{width:30, height:20, transform:[{rotate: '-90deg'}]}}></Image>
-              </TouchableOpacity>
+                }} style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer'}}>
+                <img src={require('../../assets/chev_white.png').default || require('../../assets/chev_white.png')} style={{width:30, height:20, transform:'rotate(-90deg)'}}/>
+              </button>
 
-              <TouchableOpacity style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, alignItems:'center', justifyContent:'center', marginLeft:20}} onPress={
+              <button style={{backgroundColor:'#303030', borderRadius:10, width:80, height:40, display: 'flex', alignItems:'center', justifyContent:'center', marginLeft:20, border: 'none', cursor: 'pointer'}} onClick={
                 ()=>{
                   controller.setMoment(displayType==1? moment(new Date()).endOf('week') : moment(new Date()))
                   controller.setReRender(controller.getReRender().getValue() ? false: true)
                 }
               }>
-                <Text style={{color:'#717171', fontFamily:'Inter_900Black', fontSize:20}}>Today</Text>
-              </TouchableOpacity>
-            </View>
+                <span style={{color:'#717171', fontWeight: 900, fontSize:20}}>Today</span>
+              </button>
+            </div>
             
 
-            <TouchableOpacity style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50}}
-            onPress={()=>{// Display user data
+            <button style={{display: 'flex', justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50, border: 'none', cursor: 'pointer'}}
+            onClick={()=>{
               setProfileClicked(profileClicked ? false :true)
               controller.setSelectedTask(null)
             }}
             >
-              <Text style={{color:'white', fontSize:40}}>{controller.getUser().getValue()?.name.at(0)}</Text>
-            </TouchableOpacity>
-          </View>          
+              <span style={{color:'white', fontSize:40, fontWeight: 'bold'}}>{controller.getUser().getValue()?.name.at(0)}</span>
+            </button>
+          </div>          
           
           {/* Calendar */}
-          <View style={[styles.container, {marginTop:20}]}>
+          <div style={{marginTop:20}}>
             <WireFrame leafNodesMap={leafNodesMap} sidedRootTasksMap={rootTaskMap} inMoment={currentMonth} scrollY={scrollY}/>
-          </View>
+          </div>
 
           {/* Root task list */}
-          <View style={{width:controller.getDisplay().getValue() == 2 ? "95%" : "100%", alignSelf:'center'}}>
-            <View style={{justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
-              <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:60, marginHorizontal:'9%', paddingTop:80, paddingBottom: 20}}>Root Tasks</Text>
+          <div style={{width: controller.getDisplay().getValue() == 2 ? "95%" : "100%", margin: '0 auto'}}>
+            <div style={{display: 'flex', justifyContent:'space-between', flexDirection:'row', alignItems:'flex-end'}}>
+              <h1 style={{color:'white', fontSize:60, marginLeft:'9%', paddingTop:80, paddingBottom: 20, fontWeight: 900, margin: 0}}>Root Tasks</h1>
 
-              <TouchableOpacity style={{width:80, height:80, borderRadius:100, backgroundColor:'rgba(30,30,30,1)', alignItems:'center', justifyContent:'center', marginHorizontal:'9%', marginBottom:20}}
-              onPress={() => {
+              <button style={{width:80, height:80, borderRadius:'50%', backgroundColor:'rgba(30,30,30,1)', display: 'flex', alignItems:'center', justifyContent:'center', marginRight:'9%', marginBottom:20, border: 'none', cursor: 'pointer'}}
+              onClick={() => {
                 if(controller.getSelectedTask().getValue() === null)
                   controller.createNewTask()
                   if(controller.getDisplay().getValue() != 0)
@@ -496,19 +451,19 @@ const Main: React.FC<Tasks> = ({signOut}) => {
                     console.log(controller.getReRender().getValue())
               }}
               >
-                <Image source={require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:[{rotate: '-45deg'}], opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2 }}></Image>
-              </TouchableOpacity>
-            </View>
+                <img src={require('../../assets/x_mark_white.png').default || require('../../assets/x_mark_white.png')} style={{width:15, height:15, transform:'rotate(-45deg)', opacity: controller.getSelectedTask().getValue() === null ? 1 : 0.2}}/>
+              </button>
+            </div>
             
-            <View style={{maxWidth: "auto", alignItems:"center"}}>
+            <div style={{maxWidth: "auto", display: 'flex', justifyContent: 'center'}}>
               <RootTaskList rootTasksMap={rootTaskMap} inMoment={currentMonth}/>
-            </View>
-          </View>
+            </div>
+          </div>
           
           
-        </Animated.ScrollView>
-      </View>
-      );
+        </div>
+      </div>
+    );
 }
 
 export default Main

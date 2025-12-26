@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput } from 'react-native';
-import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
-
-
-import TaskModel from '../../models/TaskModel';
-import MainController from '../../controllers/main/MainController';
-
+import TaskModel from '@/models/TaskModel';
+import MainController from '@/controllers/main/MainController';
 
 import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
-import { remove_email_notification } from '../../services/taskServices';
+import { remove_email_notification } from '@/services/taskServices';
 
 interface CreateSubTaskViewProps {
   parentTask: TaskModel;
@@ -23,10 +18,6 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
   const [isMovable, setIsMovable] = useState(task.isMovable)
   const [title, setTitle] = useState(task.title)
-
-  let [fontsLoaded] = useFonts({
-    Inter_900Black
-  });
 
   const onChangeText = (newText: React.SetStateAction<string>) => {
     setTitle(newText);
@@ -75,125 +66,282 @@ const CreateSubTaskView: React.FC<CreateSubTaskViewProps> = ({ parentTask, task,
 
 
   return(
-    <View style={{alignItems: isLeft? 'flex-start' : 'flex-end', marginTop:20, paddingBottom:20, zIndex:zIndex}}>
-        <View style={{flexDirection:'column', alignItems:'flex-start', width:'95%', backgroundColor:'rgba(50, 50, 50, 1)', borderRadius:30, zIndex:zIndex, paddingBottom:20}}>
-            <View  style={{flexDirection:isLeft? 'row' : 'row-reverse', justifyContent:'space-between', marginTop: 10, width:'100%', alignItems:'center'}}>
-                    
-                    <View style={{flexDirection:isLeft? 'row' : 'row-reverse', alignItems:'center'}}>
-                        <View style={{backgroundColor:task.color, width: 20, height:20, borderRadius:20, margin:10}}/>
-                        <TextInput
-                                style={{color:'white', borderWidth:0, height:20, textAlign: isLeft ? 'left' : 'right'}}
-                                onChangeText={onChangeText}
-                                value={title}
-                                multiline={false}
-                                placeholder="Sub Task Title..."
-                            />
-                    </View>
-                    <Text style={{color:'white'}}>Leaf Task</Text>
-                    <View style={{flexDirection: 'row', marginHorizontal: 20, padding: 10, alignItems:'center'}}>
-                            
-                            <View style={{width: 30, height: 30, borderRadius: 30, borderWidth: 2, borderColor: 'gray', marginRight:10}}></View>
+    <div style={{
+      display: 'flex',
+      alignItems: isLeft ? 'flex-start' : 'flex-end',
+      marginTop: 20,
+      paddingBottom: 20,
+      zIndex: zIndex,
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        width: '95%',
+        backgroundColor: 'rgba(50, 50, 50, 1)',
+        borderRadius: 30,
+        zIndex: zIndex,
+        paddingBottom: 20,
+      }}>
+        {/* Title and progress section */}
+        <div style={{
+          display: 'flex',
+          flexDirection: isLeft ? 'row' : 'row-reverse',
+          justifyContent: 'space-between',
+          marginTop: 10,
+          width: '100%',
+          alignItems: 'center',
+          position: 'relative',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: isLeft ? 'row' : 'row-reverse',
+            alignItems: 'center',
+          }}>
+            <div style={{
+              backgroundColor: task.color,
+              width: 20,
+              height: 20,
+              borderRadius: 20,
+              margin: 10,
+            }} />
+            <input
+              style={{
+                color: 'white',
+                border: 'none',
+                height: 20,
+                textAlign: isLeft ? 'left' : 'right',
+                backgroundColor: 'transparent',
+                fontFamily: 'Arial, sans-serif',
+              }}
+              onChange={(e) => onChangeText(e.target.value)}
+              value={title}
+              placeholder="Sub Task Title..."
+            />
+          </div>
+          <span style={{ color: 'white' }}>Leaf Task</span>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            margin: '0 20px',
+            padding: 10,
+            alignItems: 'center',
+            gap: 5,
+          }}>
+            <div style={{
+              width: 30,
+              height: 30,
+              borderRadius: 30,
+              border: '2px solid gray',
+              marginRight: 10,
+            }} />
+            <span style={{ color: 'gray' }}>0%</span>
+          </div>
 
-                            <Text style={{color: 'gray'}}>0%</Text>
+          {/* Connector lines */}
+          <div style={{
+            height: 2,
+            width: 50,
+            position: 'absolute',
+            backgroundColor: task.color,
+            ...(isLeft ? { marginLeft: -50 } : { marginRight: -50 }),
+          }} />
+          <div style={{
+            height: 420,
+            width: 1.5,
+            position: 'absolute',
+            backgroundColor: task.color,
+            marginTop: -418,
+            ...(isLeft ? { marginLeft: -50.0 } : { marginRight: -50.0 }),
+          }} />
+        </div>
 
-                    </View>
-                    <View style={[{height:2, width: 50, position:'absolute', backgroundColor:task.color}, isLeft?{ marginLeft:-50} : { marginRight:-50}]}></View>
-                    <View style={[{height:420, width: 1.5, position:'absolute', backgroundColor:task.color, marginTop:-418}, isLeft ? {marginLeft:-50.0} : {marginRight:-50.0}]}></View>
-                
-            </View>
+        {/* Settings section */}
+        <div style={{ width: '100%', paddingLeft: 25, paddingRight: 25 }}>
+          {/* Start Date */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 20,
+            zIndex: 4,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <img
+                style={{ width: 20, height: 20, marginLeft: 10, marginRight: 10, opacity: 0.3 }}
+                src={require('../../assets/calendar_icon.png')}
+              />
+              <span style={{ color: 'gray' }}>Start Date</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false} />
+              <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false} />
+            </div>
+          </div>
 
-            {/* Set start date and end date and say whether the event is movable */}
-            <View style={[{width:'100%', paddingHorizontal:25}]}>
-                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop:20, zIndex:4}}>
-                    <View style={{flexDirection:'row'}}>
-                        <Image
-                            style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                            source={require('../../assets/calendar_icon.png')}
-                            resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                        />
-                        <Text style={{color:'gray'}}>Start Date</Text>
-                    </View>
-                    <View style={{flexDirection:'row'}}>
-                        <DateSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></DateSelector>
-                        <TimeSelector task={task} modStartDate={true} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></TimeSelector>
-                    </View>
-                </View>
-                
-                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10, zIndex:3}}>
-                    <View style={{flexDirection:'row'}}>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                        source={require('../../assets/calendar_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
-                    <Text style={{color:'gray'}}>End Date</Text>
-                    </View>
-                    <View style={{flexDirection:'row'}}>
-                        <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></DateSelector>
-                        <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false}></TimeSelector>
-                    </View>
-                </View>
-                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
-                    <View style={{flexDirection:'row'}}>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                        source={require('../../assets/clock_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
-                    <Text style={{color:'gray'}}>Duration</Text>
-                    </View>
-                    <Text style={{color:'gray'}}>{duration}</Text>
-                </View>
-                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
-                    <View style={{flexDirection:'row'}}>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                        source={require('../../assets/clock_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
-                    <Text style={{color:'gray'}}>Duration From Now</Text>
-                    </View>
-                    <Text style={{color:'gray'}}>{durationFromNow}</Text>
-                </View>
-                <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 10}}>
-                    <View style={{flexDirection:'row'}}>
-                    <Image
-                        style={{width: 20, height: 20, marginHorizontal: 10, opacity:0.3}}
-                        source={require('../../assets/robot_icon.png')}
-                        resizeMode="cover" // or "contain", "stretch", "repeat", "center"
-                    />
-                    <Text style={{color:'gray'}}>Is Movable?</Text>
-                    </View>
-                    <TouchableOpacity onPress={()=>{task.isMovable = task.isMovable ? false : true; setIsMovable(task.isMovable)}}>
-                        <Text style={{color:'gray'}}>{isMovable ? 'Yes' : 'No'}</Text>
-                    </TouchableOpacity>
-                </View>
-                {
-                    task.notes.length > 0 &&
-                    <View style={{flexDirection: 'column', justifyContent:'space-between', marginTop: 15}}>
-                        <View style={{flexDirection:'row'}}>
-                            <Text style={{color:'white', fontFamily: fontsLoaded ?'Inter_900Black' : 'Arial', fontSize:20}}>AI Notes</Text>
-                        </View>
-                        <Text style={{color:'gray', marginVertical: 20}}>{task.notes}</Text>
-                    </View>
-                }
-                
-            </View>
+          {/* End Date */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 10,
+            zIndex: 3,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <img
+                style={{ width: 20, height: 20, marginLeft: 10, marginRight: 10, opacity: 0.3 }}
+                src={require('../../assets/calendar_icon.png')}
+              />
+              <span style={{ color: 'gray' }}>End Date</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <DateSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false} />
+              <TimeSelector task={task} modStartDate={false} updateFunctions={[setDuration, setDurationFromNow]} updateServer={false} />
+            </div>
+          </div>
 
-            {/* Cancel or Create sub task */}
-            <View style={{flexDirection:'row', justifyContent:'space-around', width:'100%', paddingHorizontal: 25, paddingTop:20, zIndex:-1}}>
-                <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'red', justifyContent:'center', alignItems:'center'}} onPress={()=>{handleDeleteNewTask(task)}}>
-                    <Text style={{color:'white'}}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ width:200, backgroundColor:'#151515', height: 40, borderRadius:50, borderWidth:2, borderColor:'white', justifyContent:'center', alignItems:'center'}} onPress={handleAddTask}>
-                    <Text style={{color:'white'}}>Create Sub Task</Text>
-                </TouchableOpacity>
-            </View>
+          {/* Duration */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 10,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <img
+                style={{ width: 20, height: 20, marginLeft: 10, marginRight: 10, opacity: 0.3 }}
+                src={require('../../assets/clock_icon.png')}
+              />
+              <span style={{ color: 'gray' }}>Duration</span>
+            </div>
+            <span style={{ color: 'gray' }}>{duration}</span>
+          </div>
 
+          {/* Duration From Now */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 10,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <img
+                style={{ width: 20, height: 20, marginLeft: 10, marginRight: 10, opacity: 0.3 }}
+                src={require('../../assets/clock_icon.png')}
+              />
+              <span style={{ color: 'gray' }}>Duration From Now</span>
+            </div>
+            <span style={{ color: 'gray' }}>{durationFromNow}</span>
+          </div>
 
-        </View>
-        
-    </View>
+          {/* Is Movable */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 10,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <img
+                style={{ width: 20, height: 20, marginLeft: 10, marginRight: 10, opacity: 0.3 }}
+                src={require('../../assets/robot_icon.png')}
+              />
+              <span style={{ color: 'gray' }}>Is Movable?</span>
+            </div>
+            <button
+              onClick={() => {
+                task.isMovable = task.isMovable ? false : true;
+                setIsMovable(task.isMovable);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                color: 'gray',
+              }}
+            >
+              {isMovable ? 'Yes' : 'No'}
+            </button>
+          </div>
+
+          {/* AI Notes */}
+          {task.notes.length > 0 && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              marginTop: 15,
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <span style={{
+                  color: 'white',
+                  fontFamily: 'Arial, sans-serif',
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                }}>
+                  AI Notes
+                </span>
+              </div>
+              <span style={{ color: 'gray', marginTop: 20, marginBottom: 20 }}>
+                {task.notes}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Cancel and Create buttons */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          width: '100%',
+          paddingLeft: 25,
+          paddingRight: 25,
+          paddingTop: 20,
+          zIndex: -1,
+        }}>
+          <button
+            style={{
+              width: 200,
+              backgroundColor: '#151515',
+              height: 40,
+              borderRadius: 50,
+              border: '2px solid red',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              fontSize: 16,
+            }}
+            onClick={() => {
+              handleDeleteNewTask(task);
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            style={{
+              width: 200,
+              backgroundColor: '#151515',
+              height: 40,
+              borderRadius: 50,
+              border: '2px solid white',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              fontSize: 16,
+            }}
+            onClick={handleAddTask}
+          >
+            Create Sub Task
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

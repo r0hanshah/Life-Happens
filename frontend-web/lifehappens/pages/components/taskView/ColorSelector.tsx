@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
 import moment, { Duration } from 'moment';
-import TaskModel from '../../models/TaskModel';
+import TaskModel from '@/models/TaskModel';
 
-import MainController from '../../controllers/main/MainController';
+import MainController from '@/controllers/main/MainController';
 
 
 const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:Boolean, updateFunctions:Array<(duration:string) => void>}) => {
@@ -67,94 +66,151 @@ const ColorSelector =({task, isLeft, updateFunctions} : {task:TaskModel, isLeft:
     }
 
     return (
-      <View style={[styles.container, {alignItems: isLeft ? 'flex-start' : 'flex-end',}]}>
-        <TouchableOpacity onPress={handleContainerClick}>
-            <View style={{width: 30, height: 30, borderRadius: 15, backgroundColor: task.color, marginTop:27, marginHorizontal:25}}/>
-        </TouchableOpacity>
-        {isSquareVisible && 
-        <View  style={[styles.square]}>
-          <View style={[styles.timeInput, {width:'90%'}]}>
-            <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#" + hexCode}}/>
-            <Text style={{color:'white', marginHorizontal:10}}>#</Text>
-            <TextInput
-              style={styles.input}
-              value={hexCode}
-              onChangeText={(text) => {setHexCode(text)}}
-              maxLength={6}
-            />
-            <TouchableOpacity onPress={() => {handleChangeColor()}}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:20, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
-            </TouchableOpacity>
-          </View>
-          <View style={{margin:10, width:'90%'}}>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("FF0000")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#FF0000"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Red</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("FFA800")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#FFA800"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Orange</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("FFF500")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#FFF500"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Yellow</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("24FF00")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#24FF00"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Green</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("0038FF")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#0038FF"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Blue</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("35EDF9")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#35EDF9"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Light Blue</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection:'row', width:'95%', justifyContent:'flex-start', marginVertical:5}} onPress={()=>{setHexCode("8001FF")}}>
-                <View style={{width: 20, height: 20, borderRadius: 15, backgroundColor: "#8001FF"}}/>
-                <Text style={{color:'white', marginLeft:20}}>Purple</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        }
-        
-      </View>
+      <div style={{
+        width: 80,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: isLeft ? 'flex-start' : 'flex-end',
+      }}>
+        <button
+          onClick={handleContainerClick}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <div style={{
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+            backgroundColor: task.color,
+            marginTop: 27,
+            margin: '27px 25px',
+          }} />
+        </button>
+        {isSquareVisible && (
+          <div style={styles.square}>
+            <div style={{ ...styles.timeInput, width: '90%' }}>
+              <div style={{
+                width: 20,
+                height: 20,
+                borderRadius: 15,
+                backgroundColor: '#' + hexCode,
+              }} />
+              <span style={{ color: 'white', margin: '0 10px' }}>#</span>
+              <input
+                style={styles.input}
+                value={hexCode}
+                onChange={(e) => setHexCode(e.target.value)}
+                maxLength={6}
+                type="text"
+              />
+              <button
+                onClick={() => handleChangeColor()}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  marginLeft: 10,
+                }}
+              >
+                <img
+                  src={require('../../assets/chev_white.png')}
+                  style={{
+                    width: 20,
+                    height: 10,
+                    marginLeft: 10,
+                    transform: 'rotate(180deg)',
+                  }}
+                />
+              </button>
+            </div>
+            <div style={{ margin: 10, width: '90%' }}>
+              {[
+                { code: 'FF0000', name: 'Red' },
+                { code: 'FFA800', name: 'Orange' },
+                { code: 'FFF500', name: 'Yellow' },
+                { code: '24FF00', name: 'Green' },
+                { code: '0038FF', name: 'Blue' },
+                { code: '35EDF9', name: 'Light Blue' },
+                { code: '8001FF', name: 'Purple' },
+              ].map((color) => (
+                <button
+                  key={color.code}
+                  onClick={() => setHexCode(color.code)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: '95%',
+                    justifyContent: 'flex-start',
+                    margin: '5px 0',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    alignItems: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 15,
+                      backgroundColor: '#' + color.code,
+                    }}
+                  />
+                  <span style={{ color: 'white', marginLeft: 20 }}>
+                    {color.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     );
 };
 
-const styles = StyleSheet.create({
+const styles: Record<string, React.CSSProperties> = {
   container: {
-    width:80,
+    width: 80,
     justifyContent: 'center',
   },
   pickerContainer: {
-    width:80,
+    width: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex:1
+    zIndex: 1,
   },
   square: {
     width: 200,
     height: 300,
-    position:'absolute',
+    position: 'absolute',
     backgroundColor: 'rgba(30,30,30,1)',
-    marginTop:380,
-    marginRight:0,
-    zIndex:1,
-    justifyContent:'center',
-    alignItems:'center',
+    marginTop: 380,
+    marginRight: 0,
+    zIndex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 20,
+    display: 'flex',
+    flexDirection: 'column',
   },
   dropdownContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    minWidth:100
+    paddingLeft: 10,
+    paddingRight: 10,
+    minWidth: 100,
+    display: 'flex',
   },
   calendarContainer: {
-    flexDirection: 'row',
+    display: 'flex',
+    flexDirection: 'row' as const,
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '100%',
@@ -162,17 +218,19 @@ const styles = StyleSheet.create({
   },
   yearDropdown: {
     position: 'absolute',
-    top:'100%',
+    top: '100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
     borderColor: 'white',
+    borderStyle: 'solid',
     borderWidth: 1,
-    height:100
+    height: 100,
   },
   dayColumn: {
     width: '14%',
     alignItems: 'center',
+    display: 'flex',
   },
   dayCell: {
     width: 40,
@@ -180,6 +238,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 40,
+    display: 'flex',
   },
   disabledDay: {
     backgroundColor: '#ddd',
@@ -188,9 +247,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightblue',
   },
   timeInput: {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
   },
   input: {
     width: 80,
@@ -198,16 +258,18 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 5,
     fontSize: 16,
-    color:'white',
+    color: 'white',
+    backgroundColor: 'transparent',
+    border: 'none',
   },
   separator: {
     fontSize: 20,
-    marginRight:5
+    marginRight: 5,
   },
   period: {
     fontSize: 16,
     marginLeft: 5,
-    color:'gray'
+    color: 'gray',
   },
   timezone: {
     marginTop: 10,
@@ -218,18 +280,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
   },
   timeZoneItem: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    borderBottomStyle: 'solid',
   },
   closeButton: {
     marginTop: 20,
     color: 'blue',
     fontSize: 16,
-    textDecorationLine: 'underline',
+    textDecoration: 'underline',
   },
-});
+};
 
 export default ColorSelector;

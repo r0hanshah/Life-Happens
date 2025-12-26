@@ -6,7 +6,6 @@ import SignUpScreen from './components/auth/SignUpScreen';
 import Main from './components/main/Main';
 import TaskModel from './models/TaskModel';
 import LandingScreen from './components/landing/LandingScreen';
-import ButtonTest from './components/buttonTest/ButtonTest'; // Import the ButtonTest component
 import AuthLoadingScreen from './components/auth/AuthLoadingScreen';
 
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Text } from 'react-native';
-import UserModel from '../../models/UserModel';
-import ProfileController from '../../controllers/profile/ProfileController';
+import UserModel from '@/models/UserModel';
+import ProfileController from '@/controllers/profile/ProfileController';
 
 interface TimeBlockerInterface {
     user: UserModel
@@ -58,7 +57,7 @@ const TimeBlocker: React.FC<TimeBlockerInterface> = ({user}) => {
     return () => clearInterval(intervalId);
   }, [changes])
 
-  const windowWidth = useWindowDimensions().width;
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
 
   const handleCellClick = (rowIndex: number, colIndex: number, override:boolean = false) => {
     const newGridColors = [...gridColors];
@@ -140,87 +139,100 @@ const TimeBlocker: React.FC<TimeBlockerInterface> = ({user}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <div style={{width:'100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
 
       {/* Draw grid */}
       {gridColors.map((rowColors, rowIndex) => (
-        <View key={rowIndex} style={[styles.row, {marginBottom: (rowIndex + 1)/12 == 1 ? 30 : 0}]}>
+        <div key={rowIndex} style={{display: 'flex', flexDirection: 'row', marginBottom: (rowIndex + 1)/12 == 1 ? 30 : 0}}>
           {rowColors.map((color, colIndex) => (
-            <TouchableOpacity
+            <button
               key={colIndex}
-              style={[styles.cell, { backgroundColor: color, width: windowWidth*0.49*0.10 }]}
-              onPress={() => handleCellClick(rowIndex, colIndex)}
+              style={{
+                backgroundColor: color,
+                width: windowWidth*0.49*0.10,
+                height: 15,
+                margin: 2,
+                border: 'none',
+                cursor: 'pointer'
+              }}
+              onClick={() => handleCellClick(rowIndex, colIndex)}
             />
           ))}
 
           {/* Number at the end of the row */}
-          <TouchableOpacity onPress={() => {
-            handleRowClick(rowIndex)
-          }}>
-            <Text style={{color:'gray', width:50, marginLeft:5}}>{((rowIndex+1)%12) == 0 ? 12 : ((rowIndex+1)%12)} {((rowIndex)%12) == 0 ? (rowIndex )/12 == 1 ? 'PM' : 'AM' : rowIndex == 23 ? 'AM' : rowIndex == 11 ? 'PM' :''}</Text>
-          </TouchableOpacity>
+          <button 
+            onClick={() => {
+              handleRowClick(rowIndex)
+            }}
+            style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+          >
+            <span style={{color:'gray', width:50, marginLeft:5}}>{((rowIndex+1)%12) == 0 ? 12 : ((rowIndex+1)%12)} {((rowIndex)%12) == 0 ? (rowIndex )/12 == 1 ? 'PM' : 'AM' : rowIndex == 23 ? 'AM' : rowIndex == 11 ? 'PM' :''}</span>
+          </button>
           
-        </View>
+        </div>
       ))}
 
       {/* Day column labels */}
-      <View style={{flexDirection:'row', width:'100%', marginRight:50, justifyContent:'space-around', paddingHorizontal:20}}>
-        <TouchableOpacity onPress={() => {
+      <div style={{display:'flex', flexDirection:'row', width:'100%', marginRight:50, justifyContent:'space-around', paddingLeft: 20, paddingRight: 20}}>
+        <button 
+          onClick={() => {
             handleColumnClick(0)
-        }}>
-            <Text style={{color:'gray'}}>Su</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>Su</span>
+        </button>
+        <button 
+          onClick={() => {
             handleColumnClick(1)
-        }}>
-            <Text style={{color:'gray'}}>M</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>M</span>
+        </button>
+        <button 
+          onClick={() => {
             handleColumnClick(2)
-        }}>
-            <Text style={{color:'gray'}}>T</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>T</span>
+        </button>
+        <button 
+          onClick={() => {
              handleColumnClick(3)
-        }}>
-            <Text style={{color:'gray'}}>W</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>W</span>
+        </button>
+        <button 
+          onClick={() => {
              handleColumnClick(4)
-        }}>
-            <Text style={{color:'gray'}}>Th</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>Th</span>
+        </button>
+        <button 
+          onClick={() => {
              handleColumnClick(5)
-        }}>
-            <Text style={{color:'gray'}}>F</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>F</span>
+        </button>
+        <button 
+          onClick={() => {
              handleColumnClick(6)
-        }}>
-            <Text style={{color:'gray'}}>S</Text>
-        </TouchableOpacity>
-        </View>
-    </View>
+          }}
+          style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+        >
+            <span style={{color:'gray'}}>S</span>
+        </button>
+        </div>
+    </div>
   );
 };
-
-
-
-const styles = StyleSheet.create({
-  container: {
-    width:'100%',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  cell: {
-    height: 15,
-    margin: 2,
-  },
-});
 
 export default TimeBlocker;

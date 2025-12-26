@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Svg, Circle, LinearGradient, Stop } from 'react-native-svg';
-import TaskModel from '../../models/TaskModel';
+import TaskModel from '@/models/TaskModel';
 
 const CircularProgressBar = ({ percentage, task }: {percentage:number, task:TaskModel })  => {
     // Calculate the radius, circumference, and stroke width
@@ -18,10 +16,18 @@ const CircularProgressBar = ({ percentage, task }: {percentage:number, task:Task
     },[percentage])
     
     return (
-      <View style={styles.container}>
-        <Svg height="40" width="40">
+      <div style={styles.container}>
+        <svg height="40" width="40" style={{ transform: 'rotate(-90deg)' }}>
           {/* Draw the gradient background */}
-          <Circle
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#00ff00" />
+              <stop offset="100%" stopColor="#00ff00" />
+            </linearGradient>
+          </defs>
+          
+          {/* Draw the background circle */}
+          <circle
             cx="20"
             cy="20"
             r={radius}
@@ -29,8 +35,9 @@ const CircularProgressBar = ({ percentage, task }: {percentage:number, task:Task
             stroke="#303030"
             strokeWidth={strokeWidth}
           />
+          
           {/* Draw the progress bar */}
-          <Circle
+          <circle
             cx="20"
             cy="20"
             r={radius}
@@ -40,23 +47,18 @@ const CircularProgressBar = ({ percentage, task }: {percentage:number, task:Task
             strokeDasharray={circumference}
             strokeDashoffset={progress}
           />
-          {/* Define the linear gradient */}
-          <LinearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor="#00ff00" />
-            <Stop offset="100%" stopColor="#00ff00" />
-          </LinearGradient>
-        </Svg>
-      </View>
+        </svg>
+      </div>
     );
   };
 
-  const styles = StyleSheet.create({
+  const styles: Record<string, React.CSSProperties> = {
     container: {
+      display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight:10,
-      transform:[{rotate: '-90deg'}]
+      marginRight: 10,
     },
-  });
+  };
 
   export default CircularProgressBar

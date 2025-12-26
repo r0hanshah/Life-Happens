@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useFonts, Inter_500Medium, Inter_900Black } from '@expo-google-fonts/inter';
 
 import UserModel from '@/models/UserModel';
 
@@ -17,16 +16,14 @@ interface ProfileViewProps {
 
 const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletAccount, editAccount}) => {
 
-    let [fontsLoaded] = useFonts({
-        Inter_900Black
-        });
-    
+    const fontsLoaded = true; // Fonts are loaded by Next.js automatically
+
     const [toggleUpcomingRoots, setToggleUpcomingRoots] = useState(true)
     const [togglePastRoots, setTogglePastRoots] = useState(false)
     const [viewSettings, setViewSettings] = useState(false);
 
-    let windowWidth = useWindowDimensions().width;
-    let windowHeight = useWindowDimensions().height;
+    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+    const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 768;
     
     const displayAllTaskList = () => {
         // TODO: Takes in what level of task that the user wants to display
@@ -37,91 +34,111 @@ const ProfileView: React.FC<ProfileViewProps> = ({user, onPress, signOut, deletA
     
 
     return(
-        <View style={{overflow: viewSettings ? 'visible' : 'hidden', minHeight:'100%'}}>
-            <View style={styles.gradientOverlayL}>
-                <LinearGradient
-                colors={["orange", "orange"]}              
-                style={styles.gradient}/>
-            </View>
+        <div style={{overflow: viewSettings ? 'visible' : 'hidden', minHeight:'100%'}}>
+            {/* Gradient overlay */}
+            <div style={{
+                background: 'linear-gradient(135deg, orange 0%, orange 100%)',
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '200px',
+                height: '200px'
+            }}/>
 
-            <View style={[styles.container,styles.containerL]}>
-                <View style ={{flexDirection:'row', width:'100%', paddingBottom: 20}}>
-                    <ScrollView style={{ height: useWindowDimensions().height, padding:39}}>
-                        <View style={{flexDirection:'row', width:'100%', alignItems:'flex-start'}}>
-                            <View style={{justifyContent:'center', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:50, marginRight:20, marginBottom:30}}
+            <div style={{display: 'flex', flexDirection: 'row', width:'100%', paddingBottom: 20}}>
+                <div style={{ height: windowHeight, padding:'39px', overflow: 'auto', flex: 1}}>
+                    <div style={{display:'flex', flexDirection:'row', width:'100%', alignItems:'flex-start'}}>
+                        <div style={{position: 'relative', justifyContent:'center', display: 'flex', alignItems:'center', height: 80, width: 80, backgroundColor:'orange', borderRadius:'50%', marginRight:20, marginBottom:30}}>
+                            <button 
+                                onClick={editAccount}
+                                style={{backgroundColor:'#717171', borderColor:'#151515', border: '4px solid #151515', borderRadius:'30px', position:'absolute', width:40, height:40, padding:10, right:-10, bottom:-10, display: 'flex', justifyContent:'center', alignItems:'center', cursor: 'pointer'}}
                             >
-                                <TouchableOpacity style={{backgroundColor:'#717171', borderColor:'#151515', borderRadius:30, borderWidth:4,position:'absolute', width:40, height:40, padding:10, right:-10, bottom:-10, justifyContent:'center', alignItems:'center'}}
-                                onPress={editAccount}
-                                >
-                                    <Image source={require('../../assets/pencil.png')} style={{height:20, width:20}}/>
-                                </TouchableOpacity>
-                                <Text style={{color:'white', fontSize:40}}>{user.name.at(0)}</Text>
-                            </View>
-                            <View>
-                                <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:40, marginBottom:5}}>{user.name}</Text>
-                                <Text style={{color:'gray', fontSize:20}}>{user.email}</Text>
-                            </View>
-                            <TouchableOpacity style={{marginLeft:'auto', alignItems:'flex-end', alignSelf:'flex-end'}} onPress={()=>{setViewSettings(!viewSettings)}}>
-                                <Image source={require('../../assets/gear-icon.png')} style={{height:40, width:40, margin:20}}/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{padding: 25}}>
-                            <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginBottom:30}}>Rest Periods</Text>
-                            <TimeBlocker user={user}/>
+                                <img src={require('../../assets/pencil.png').default || require('../../assets/pencil.png')} style={{height:20, width:20}}/>
+                            </button>
+                            <span style={{color:'white', fontSize:40, fontWeight: 'bold'}}>{user.name.at(0)}</span>
+                        </div>
+                        <div>
+                            <h2 style={{color:"white", fontSize:40, marginBottom:5, fontWeight: 900, margin: '0 0 5px 0'}}>{user.name}</h2>
+                            <p style={{color:'gray', fontSize:20, margin: 0}}>{user.email}</p>
+                        </div>
+                        <button 
+                            onClick={()=>{setViewSettings(!viewSettings)}}
+                            style={{marginLeft:'auto', alignItems:'flex-end', alignSelf:'flex-end', border: 'none', backgroundColor: 'transparent', cursor: 'pointer'}}
+                        >
+                            <img src={require('../../assets/gear-icon.png').default || require('../../assets/gear-icon.png')} style={{height:40, width:40, margin:20}}/>
+                        </button>
+                    </div>
+                    <div style={{padding: 25}}>
+                        <h3 style={{color:"white", fontSize:30, marginBottom:30, fontWeight: 900}}>Rest Periods</h3>
+                        <TimeBlocker user={user}/>
 
-                            <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={()=>{setToggleUpcomingRoots(!toggleUpcomingRoots)}}>
-                                <Image source={require('../../assets/triangle_right.png')} style={{
-                                        width:20, height:20, marginRight:10, transform: [{ rotate: toggleUpcomingRoots ? '90deg' : '0deg' }]
-                                    }}/>
-                                <Text style={{color:"white", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>Upcoming Root Tasks</Text>
-                            </TouchableOpacity>
+                        <button 
+                            onClick={()=>{setToggleUpcomingRoots(!toggleUpcomingRoots)}}
+                            style={{display: 'flex', flexDirection: 'row', alignItems:'center', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+                        >
+                            <img src={require('../../assets/triangle_right.png').default || require('../../assets/triangle_right.png')} style={{
+                                    width:20, height:20, marginRight:10, transform: toggleUpcomingRoots ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s'
+                                }}/>
+                            <h3 style={{color:"white", fontSize:30, margin: '30px 0', fontWeight: 900}}>Upcoming Root Tasks</h3>
+                        </button>
 
-                            {/* Get all root tasks */}
+                        {/* Get all root tasks */}
 
-                            <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={()=>{setTogglePastRoots(!togglePastRoots)}}>
-                                <Image source={require('../../assets/triangle_right.png')} style={{
-                                        width:20, height:20, opacity:0.2, marginRight:10, transform: [{ rotate: togglePastRoots ? '90deg' : '0deg' }]
-                                    }}/>
-                                <Text style={{color:"white", opacity:0.2, fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginVertical:30}}>Past Root Tasks</Text>
-                            </TouchableOpacity>
-                            
-                            <Text style={{color:"red", fontFamily:fontsLoaded?'Inter_900Black' : 'Arial', fontSize:30, marginTop:30}}>Red Zone</Text>
-
-                            <TouchableOpacity onPress={signOut}>
-                            <Text style={{color:"red", fontSize:15, marginVertical:10}}>Sign Out</Text>
-                            </TouchableOpacity>
-                            
-                            <TouchableOpacity onPress={deletAccount}>
-                            <Text style={{color:"red", fontSize:15, marginVertical:10}}>Delete Account</Text>
-                            </TouchableOpacity>
-                            
-                        </View>
+                        <button 
+                            onClick={()=>{setTogglePastRoots(!togglePastRoots)}}
+                            style={{display: 'flex', flexDirection: 'row', alignItems:'center', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0}}
+                        >
+                            <img src={require('../../assets/triangle_right.png').default || require('../../assets/triangle_right.png')} style={{
+                                    width:20, height:20, opacity:0.2, marginRight:10, transform: togglePastRoots ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s'
+                                }}/>
+                            <h3 style={{color:"white", opacity:0.2, fontSize:30, margin: '30px 0', fontWeight: 900}}>Past Root Tasks</h3>
+                        </button>
                         
+                        <h3 style={{color:"red", fontSize:30, marginTop:30, fontWeight: 900}}>Red Zone</h3>
+
+                        <button 
+                            onClick={signOut}
+                            style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0, color: 'red', fontSize: 15, margin: '10px 0'}}
+                        >
+                            <p style={{color:"red", fontSize:15, margin: '10px 0'}}>Sign Out</p>
+                        </button>
                         
+                        <button 
+                            onClick={deletAccount}
+                            style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer', padding: 0, color: 'red', fontSize: 15, margin: '10px 0'}}
+                        >
+                            <p style={{color:"red", fontSize:15, margin: '10px 0'}}>Delete Account</p>
+                        </button>
+                        
+                    </div>
+                </div>
+                <div style={{width: '5%', minHeight:'100%', display: 'flex', alignItems:'center', justifyContent: 'center', position:'absolute', top:20, right: 20 - (viewSettings ? windowWidth*0.51 : 0)}}>
+                    <button 
+                        onClick={onPress}
+                        style={{border: 'none', backgroundColor: 'transparent', cursor: 'pointer'}}
+                    >
+                        <img src={require('../../assets/x_mark_white.png').default || require('../../assets/x_mark_white.png')} style={{width:20, height:20}}/>
+                    </button>
+                </div>
+            </div>
 
-                    </ScrollView>
-                    <View style={[{width: '5%', minHeight:'100%', alignItems:'center', position:'absolute', top:20, right: 20 - (viewSettings ? windowWidth*0.51 : 0)}]}>
-                            <TouchableOpacity onPress={onPress}>
-                                <Image source={require('../../assets/x_mark_white.png')} style={{width:20, height:20}}></Image>
-                            </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-
-            {viewSettings &&
-            <View  style={{height: windowHeight, position:'absolute', top:0, width:windowWidth*0.515, backgroundColor:'#050505', left:windowWidth*0.485}}>
-                <View style={[styles.container, {flexDirection:'column', overflow:'hidden', padding:10, paddingHorizontal:80}]}>
-                    <Text style={styles.h1}>Settings</Text>
-                    <EmailSettings user={user}/>
-                </View>
-                <View style={styles.gradientOverlayL}>
-                    <LinearGradient
-                    colors={["orange", "orange"]}              
-                    style={styles.gradient}/>
-                </View>
-            </View>
-            }
-        </View>
+            {viewSettings && (
+                <div style={{height: windowHeight, position:'absolute', top:0, width: windowWidth*0.515, backgroundColor:'#050505', left: windowWidth*0.485}}>
+                    <div style={{flexDirection:'column', overflow:'hidden', padding:10, paddingLeft: 80, paddingRight: 80}}>
+                        <h1 style={{color: 'white', fontSize: 32, fontWeight: 900}}>Settings</h1>
+                        <EmailSettings user={user}/>
+                    </div>
+                    <div style={{
+                        background: 'linear-gradient(135deg, orange 0%, orange 100%)',
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '200px',
+                        height: '200px'
+                    }}/>
+                </div>
+            )}
+        </div>
     );
 };
 

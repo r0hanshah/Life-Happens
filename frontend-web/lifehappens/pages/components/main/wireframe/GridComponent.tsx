@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
 import BorderComponent from './BorderComponent';
 import moment from 'moment';
 
@@ -418,9 +417,9 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
       )
   
       components.push(
-        <View key={row} style={styles.row}>
+        <div key={row} style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-end'}}>
           {rowComponents}
-        </View>
+        </div>
       );
     }
 
@@ -430,22 +429,11 @@ const GridComponent: React.FC<GridProps> = ({ offset, subtaskDispIds, inMoment }
 
 
   return (
-    <View style={[styles.grid, {marginTop: offset * 8}]}>
+    <div style={{flex: 1, position: 'absolute', marginTop: offset * 8}}>
       {renderBorderComponents(colorQueues)}
       {/* Create another row only if there is not enough day modules to display all days */}
-    </View>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flex: 1,
-    position: 'absolute'
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-});
 
 export default GridComponent;

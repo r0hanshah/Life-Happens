@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, useWindowDimensions, TouchableHighlight } from 'react-native';
 import Circle from './ParentTaskCircle';
 import moment from 'moment';
 
-import TaskModel from '../../../models/TaskModel';
-import MainController from '../../../controllers/main/MainController';
+import TaskModel from '@/models/TaskModel';
+import MainController from '@/controllers/main/MainController';
 
 interface GridProps {
   offset: number;
@@ -21,7 +20,7 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
 
   const controller = MainController.getInstance();
 
-  const windowWidth = useWindowDimensions().width;
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
   const windowHeight = 630;
 
   const [colors, setColors] = useState<ColorMapType>({});
@@ -82,24 +81,27 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
         const id = `${row}${col}`;
   
         rowComponents.push(
-          <View key={id}>
+          <div key={id}>
             { colors.hasOwnProperty(id) && parentTasks.hasOwnProperty(id) ? (
-              <TouchableHighlight  style={{borderRadius: 10, zIndex:999}} onPress={() => controller.setSelectedTask(parentTasks[id])}>
+              <button 
+                onClick={() => controller.setSelectedTask(parentTasks[id])}
+                style={{borderRadius: 10, zIndex:999, border: 'none', padding: 0, cursor: 'pointer', backgroundColor: 'transparent'}}
+              >
                 <Circle diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
-              </TouchableHighlight>
+              </button>
             ) :
             (
               <Circle  diameter={10} color={colors.hasOwnProperty(id) ? colors[id] : 'rgba(0,0,0,0)'}/>
             )
             }
-          </View>
+          </div>
         );
       }
   
       components.push(
-        <View key={`row${row}`} style={[styles.row, { position:'absolute', top: ((windowHeight / 6) * 0.9 )*(row)-(rows > 5 ? 222  : 175) + (row == rows-1 ? 50 : 0), width:'100%'}]}>
+        <div key={`row${row}`} style={{ position:'absolute', top: ((windowHeight / 6) * 0.9 )*(row)-(rows > 5 ? 222  : 175) + (row == rows-1 ? 50 : 0), width:'100%', display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around' }}>
           {rowComponents}
-        </View>
+        </div>
       );
     }
 
@@ -107,23 +109,11 @@ const ParentNodeGridComponent: React.FC<GridProps> = ({ offset, parentNodeIds, p
   };
 
   return (
-    <View style={[styles.grid, {marginTop: offset * 8 + 10, width: windowWidth * 0.96}]}>
+    <div style={{marginTop: offset * 8 + 10, width: windowWidth * 0.96, flex: 1, position: 'absolute'}}>
       {renderParentNodeGrid(colors, parentTasksMap)}
       {/* Display another row only if there are not enough days to represent all days in the calendar */}
-    </View>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flex: 1,
-    position: 'absolute',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-around',
-  },
-});
 
 export default ParentNodeGridComponent;

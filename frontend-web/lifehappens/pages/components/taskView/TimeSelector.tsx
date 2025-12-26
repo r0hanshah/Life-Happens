@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, ScrollView, TextInput, Modal, FlatList, Image } from 'react-native';
 import moment, { Duration } from 'moment';
-import TaskModel from '../../models/TaskModel';
-import MainController from '../../controllers/main/MainController';
-import { request_email_notification } from '../../services/taskServices';
-import TaskViewController from '../../controllers/taskView/TaskViewController';
+import TaskModel from '@/models/TaskModel';
+import MainController from '@/controllers/main/MainController';
+import { request_email_notification } from '@/services/taskServices';
+import TaskViewController from '@/controllers/taskView/TaskViewController';
 
 
 const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task:TaskModel, modStartDate:boolean, updateFunctions:Array<(duration:string) => void>, updateServer:boolean}) => {
@@ -118,78 +117,86 @@ const TimeSelector =({task, modStartDate, updateFunctions, updateServer} : {task
     };
 
     return (
-      <View style={styles.container}>
-        <TouchableOpacity onPress={handleContainerClick}>
-          <View style={[styles.pickerContainer, {alignItems:'flex-end'}]}>
-              <Text style={{color:'gray'}}>{hours}:{minutes} {isPM ? 'PM' : 'AM'}</Text> 
-          </View>
-        </TouchableOpacity>
+      <div style={styles.container}>
+        <button onClick={handleContainerClick} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+          <div style={{ ...styles.pickerContainer, alignItems: 'flex-end' }}>
+            <span style={{ color: 'gray' }}>{hours}:{minutes} {isPM ? 'PM' : 'AM'}</span> 
+          </div>
+        </button>
         {isSquareVisible && 
-        <View  style={[styles.square]}>
-          <View style={styles.timeInput}>
-            <TextInput
+        <div style={styles.square}>
+          <div style={styles.timeInput}>
+            <input
               style={styles.input}
+              type="text"
               value={hours}
-              onChangeText={(text) => {setHours(text)}}
-              keyboardType='numeric'
+              onChange={(e) => { setHours(e.target.value) }}
+              inputMode="numeric"
               maxLength={2}
             />
-            <Text style={[styles.separator, {color:'gray'}]}>:</Text>
-            <TextInput
+            <span style={{ ...styles.separator, color: 'gray' }}>:</span>
+            <input
               style={styles.input}
+              type="text"
               value={minutes}
-              keyboardType='numeric'
-              onChangeText={(text) => {
-                setMinutes(text)
+              inputMode="numeric"
+              onChange={(e) => {
+                setMinutes(e.target.value)
               }}
               maxLength={2}
             />
-            <TouchableOpacity onPress={togglePeriod}>
-              <Text style={styles.period}>{isPM ? 'PM' : 'AM'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleValidation}>
-              <Image source={require('../../assets/chev_white.png')} style={{width:20, height:10, marginLeft:10, transform:[{rotate: '180deg'}]}}></Image>
-            </TouchableOpacity>
-          </View>
-        </View>
+            <button onClick={togglePeriod} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+              <span style={styles.period}>{isPM ? 'PM' : 'AM'}</span>
+            </button>
+            <button onClick={handleValidation} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginLeft: 10 }}>
+              <img src={require('../../assets/chev_white.png').default} alt="confirm" style={{ width: 20, height: 10, transform: 'rotate(180deg)' }} />
+            </button>
+          </div>
+        </div>
         }
         
-      </View>
+      </div>
     );
 };
 
-const styles = StyleSheet.create({
+const styles: Record<string, React.CSSProperties> = {
   container: {
-    width:80,
+    width: 80,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-end',
   },
   pickerContainer: {
-    width:80,
+    width: 80,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex:1
+    zIndex: 1,
   },
   square: {
     width: 230,
     height: 70,
-    position:'absolute',
+    position: 'absolute',
     backgroundColor: 'rgba(30,30,30,1)',
-    marginTop:100,
-    marginRight:0,
-    zIndex:1,
-    justifyContent:'center',
-    alignItems:'center',
+    marginTop: 100,
+    marginRight: 0,
+    zIndex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 20,
   },
   dropdownContainer: {
+    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    minWidth:100
+    paddingLeft: 10,
+    paddingRight: 10,
+    minWidth: 100,
   },
   calendarContainer: {
+    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
@@ -198,21 +205,23 @@ const styles = StyleSheet.create({
   },
   yearDropdown: {
     position: 'absolute',
-    top:'100%',
+    top: '100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
     borderColor: 'white',
     borderWidth: 1,
-    height:100
+    height: 100,
   },
   dayColumn: {
     width: '14%',
+    display: 'flex',
     alignItems: 'center',
   },
   dayCell: {
     width: 40,
     height: 40,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 40,
@@ -224,6 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightblue',
   },
   timeInput: {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -231,20 +241,21 @@ const styles = StyleSheet.create({
     width: 50,
     height: 40,
     borderWidth: 1,
+    border: '1px solid #ccc',
     borderRadius: 5,
     padding: 10,
     marginRight: 5,
     fontSize: 16,
-    color:'white',
+    color: 'white',
   },
   separator: {
     fontSize: 20,
-    marginRight:5
+    marginRight: 5,
   },
   period: {
     fontSize: 16,
     marginLeft: 5,
-    color:'gray'
+    color: 'gray',
   },
   timezone: {
     marginTop: 10,
@@ -252,21 +263,23 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   modalContainer: {
+    display: 'flex',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   timeZoneItem: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottom: '1px solid #ccc',
   },
   closeButton: {
     marginTop: 20,
     color: 'blue',
     fontSize: 16,
-    textDecorationLine: 'underline',
+    textDecoration: 'underline',
   },
-});
+};
 
 export default TimeSelector;

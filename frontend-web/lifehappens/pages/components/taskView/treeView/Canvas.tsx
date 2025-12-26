@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import TaskModel from '../../../models/TaskModel';
-import Tree from './Tree';
+import React, { useEffect, useState, useRef } from 'react';
+import TaskModel from '@/models/TaskModel';
 import Tree_RTA from './Tree_RTA';
-
-const { width, height } = Dimensions.get('window');
 
 interface CanvasProps {
     rootTask:TaskModel
@@ -14,108 +8,99 @@ interface CanvasProps {
 }
 
 const Canvas: React.FC<CanvasProps> = ({rootTask, currentTask}) => {
-  const translationX = useSharedValue(0);
-  const translationY = useSharedValue(0);
-  const prevTranslationX = useSharedValue(0);
-  const prevTranslationY = useSharedValue(0);
-  const scale = useSharedValue(1);
-
+  const [translationX, setTranslationX] = useState(0);
+  const [translationY, setTranslationY] = useState(0);
+  const [scale, setScale] = useState(1);
   const [isHovered, setIsHovered] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLDivElement>(null);
 
-  function clamp(val:number, min:number, max:number) {
+  const clamp = (val: number, min: number, max: number) => {
     return Math.min(Math.max(val, min), max);
-  }
+  };
 
-  // Pan Gesture
-  const panGesture = Gesture.Pan()
-        .minDistance(1)
-        .onStart(() => {
-            prevTranslationX.value = translationX.value;
-            prevTranslationY.value = translationY.value;
-        })
-        .onUpdate((event) => {
-            const maxTranslateX = width / 2 - 50;
-            const maxTranslateY = height / 2 - 50;
-
-            translationX.value = clamp(
-            prevTranslationX.value + event.translationX,
-            -maxTranslateX,
-            maxTranslateX
-            );
-            translationY.value = clamp(
-            prevTranslationY.value + event.translationY,
-            -maxTranslateY,
-            maxTranslateY
-            );
-        })
-        .runOnJS(true);
-
-  // Pinch Gesture
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((event) => {
-      scale.value = event.scale;
-    })
-    .onEnd(() => {
-      scale.value = withSpring(Math.max(1, Math.min(scale.value, 3))); // Constrain scale between 0.1 and 3
-    });
-
-    
-
+  // Handle mouse wheel for zooming
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
-      if (isHovered) {
-        scale.value = withSpring(Math.max(0.5, Math.min(scale.value - event.deltaY * 0.001, 3))); // Adjust sensitivity here
+      if (isHovered && canvasRef.current) {
+        event.preventDefault();
+        const newScale = clamp(scale - event.deltaY * 0.001, 0.5, 3);
+        setScale(newScale);
       }
     };
 
-    window.addEventListener('wheel', handleWheel);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.addEventListener('wheel', handleWheel, { passive: false });
+    }
 
     return () => {
-      window.removeEventListener('wheel', handleWheel);
+      if (canvas) {
+        canvas.removeEventListener('wheel', handleWheel);
+      }
     };
   }, [isHovered, scale]);
 
-  // Combine Pan and Pinch Gestures
-  const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
+  // Handle pan (drag)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - translationX, y: e.clientY - translationY });
+  };
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translationX.value },
-        { translateY: translationY.value },
-        { scale: scale.value },
-      ],
-    };
-  });
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isPanning) {
+      const maxTranslateX = window.innerWidth / 2 - 50;
+      const maxTranslateY = window.innerHeight / 2 - 50;
+
+      const newX = clamp(e.clientX - panStart.x, -maxTranslateX, maxTranslateX);
+      const newY = clamp(e.clientY - panStart.y, -maxTranslateY, maxTranslateY);
+
+      setTranslationX(newX);
+      setTranslationY(newY);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+  };
+
+  const handleCanvasMouseLeave = () => {
+    setIsHovered(false);
+    setIsPanning(false);
+  };
 
   return (
-    <div onMouseEnter={() => setIsHovered(true)}
-    onMouseLeave={() => setIsHovered(false)}>
-        <GestureDetector gesture={composedGesture}>
-            <Animated.View style={[styles.canvas, animatedStyle]}>
-                {/*Generate Tree Here */}
-                <Tree_RTA rootTask={rootTask} currentTask={currentTask} />
-                {/* <View style={styles.box} />
-                <View style={[styles.box, { top: 200, left: 200 }]} /> */}
-            </Animated.View>
-        </GestureDetector>
+    <div 
+      ref={canvasRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleCanvasMouseLeave}
+      style={{
+        width: '100%',
+        height: '100vh',
+        overflow: 'hidden',
+        cursor: isPanning ? 'grabbing' : 'grab',
+        backgroundColor: '#1a1a1a'
+      }}
+    >
+      <div
+        style={{
+          transform: `translate(${translationX}px, ${translationY}px) scale(${scale})`,
+          transformOrigin: 'center',
+          transition: isPanning ? 'none' : 'transform 0.3s ease',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          position: 'relative'
+        }}
+      >
+        {/* Generate Tree Here */}
+        <Tree_RTA rootTask={rootTask} currentTask={currentTask} />
+      </div>
     </div>
   );
 };
-
-const styles = StyleSheet.create({
-  canvas: {
-    width: width,
-    height: height,
-    justifyContent: 'center',
-    alignItems:'flex-start',
-  },
-  box: {
-    width: 100,
-    height: 100,
-    backgroundColor: 'lightblue',
-    borderRadius: 8,
-  },
-});
 
 export default Canvas;

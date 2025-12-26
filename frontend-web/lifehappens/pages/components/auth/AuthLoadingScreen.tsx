@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styles from '@/styles/components/auth/AuthLoadingScreen.module.css'
-import AuthController from '@/controllers/auth/authController';
+import AuthController from '@/controllers/auth/AuthController';
 import {Spinner} from "@heroui/spinner";
 
 interface AuthLoadingScreenProps {
